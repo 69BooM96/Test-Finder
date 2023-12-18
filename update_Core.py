@@ -95,7 +95,7 @@ class update_p(QThread):
                         updates_f.write(updates_file)
 
                     self.progress_update_signal.emit(progress_s, f"INSTALLING UPDATE {num_down} OF {num_up}", 0)
-            self.progress_update_signal.emit(100, "STARTING...", 1)
+        self.progress_update_signal.emit(100, "STARTING...", 1)
 
 
 #Update
@@ -135,7 +135,7 @@ class ExampleApp(QtWidgets.QMainWindow, update.Ui_MainWindow):
         self.progressBar.setValue(value)
         self.label_2.setText(text_progress)
         if start_files == 1:
-            os.startfile("Test-Finder.exe")
+            os.startfile("Test-Finder-start.exe")
             time.sleep(1)
             exit()
 
