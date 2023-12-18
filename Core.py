@@ -42,7 +42,7 @@ class search_browser_test(QThread):
 
         if item != False:
             if data['Google_b'] == True:
-                service = Service("chromedriver.exe")
+                service = Service("drivers/x32/chromedriver.exe")
                 options = webdriver.ChromeOptions()
 
                 options.add_argument("--headless")
@@ -50,7 +50,11 @@ class search_browser_test(QThread):
                 driver = webdriver.Chrome(service=service, options=options)
                 driver_join_test = webdriver.Chrome(service=service, options=options)
             else:
-                service = Service("geckodriver.exe")
+                if data['Architecture'] == "64":
+                    service = Service("drivers/x64/geckodriver.exe")
+                else:
+                    service = Service("drivers/x32/geckodriver.exe")
+
                 options = webdriver.FirefoxOptions()
 
                 options.headless = True
@@ -100,7 +104,10 @@ class search_browser_test(QThread):
                     pickle.dump(driver.get_cookies(), open("data/cookies", "wb"))
 
             if data['Firefox'] == True:
-                service_j = Service("geckodriver.exe")
+                if data['Architecture'] == "64":
+                    service_j = Service("drivers/x64/geckodriver.exe")
+                else:
+                    service_j = Service("drivers/x32/geckodriver.exe")
                 options_j = webdriver.FirefoxOptions()
 
                 options_j.headless = True
@@ -193,11 +200,14 @@ class browser_test(QThread):
             data = json.load(f)
 
         if data['Google_b'] == True:
-            service = Service("chromedriver.exe")
+            service = Service("drivers/x32/chromedriver.exe")
             options = webdriver.ChromeOptions()
             driver = webdriver.Chrome(service=service, options=options)
         else:
-            service = Service("geckodriver.exe")
+            if data['Architecture'] == "64":
+                service = Service("drivers/x64/geckodriver.exe")
+            else:
+                service = Service("drivers/x32/geckodriver.exe")
             options = webdriver.FirefoxOptions()
             driver = webdriver.Firefox(service=service, options=options)
 
@@ -573,6 +583,9 @@ class ExampleApp(QtWidgets.QMainWindow, V1_p.Ui_MainWindow):
         self.horizontalSlider.setValue(data['Bing'])
         self.radioButton.setChecked(data['Google_b'])
         self.radioButton_2.setChecked(data['Firefox'])
+
+        with open("version.info", "w", encoding="utf-8") as version_p:
+            version_p.write("0.1.1")
 
     def load_gif_an(self, value):
         if value == "1":

@@ -1,7 +1,1 @@
-{
-	"main/Core.py": true,
-	"main/update.py": true,
-	"main/V1_p.py": true,
-	"main/LICENSE": true,
-	"main/README.md": true
-}
+{	"main/Core.py": true,	"main/update.py": true,	"main/update_Core.py": true,	"main/V1_p.py": true,	"main/LICENSE": true,	"main/README.md": true}
