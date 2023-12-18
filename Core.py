@@ -114,81 +114,86 @@ class search_browser_test(QThread):
 
                 driver_join_test = webdriver.Firefox(service=service_j, options=options_j)
 
-            self.progress_create_test.emit(40)
-            driver.get(item)
-            driver.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/a").click()
-            gamecode = driver.find_element(by=By.CLASS_NAME, value='gamecode').text
+            try:
+                self.progress_create_test.emit(40)
+                driver.get(item)
+                driver.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/a").click()
+                gamecode = driver.find_element(by=By.CLASS_NAME, value='gamecode').text
 
-            #Start Create
-            driver_join_test.get('https://naurok.com.ua/test/join')
-            time.sleep(2)
-            self.progress_create_test.emit(60)
-            driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/div[1]/input").send_keys(gamecode)
-            driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/div[2]/input").send_keys(gamecode)
+                #Start Create
+                driver_join_test.get('https://naurok.com.ua/test/join')
+                time.sleep(2)
+                self.progress_create_test.emit(60)
+                driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/div[1]/input").send_keys(gamecode)
+                driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/div[2]/input").send_keys(gamecode)
 
-            driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/button").click()
-            time.sleep(2)
-            if 'https://naurok.com.ua/test/join' != driver_join_test.current_url:
-                time.sleep(4)
-                driver.find_element(by=By.XPATH, value="/html/body/div[1]/div[2]/div[3]/div[2]/a[1]").click()
+                driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div[1]/div/form/button").click()
+                time.sleep(2)
+                if 'https://naurok.com.ua/test/join' != driver_join_test.current_url:
+                    time.sleep(4)
+                    driver.find_element(by=By.XPATH, value="/html/body/div[1]/div[2]/div[3]/div[2]/a[1]").click()
 
-                url_lists = driver_join_test.current_url
-                self.progress_create_test.emit(70)
-                time.sleep(5)
-                search_selenium = ""
-                link_im_t = ""
-                exit_test = False
-                while True:
-                    try:
+                    url_lists = driver_join_test.current_url
+                    self.progress_create_test.emit(70)
+                    time.sleep(5)
+                    search_selenium = ""
+                    link_im_t = ""
+                    exit_test = False
+                    while True:
                         try:
-                            link = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[1]/div/div[2]/div").text
-                        except:
-                            link = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div/div/div/div[2]/div[1]/div/div[2]/div").text
-                        try:
-                            link_i = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[1]/div/div[1]/img")
-                            if link_i.get_attribute('src') == None:
+                            try:
+                                link = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[1]/div/div[2]/div").text
+                            except:
+                                link = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div/div/div/div/div[2]/div[1]/div/div[2]/div").text
+                            try:
+                                link_i = driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[1]/div/div[1]/img")
+                                if link_i.get_attribute('src') == None:
+                                    pass
+                                else:
+                                    if link_i.get_attribute('src') != link_im_t:
+                                        link_im_t = link_i.get_attribute('src')
+                            except:
                                 pass
-                            else:
-                                if link_i.get_attribute('src') != link_im_t:
-                                    link_im_t = link_i.get_attribute('src')
+                            if search_selenium != link:
+                                if exit_test == True:
+                                    break
+
+                                if link != "":
+                                    driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[2]/div/div[1]/div").click()
+                                    exit_test = True
+                                    self.progress_create_test.emit(80)
                         except:
                             pass
-                        if search_selenium != link:
-                            if exit_test == True:
-                                break
+                        time.sleep(0.2)
 
-                            if link != "":
-                                driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/div/div/div/div/div[2]/div[2]/div/div[1]/div").click()
-                                exit_test = True
-                                self.progress_create_test.emit(80)
-                    except:
-                        pass
+            
 
-                    time.sleep(0.2)
+            
 
-            self.progress_create_test.emit(90)
-            time.sleep(3)
-            driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/nav/div/div/div[3]/div/a[3]/i").click()
+                self.progress_create_test.emit(90)
+                time.sleep(3)
+                driver_join_test.find_element(by=By.XPATH, value="/html/body/div[1]/div/div[2]/nav/div/div/div[3]/div/a[3]/i").click()
 
-            while True:
-                if url_lists != driver_join_test.current_url:
-                    break
+                while True:
+                    if url_lists != driver_join_test.current_url:
+                        break
+                    time.sleep(1)
+
+                self.mainwindows.listWidget.addItem(driver_join_test.current_url)
+                self.progress_create_test.emit(100)
+
                 time.sleep(1)
+                if Registration == True:
+                    self.progress_create_test.emit(0)
+                    driver.quit()
+                    driver_join_test.quit()
+                else:
+                    self.progress_create_test.emit(0)
+                    driver_join_test.quit()
 
-            self.progress_create_test.emit(100)
-            self.mainwindows.listWidget.addItem(driver_join_test.current_url)
-
-
-
-            time.sleep(1)
-            if Registration == True:
-                self.progress_create_test.emit(0)
-                driver.quit()
-                driver_join_test.quit()
-            else:
-                self.progress_create_test.emit(0)
-                driver_join_test.quit()
-
+            except:
+                pass
+            self.progress_create_test.emit(0)
 
 class browser_test(QThread):
     def __init__(self, mainwindows):
@@ -585,7 +590,7 @@ class ExampleApp(QtWidgets.QMainWindow, V1_p.Ui_MainWindow):
         self.radioButton_2.setChecked(data['Firefox'])
 
         with open("version.info", "w", encoding="utf-8") as version_p:
-            version_p.write("0.1.1")
+            version_p.write("0.1.2")
 
     def load_gif_an(self, value):
         if value == "1":
