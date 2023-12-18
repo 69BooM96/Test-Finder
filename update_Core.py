@@ -135,7 +135,7 @@ class ExampleApp(QtWidgets.QMainWindow, update.Ui_MainWindow):
         self.progressBar.setValue(value)
         self.label_2.setText(text_progress)
         if start_files == 1:
-            os.startfile("Test-Finder.py")
+            os.startfile("Test-Finder.exe")
             time.sleep(1)
             exit()
 
