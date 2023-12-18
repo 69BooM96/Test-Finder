@@ -91,6 +91,7 @@ class update_p(QThread):
                 if data_update[i] == True:
                     file_name = i.split('/')[-1]
                     updates_file = requests.get(f"https://raw.githubusercontent.com/69BooM96/Test-Finder/{i}").text
+                    updates_file.replace("\n", "")
                     with open(file_name, "w", encoding="utf-8") as updates_f:
                         updates_f.write(updates_file)
 
@@ -135,7 +136,7 @@ class ExampleApp(QtWidgets.QMainWindow, update.Ui_MainWindow):
         self.progressBar.setValue(value)
         self.label_2.setText(text_progress)
         if start_files == 1:
-            os.startfile("Test-Finder-start.exe")
+            os.startfile("Test-Finder.exe")
             time.sleep(1)
             exit()
 
