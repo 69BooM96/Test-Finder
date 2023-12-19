@@ -91,7 +91,6 @@ class update_p(QThread):
                 if data_update[i] == True:
                     file_name = i.split('/')[-1]
                     updates_file = requests.get(f"https://raw.githubusercontent.com/69BooM96/Test-Finder/{i}").text
-                    updates_file = updates_file.replace("\n", "")
                     with open(file_name, "w", encoding="utf-8") as updates_f:
                         updates_f.write(updates_file)
 
@@ -178,7 +177,10 @@ class ExampleApp(QtWidgets.QMainWindow, update.Ui_MainWindow):
         with open('data/settings.json') as f:
             data = json.load(f)
 
-        data['Architecture'] = OS_Architecture
+        if versions_f == False:
+            pass
+        else:
+            data['Architecture'] = OS_Architecture
         data['Firefox_v'] = versions_f
         data['Google_v'] = versions_c
 
