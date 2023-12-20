@@ -93,7 +93,7 @@ class update_p(QThread):
                 if data_update[i] == True:
                     file_name = i.split('/')[-1]
                     updates_file = requests.get(f"https://raw.githubusercontent.com/69BooM96/Test-Finder/{i}").text
-                    updates_file = updates_file.replace("\n", "")
+                    # updates_file = updates_file.replace("\n", "")
                     with open(file_name, "w", encoding="utf-8") as updates_f:
                         updates_f.write(updates_file)
 
