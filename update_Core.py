@@ -71,6 +71,8 @@ class update_p(QThread):
         with open("version.info", "r", encoding="utf-8") as version_read:
             version_p = version_read.read()
 
+        version = version.replace("\n", "")
+
         if version != version_p:
             updates = requests.get("https://raw.githubusercontent.com/69BooM96/Test-Finder/main/update.json").text
             updates = updates.replace("\n", "")
