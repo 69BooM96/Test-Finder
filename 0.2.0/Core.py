@@ -20,7 +20,8 @@ import aiohttp
 import asyncio
 import aiofiles
 import multiprocessing
-from lxml import html
+import lxml
+import fake_useragent
 import re
 import psutil
 import winapps
@@ -32,6 +33,291 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
+
+#Get answers test (auto)
+class Get_answers_test_auto(QThread):
+    log_signal = QtCore.pyqtSignal(str, str)
+    index_signal = QtCore.pyqtSignal(str)
+    def __init__(self, mainwindows):
+        QThread.__init__(self)
+        self.mainwindows = mainwindows
+
+    def run(self):
+        join_test_url = ""
+        try:
+            join_test_url = f"https://naurok.com.ua/test/join?gamecode={self.mainwindows.gamecode_test}"
+
+            usr_ = UserAgent()
+            header = {'user-agent': f'{usr_.random}'}
+
+            session_join = requests.Session()
+            test_join = session_join.get(join_test_url, headers=header)
+            soup = BeautifulSoup(test_join.text, "lxml")
+            csrf_token = soup.find('input', {'name': '_csrf'})['value']
+
+            data_join = {"_csrf": csrf_token,
+                    "JoinForm[gamecode]": self.mainwindows.gamecode_test,
+                    "JoinForm[name]": f"{self.mainwindows.user_name_test}"}
+
+            header_join = {'user-agent': f'{usr_.random}',
+                      'Referer': 'https://naurok.com.ua/test/join',
+                      'Origin': 'https://naurok.com.ua'}
+
+            test_join_start = session_join.post(join_test_url, headers=header_join, data=data_join)
+            test_one_ = session_join.get(test_join_start.url, headers=header)
+            soup = BeautifulSoup(test_one_.text, "lxml")
+
+            ng_init_value = soup.find('div', attrs={'ng-init': True}).get('ng-init', '')
+            value = ng_init_value.split(',')[1].strip()            
+
+            #json
+            questions_full = session_join.get(f"https://naurok.com.ua/api2/test/sessions/{value}", headers=header)
+            self.mainwindows.list_question = questions_full.json()
+
+            self.index_signal.emit("set_")
+            self.log_signal.emit(f'[INFO] [Test join]: [url][<span style="color:#1AA8DD;">{join_test_url}</span>] [gamecode][{self.mainwindows.gamecode_test}]', "INFO_1")
+            self.log_signal.emit(f'[INFO] [Test join]: [url][<span style="color:#1AA8DD;">{test_join_start.url}</span>]', "INFO_1")
+
+            while True:
+                if self.mainwindows.continue_answers_auto == True:
+                    break
+                time.sleep(1)
+
+            for answers_urls in self.mainwindows.url_auto_test:
+                self.log_signal.emit(f'[INFO] [Answers]: [{len(self.mainwindows.url_auto_test)}]', "INFO_1")
+                self.log_signal.emit(f'[INFO] [Answers]: [url][<span style="color:#1AA8DD;">{answers_urls}</span>]', "INFO_1")
+
+        except:
+            self.index_signal.emit("ERROR")
+            self.log_signal.emit(f'[ERROR] [Test join]: [url][<span style="color:#1AA8DD;">{join_test_url}</span>] [gamecode][{self.mainwindows.gamecode_test}]', "ERROR")
+
+#Search test (auto)
+class Search_test_auto(QThread):
+    log_signal = QtCore.pyqtSignal(str, str)
+    progress_signal = QtCore.pyqtSignal(int)
+    def __init__(self, mainwindows):
+        QThread.__init__(self)
+        self.mainwindows = mainwindows
+
+    def run(self):
+        #start
+        self.start_time = perf_counter()
+        self.log_signal.emit(f"[start]: [auto]", "INFO_1")
+        self.progress_signal.emit(5)
+        with open("data/settings.json", "r", encoding="utf-8") as settings_r:
+            self.settings_loads = json.load(settings_r)
+
+        multiprocessing.Process(target=self.auto_test_search_()).start()
+
+        self.progress_signal.emit(0)
+        search_time = f"{(perf_counter() - self.start_time):.02f}"
+        self.log_signal.emit(f"[end]: [{search_time}]\n<br>", "INFO_1")
+        self.mainwindows.progressBar.setMaximum(100)
+
+    def auto_test_search_(self):
+        async def naurok_(num_url, header, session):
+            try:
+                async with session.get(f"https://naurok.com.ua/test?q={self.inputs_txt}&storinka={num_url}", headers=header, proxy=None) as response:
+                    contents = await response.text()
+
+                soup = BeautifulSoup(contents, "lxml")
+                user_n = soup.find("div", class_="items")
+                user_n_2 = user_n.find_all("div", class_="file-item test-item")
+                for links in user_n_2:
+                    link_n = f'https://naurok.com.ua{links.find("div", class_="row").find("div", class_="headline").find("a").get("href")}'
+                    if re.search(r'\bhttps://naurok.com.ua/test/\b', link_n):
+                        if re.search(r'\b.html\b', link_n):
+                            self.links_naurok.append(link_n)
+
+                self.log_signal.emit(f"[INFO] [Naurok]: [page][{num_url}]", "INFO_0")
+            except:
+                self.log_signal.emit(f"[ERROR] [Naurok]: [page][{num_url}]", "ERROR")
+
+        async def google_(num_url, header, session):
+            try:
+                async with session.get(f"https://www.google.com/search?q=на+урок+{self.inputs_txt}&start={num_url}0&sa=N", headers=header, proxy=None) as response:
+                    contents = await response.text()
+
+                soup = BeautifulSoup(contents, "lxml")
+                user_n = soup.find(class_="dURPMd").find_all("a")
+                for links in user_n:
+                    block = links.get("href")
+                    if re.search(r'\bhttps://naurok.com.ua/test/\b', block):
+                        if re.search(r'\b.html\b', block):
+                            self.links_google.append(block)
+
+                self.log_signal.emit(f"[INFO] [Google]: [page][{num_url}]", "INFO_0")
+            except:
+                self.log_signal.emit(f"[ERROR] [Google]: [page][{num_url}]", "ERROR")
+
+        async def bing_(num_url, header, session):
+            try:
+                async with session.get(f"https://www.bing.com/search?q=на+урок+{self.inputs_txt}+&first={num_url}0&FORM=PERE", headers=header, proxy=None) as response:
+                    contents = await response.text()
+
+                soup = BeautifulSoup(contents, "lxml")
+                user_n = soup.find_all(class_="tilk")
+                for links in user_n:
+                    block = links.get("href")
+                    if re.search(r'\bhttps://naurok.com.ua/test/\b', block):
+                        if re.search(r'\b.html\b', block):
+                            self.links_bing.append(block)
+
+                self.log_signal.emit(f"[INFO] [Bing]: [page][{num_url}]", "INFO_0")
+            except:
+                self.log_signal.emit(f"[ERROR] [Bing]: [page][{num_url}]", "ERROR")
+
+        async def load_links_(num_url, header, url, session):
+            try:
+                for url_answer_auto in self.list_test_ansver:
+                    if url_answer_auto['url'] == url:
+                        self.log_signal.emit(f'[INFO] [Test]: [continue] [num][{num_url}] | [url][<span style="color:#1AA8DD;">{url}</span>]', "INFO_0")
+                        break
+
+                async with session.get(url, headers=header, proxy=None) as response:
+                    contents = await response.text()
+                try:
+                    soup = BeautifulSoup(contents, "lxml")
+                    num_t = soup.find("div", class_="block-head").text
+                    num_t3 = num_t.replace(" запитань", "")
+                    num_t4 = num_t3.replace(" запитання", "")
+
+                    test_search_1 = soup.find("div", class_="col-md-9 col-sm-8")
+                    test_search_2 = test_search_1.find_all("div", class_="content-block entry-item question-view-item")
+
+                    test_search_num = 0
+                    list_question_test = []
+                    test_search_text = ""
+                    index_num_question = 0
+                    for item_text_question in self.mainwindows.list_question_content:
+                        test_search_num_question = []
+                        for test_search_3 in test_search_2:
+                            test_search_4 = test_search_3.find("div", class_="question-view-item-content")
+                            test_search_4 = test_search_4.text.replace("\n", "")
+                            fuzz_num_ = fuzz.WRatio(item_text_question, test_search_4)
+                            test_search_num_question.append(fuzz_num_)
+                            if fuzz_num_ > 85:
+                                list_question_test.append(index_num_question)
+                        test_search_num += max(test_search_num_question)
+                        index_num_question += 1
+
+                    list_question_test = list(dict.fromkeys(list_question_test))
+
+                    self.list_status.append({
+                        "num_q": int(num_t4),
+                        "url": url,
+                        "question": list_question_test,
+                        "max_": test_search_num,
+                        "ERROR": False
+                        })
+
+                    self.log_signal.emit(f'[INFO] [Test]: [num][{num_url}] | [url][<span style="color:#1AA8DD;">{url}</span>]', "INFO_0")
+                except:
+                    self.log_signal.emit(f"[ERROR] [Test]: [num][{num_url}] | [url][{url}]", "ERROR")
+                    self.list_status.append({
+                        "num_q": None,
+                        "url": None,
+                        "question": None,
+                        "max_": None,
+                        "ERROR": True
+                        })
+            except:
+                self.update_list_.emit()
+                self.log_signal.emit(f"[ERROR] [Test]: [num][{num_url}] | [url][{url}]", "ERROR")
+                self.list_status.append({
+                    "num_q": None,
+                    "url": None,
+                    "question": None,
+                    "max_": None,
+                    "ERROR": True
+                    })
+
+        async def search_async():
+            self.list_test_ansver = []
+            break_search = False
+            for inf_text_ in self.mainwindows.list_question_content:
+                if break_search != True:
+                    self.list_status = []
+                    time.sleep(5)
+                    self.log_signal.emit(f"[start]: [auto][{inf_text_}]", "INFO_1")
+                    self.inf_text_ = inf_text_
+                    self.inputs_txt = inf_text_.replace(" ", "+")
+                    self.links_naurok = []
+                    self.links_google = []
+                    self.links_bing = []
+
+                    usr_ = UserAgent()
+                    header = {'user-agent': f'{usr_.random}'}
+
+                    async with aiohttp.ClientSession() as session:
+                    #Naurok
+                        tasks = []
+                        for num_link in range(self.settings_loads['naurok_page']):
+                            tasks.append(asyncio.create_task(naurok_(num_link, header, session)))
+
+                        await asyncio.gather(*tasks)
+                        self.log_signal.emit(f"[INFO] [Naurok]: [pages][{self.settings_loads['naurok_page']}] | [links][{len(self.links_naurok)}]", "INFO_1")
+                        self.progress_signal.emit(10)
+
+                    #Google
+                        tasks = []
+                        for num_link in range(self.settings_loads['google_page']):
+                            tasks.append(asyncio.create_task(google_(num_link, header, session)))
+
+                        await asyncio.gather(*tasks)
+                        self.log_signal.emit(f"[INFO] [Google]: [pages][{self.settings_loads['google_page']}] | [links][{len(self.links_google)}]", "INFO_1")
+                        self.progress_signal.emit(15)
+
+                    #Bing
+                        tasks = []
+                        for num_link in range(self.settings_loads['bing_page']):
+                            tasks.append(asyncio.create_task(bing_(num_link, header, session)))
+
+                        await asyncio.gather(*tasks)
+                        self.log_signal.emit(f"[INFO] [Bing]: [pages][{self.settings_loads['bing_page']}] | [links][{len(self.links_bing)}]", "INFO_1")
+                        self.progress_signal.emit(20)
+
+
+                        all_link_ = list(dict.fromkeys(self.links_naurok + self.links_google + self.links_bing))
+
+                        self.log_signal.emit(f"[INFO] [All_no_sort]: [links][{len(self.links_google) + len(self.links_bing) + len(self.links_naurok)}]", "INFO_1")
+                        self.log_signal.emit(f"[INFO] [All]: [links][{len(all_link_)}]", "INFO_1")
+
+                    #Load link
+                        tasks = []
+                        num_link = 0
+
+                        for url_link in all_link_:
+                            tasks.append(asyncio.create_task(load_links_(num_link, header, url_link, session)))
+                            num_link += 1
+
+                        await asyncio.gather(*tasks)
+
+                #sort test auto
+                    for item_test in self.list_status:
+                        if item_test['ERROR'] == False:
+                            if item_test['max_'] > item_test['num_q'] * 98:
+                                if item_test['num_q'] >= len(self.mainwindows.list_question_content):
+                                    self.mainwindows.url_auto_test = [f"{item_test['url']}"]
+                                    self.log_signal.emit(f'[INFO] [Test answer]: [questions][{item_test["num_q"]}] [score][{item_test["max_"]}] | [url][<span style="color:#1AA8DD;">{item_test["url"]}</span>]', "INFO_1")
+                                    break_search = True
+                                    break
+
+                            if item_test['max_'] > item_test['num_q'] * 85:
+                                self.log_signal.emit(f'[INFO] [Test]: [questions][{item_test["num_q"]}] [score][{item_test["max_"]}] | [url][<span style="color:#1AA8DD;">{item_test["url"]}</span>]', "INFO_0")
+                                self.mainwindows.url_auto_test.append(item_test)
+                                self.list_test_ansver.append(item_test)
+
+            self.mainwindows.continue_answers_auto = True
+            print(self.list_test_ansver)
+            print(self.list_status)
+
+
+
+        if __name__ == '__main__':
+            multiprocessing.freeze_support()
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            asyncio.run(search_async())
 
 #Get answers
 class Get_answers_test(QThread):
@@ -536,7 +822,7 @@ class Load_img(QThread):
                 settings_loads = json.load(settings_r)
 
             multiprocessing.freeze_support()
-            # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
             asyncio.run(main())
 
 #Parser - search
@@ -906,7 +1192,7 @@ class Search_test(QThread):
                 settings_loads = json.load(settings_r)
 
             multiprocessing.freeze_support()
-            # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
             asyncio.run(search_async(self.inputs_text, self.inputs_subject, self.inputs_class, settings_loads))
 
 #Main
@@ -937,18 +1223,21 @@ class ExampleApp(QtWidgets.QMainWindow, GUI_.Ui_MainWindow):
         self.pushButton_35.clicked.connect(self.search_question_2)
         self.pushButton_13.clicked.connect(self.open_web_answer_url)
         self.pushButton_16.clicked.connect(self.copy_web_answer_url)
-        self.pushButton_11.clicked.connect(self.url_join_test_)
+        self.pushButton_12.clicked.connect(self.url_join_test_)
         self.pushButton_30.clicked.connect(self.del_history_logs)
         self.pushButton_28.clicked.connect(self.del_history_answer)
+        self.pushButton_22.clicked.connect(self.getting_answers_auto)
+        self.pushButton_36.clicked.connect(self.search_question_2)
 
     #radio button
         self.radioButton_14.clicked.connect(self.update_list_widget)
         self.radioButton_13.clicked.connect(self.update_list_widget)
         self.radioButton_12.clicked.connect(self.update_list_widget)
-        self.checkBox.clicked.connect(self.update_list_widget)
         self.radioButton_15.clicked.connect(self.update_list_widget)
         self.radioButton_16.clicked.connect(self.update_list_widget)
 
+    #checkBox
+        self.checkBox.clicked.connect(self.update_list_widget)
 
     #List
         self.listWidget.clicked.connect(self.clicked_list_test_)
@@ -1005,6 +1294,16 @@ class ExampleApp(QtWidgets.QMainWindow, GUI_.Ui_MainWindow):
         self.get_answer.reload_browser_signal.connect(self.reload_answer)
         self.get_answer.progress_bar_signal.connect(self.set_value_answer_web)
 
+    #Search test auto
+        self.search_parser_auto = Search_test_auto(mainwindows=self)
+        self.search_parser_auto.log_signal.connect(self.logs_)
+        self.search_parser_auto.progress_signal.connect(self.progress_search_auto)
+
+    #Get answers test auto
+        self.get_answer_auto = Get_answers_test_auto(mainwindows=self)
+        self.get_answer_auto.log_signal.connect(self.logs_)
+        self.get_answer_auto.index_signal.connect(self.signal_answers_auto)
+
     #======================
         #def start
         self.check_log_file()
@@ -1019,6 +1318,47 @@ class ExampleApp(QtWidgets.QMainWindow, GUI_.Ui_MainWindow):
         self.read_html = ""
         self.url_test_reload = None
         self.file_read_html_br = None
+        self.continue_answers_auto = False
+        self.url_auto_test = []
+
+    def signal_answers_auto(self, index_s):
+        if index_s == "set_":
+            self.stackedWidget.setCurrentIndex(5)
+            self.label_22.setText(f"{self.user_name_test} | [{self.gamecode_test}]")
+            self.label_30.setText(f"{self.user_name_test} | [{self.gamecode_test}]")
+            for item_list_question in self.list_question['questions']:
+                soup = BeautifulSoup(item_list_question['content'], "lxml")
+                text_question = soup.find("p")
+                self.listWidget_6.addItem(text_question.text)
+                self.list_question_content.append(text_question.text)
+            self.search_parser_auto.start()
+
+        elif index_s == "ERROR":
+            self.label_29.setText("Such code does not exist or \nthere is no Internet")
+
+    def getting_answers_auto(self):
+        if self.login_ok != True:
+            self.msg = QMessageBox()
+            self.msg.setWindowTitle("Login ERROR")
+            self.msg.setText("Будь ласка, увійдіть до облікового запису на урок,\nщоб отримати відповіді!")
+            self.msg.setIcon(QMessageBox.Warning)
+            self.msg.exec_()
+        else:
+            if self.lineEdit_6.text() != "":
+                if self.lineEdit_7.text() != "":
+                    self.list_question = []
+                    self.list_question_content = []
+                    self.label_29.setText("")
+                    self.gamecode_test = self.lineEdit_6.text()
+                    self.user_name_test = self.lineEdit_7.text()
+                    self.get_answer_auto.start()
+                else:
+                    self.label_29.setText("Enter your name")
+            else:
+                self.label_29.setText("Enter a code")
+
+    def progress_search_auto(self, value_):
+        self.progressBar_5.setValue(value_)
 
     def del_history_logs(self):
         try:
