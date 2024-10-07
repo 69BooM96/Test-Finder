@@ -1,10 +1,12 @@
 {
-  "name": "naurok",
-  "file": "naurok.py",
+  "name": "Naurok",
+  "file": "naurok",
   "type": "search",
-  "version": "0.0.1",
+  "data": [{"url": "https://naurok.com.ua/test/","type": "test"}, {"url": "https://naurok.com.ua/","type": "doc"}],
+  "author": "Test-Finder",
+  "version": "0.0.11",
   "status": "works",
   "git": "https://github.com/69BooM96/Test-Finder/plugin/plugin_test",
   "check": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/naurok/metadata.json",
-  "update": ""
+  "update": "update://"
 }
