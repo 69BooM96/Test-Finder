@@ -1,1 +1,101 @@
-None
+[
+    {
+        "name": "_gat_gtag_UA_108352460_1",
+        "value": "1",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1726655066,
+        "sameSite": "None"
+    },
+    {
+        "name": "_dc_gtm_UA-108352460-1",
+        "value": "1",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1726655066,
+        "sameSite": "None"
+    },
+    {
+        "name": "_dc_gtm_UA-108352460-4",
+        "value": "1",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1726655066,
+        "sameSite": "None"
+    },
+    {
+        "name": "_csrf",
+        "value": "258cec6807d2c8c5f6d580b1cc6e1571fc7ba77db86ddd02fd136beebf3cf5d3a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22CWNaSG2cYUXjJcKSdbfllPiOzi9m8fZB%22%3B%7D",
+        "path": "/",
+        "domain": "naurok.com.ua",
+        "secure": false,
+        "httpOnly": true,
+        "sameSite": "Lax"
+    },
+    {
+        "name": "PHPSESSID",
+        "value": "6di4c11e6kghrcot75mkhhpipu",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1758191016,
+        "sameSite": "None"
+    },
+    {
+        "name": "_gid",
+        "value": "GA1.3.798634073.1726655007",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1726741416,
+        "sameSite": "None"
+    },
+    {
+        "name": "_ga",
+        "value": "GA1.1.1717669686.1726655007",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1789727016,
+        "sameSite": "None"
+    },
+    {
+        "name": "_ga_1R05Q72V2L",
+        "value": "GS1.1.1726655006.1.1.1726655016.50.0.0",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1789727016,
+        "sameSite": "None"
+    },
+    {
+        "name": "_fbp",
+        "value": "fb.2.1726655006582.284420171788445089",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1734431016,
+        "sameSite": "None"
+    },
+    {
+        "name": "_ga_2LWSGFF2KK",
+        "value": "GS1.3.1726655007.1.1.1726655016.51.0.0",
+        "path": "/",
+        "domain": ".naurok.com.ua",
+        "secure": false,
+        "httpOnly": false,
+        "expiry": 1789727016,
+        "sameSite": "None"
+    }
+]
