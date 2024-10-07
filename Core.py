@@ -3,7 +3,7 @@ import time
 import json
 from typing import Literal
 from modules import ld_plugins
-
+from modules import sr_data
 
 class Core():
 	def __init__(self):
@@ -24,3 +24,4 @@ class Core():
 
 if __name__ == '__main__':
 	Core()
+	
