@@ -11,7 +11,9 @@ import multiprocessing
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-from pprint import pprint
+
+
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Load_img():
 	def __init__(self):
@@ -97,18 +99,6 @@ class Load_data():
 		start = time.perf_counter()
 		asyncio.run(async_run())
 		print(time.perf_counter()-start)
-
-a = Load_data()
-qwqw = a.search_url(1)
-a.load_test(0, ["https://naurok.com.ua/test/-3014614.html"])
-
-with open("temp_data/json/index_1.json") as file:
-	a = json.load(file)
-	print(a)
-
-
-
-
 
 
 
