@@ -15,8 +15,6 @@ from fake_useragent import UserAgent
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 class Load_img():
 	def __init__(self):
 		super().__init__()

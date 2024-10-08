@@ -37,8 +37,8 @@ class Load_data():
 		return self.url_list
 		
 
-a = Load_data().search_url(15, "на урок тест укр мова")
-print(a)
+# a = Load_data().search_url(15, "на урок тест укр мова")
+# print(a)
 
 class Main():
 	def work(status):
