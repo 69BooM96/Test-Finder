@@ -4,6 +4,7 @@ import json
 from typing import Literal
 from modules import ld_plugins
 from modules import sr_data
+from modules import GUI
 
 class Core():
 	def __init__(self):
@@ -22,7 +23,7 @@ class Core():
 			log_wr.write(f'{data_log}\n')
 		print(data_log)
 
-class ExampleApp(QtWidgets.QMainWindow, GUI_.Ui_MainWindow):
+class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
 		self.setupUi(self)

@@ -1095,7 +1095,7 @@ QPushButton:pressed {
     <item row="2" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_8">
@@ -1582,7 +1582,7 @@ QPushButton:pressed {
               </property>
               <property name="icon">
                <iconset>
-                <normalon>res/user_.png</normalon>
+                <normalon>res/user.png</normalon>
                </iconset>
               </property>
               <property name="iconSize">
