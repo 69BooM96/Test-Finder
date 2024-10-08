@@ -1,8 +1,7 @@
 {
-  "name": "Naurok",
-  "file": "naurok",
-  "type": "search",
-  "data": [{"url": "https://naurok.com.ua/test/","type": "test"}, {"url": "https://naurok.com.ua/","type": "doc"}],
+  "name": "Google",
+  "file": "google",
+  "type": "search_engine",
   "author": "Test-Finder",
   "version": "0.0.1",
   "status": "works",
