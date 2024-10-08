@@ -1800,8 +1800,8 @@ QWidget {
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>30</width>
-                  <height>30</height>
+                  <width>24</width>
+                  <height>24</height>
                  </size>
                 </property>
                 <property name="styleSheet">
@@ -1833,8 +1833,8 @@ QWidget {
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>30</width>
-                  <height>30</height>
+                  <width>24</width>
+                  <height>24</height>
                  </size>
                 </property>
                 <property name="text">
@@ -1930,7 +1930,7 @@ QWidget {
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>30</height>
+                     <height>26</height>
                     </size>
                    </property>
                    <property name="styleSheet">
