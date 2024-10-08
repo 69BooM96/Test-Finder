@@ -15,6 +15,8 @@ from fake_useragent import UserAgent
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 class Load_img():
 	def __init__(self):
 		super().__init__()
@@ -36,7 +38,7 @@ class Load_data():
 
 			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klas}/storinka-{page}?q={text}", proxy=prox) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				print(req.url)
+
 			for item in soup.find_all(class_="headline"):
 				self.url_list.append("https://naurok.com.ua"+item.find("a").get("href"))
 
@@ -99,8 +101,6 @@ class Load_data():
 		start = time.perf_counter()
 		asyncio.run(async_run())
 		print(time.perf_counter()-start)
-
-
 
 
 
