@@ -1,3 +1,7 @@
 data\cookie
 test.py
 test2.py
+*.pyc
+*.log
+*.log
+*.log
