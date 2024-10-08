@@ -22,6 +22,12 @@ class Core():
 			log_wr.write(f'{data_log}\n')
 		print(data_log)
 
+class ExampleApp(QtWidgets.QMainWindow, GUI_.Ui_MainWindow):
+	def __init__(self):
+		super().__init__()
+		self.setupUi(self)
+
+
 if __name__ == '__main__':
 	Core()
 	
