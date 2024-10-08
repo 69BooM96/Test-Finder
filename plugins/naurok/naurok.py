@@ -11,7 +11,9 @@ import multiprocessing
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-from pprint import pprint
+
+
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -100,9 +102,8 @@ class Load_data():
 		asyncio.run(async_run())
 		print(time.perf_counter()-start)
 
-# a = Load_data()
-# qwqw = a.search_url(1)
-# a.load_test(0, ["https://naurok.com.ua/test/-3014614.html"])
+
+
 
 class Main():
 	def work(status):
