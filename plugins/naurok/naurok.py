@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from pprint import pprint
 
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 class Load_img():
 	def __init__(self):
 		super().__init__()
@@ -34,7 +36,7 @@ class Load_data():
 
 			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klas}/storinka-{page}?q={text}", proxy=prox) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				print(req.url)
+
 			for item in soup.find_all(class_="headline"):
 				self.url_list.append("https://naurok.com.ua"+item.find("a").get("href"))
 
@@ -98,22 +100,9 @@ class Load_data():
 		asyncio.run(async_run())
 		print(time.perf_counter()-start)
 
-a = Load_data()
-qwqw = a.search_url(1)
-a.load_test(0, ["https://naurok.com.ua/test/-3014614.html"])
-
-with open("temp_data/json/index_1.json") as file:
-	a = json.load(file)
-	print(a)
-
-
-
-
-
-
-
-
-
+# a = Load_data()
+# qwqw = a.search_url(1)
+# a.load_test(0, ["https://naurok.com.ua/test/-3014614.html"])
 
 class Main():
 	def work(status):
