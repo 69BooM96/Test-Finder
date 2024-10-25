@@ -23,19 +23,23 @@ class Load_data:
 					"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 					]
 	
-	def search(self, object="", klass=0, q="", storinka=1, proxy=None):
+	def search(self, object="", klass=0, q="", storinka=(1,11), proxy=None):
 		@async_session
-		async def async_search(session: aiohttp.ClientSession):
+		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 		
 			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 		
-		return asyncio.run(async_search())
+		async def run():
+			task = [async_search(storinka=item) for item in range(*storinka)]
+			return await asyncio.gather(*task)
+		
+		return sum(asyncio.run(run()), [])
 
-	def processing_data(self, url, proxy=None):
+	def processing_data(self, url: list, proxy=None):
 		@async_session
-		async def async_processing_data(session: aiohttp.ClientSession):
+		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
@@ -48,22 +52,26 @@ class Load_data:
 
 				"answers": [{
 					"type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
-					"text": obj.find(class_="question-view-item-content").text.strip() if obj.find(class_="question-view-item-content") else None,
+					"text": obj.find(class_="question-view-item-content").text.strip().replace(" ", "") if obj.find(class_="question-view-item-content") else None,
 					"img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
 					"value": [{
-						"text": item.find("p").text if item.find("p") else None,
+						"text": item.find("p").text.strip().replace(" ", "") if item.find("p") else None,
 						"img": item.find("img").get("src") if item.find("img") else None
 					} for item in obj.select('.question-options > div')]
 					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
 			}
 		
-		return asyncio.run(async_processing_data())
+		async def run():
+			task = [async_processing_data(url=item) for item in url]
+			return await asyncio.gather(*task)
+
+		return asyncio.run(run())
 
 def main():
 	naurok = Load_data()
-	a = naurok.search()
-	print(a)
-	b = naurok.processing_data("https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html")
+
+	b = naurok.processing_data(["https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html"])
+	print(b)
 	with open("temp_data/json/index_1.json", "w", encoding="utf-8") as file:
 		json.dump(b, file, indent=4, ensure_ascii=False)
 
