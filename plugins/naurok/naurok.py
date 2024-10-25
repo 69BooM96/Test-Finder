@@ -56,11 +56,7 @@ class Load_data:
 				"klass": soup.find_all(attrs={"itemprop": "name"})[2].text,
 				"questions": soup.find(class_="block-head").text.split()[0],
 
-				"answers": []
-			}
-			
-			for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item"):
-				data["answers"].append({
+				"answers": [{
 					"type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
 					"text": obj.find(class_="question-view-item-content").text.strip() if obj.find(class_="question-view-item-content") else None,
 					"img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
@@ -68,7 +64,8 @@ class Load_data:
 						"text": item.find("p").text if item.find("p") else None,
 						"img": item.find("img").get("src") if item.find("img") else None
 					} for item in obj.select('.question-options > div')]
-					})
+					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
+			}
 
 			with open(f"temp_data/json/{filename}.json", "w", encoding="utf-8") as file:
 				json.dump(data, file, indent=4, ensure_ascii=False)
@@ -79,7 +76,7 @@ class Load_data:
 
 def main():
 	naurok = Load_data()
-	naurok.processing_data("https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html", "index_2")
+	naurok.processing_data("https://naurok.com.ua/test/gomogey-3053718.html", "index_2")
 
 if __name__ == "__main__":
 	main()
