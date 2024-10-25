@@ -1,17 +1,8 @@
-import time
-
 import json
-
-import numpy
 import asyncio
-import threading
-
 import aiohttp
-import multiprocessing
-
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-from pprint import pprint
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -38,18 +29,17 @@ class Load_data:
 			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 		
-			url_list = ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
-			print(url_list)
+			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
+		
+		return asyncio.run(async_search())
 
-		asyncio.run(async_search())
-
-	def processing_data(self, url, filename, proxy=None):
+	def processing_data(self, url, proxy=None):
 		@async_session
 		async def async_processing_data(session: aiohttp.ClientSession):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
-			data = {
+			return {
 				"platform": "naurok",
 				"name_test": soup.find(class_="h1-block h1-single").text,
 				"object": soup.find_all(attrs={"itemprop": "name"})[1].text,
@@ -66,17 +56,16 @@ class Load_data:
 					} for item in obj.select('.question-options > div')]
 					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
 			}
-
-			with open(f"temp_data/json/{filename}.json", "w", encoding="utf-8") as file:
-				json.dump(data, file, indent=4, ensure_ascii=False)
-
-		asyncio.run(async_processing_data())
-
-
+		
+		return asyncio.run(async_processing_data())
 
 def main():
 	naurok = Load_data()
-	naurok.processing_data("https://naurok.com.ua/test/gomogey-3053718.html", "index_2")
+	a = naurok.search()
+	print(a)
+	b = naurok.processing_data("https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html")
+	with open("temp_data/json/index_1.json", "w", encoding="utf-8") as file:
+		json.dump(b, file, indent=4, ensure_ascii=False)
 
 if __name__ == "__main__":
 	main()
