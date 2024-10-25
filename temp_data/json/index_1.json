@@ -1,62 +1,78 @@
-[
-    {
-        "INFO": {
-            "type": "test",
-            "resp_code": 200,
-            "name": "Алгебра",
-            "class": "2 клас",
-            "questions": 2,
-            "url": "https://naurok.com.ua/test/-3014614.html",
-            "platform": "naurok",
-            "answers": "None"
+{
+    "platform": "naurok",
+    "name_test": "гомогей",
+    "object": "Алгебра",
+    "klass": "1 клас",
+    "questions": "3",
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "ывавы",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/564712_1729794616.png",
+            "value": [
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/180571_1729794620.png"
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/705356_1729794622.png"
+                },
+                {
+                    "text": "йцуйцу",
+                    "img": null
+                },
+                {
+                    "text": "йцуцйуйцуйцуйцуй",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "пвы",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/955976_1729794689.png",
+            "value": [
+                {
+                    "text": "ывапывап",
+                    "img": null
+                },
+                {
+                    "text": "ывапываппывапваыывап",
+                    "img": null
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/792009_1729794694.png"
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/767683_1729794699.png"
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "апр\\апр\\апрапрапрпрарпапрааапррппапраапрапрапрапрпраапррапрапапрппрарпррапапапапрапрапрапрпрапра",
+            "img": null,
+            "value": [
+                {
+                    "text": "123",
+                    "img": null
+                },
+                {
+                    "text": "123123",
+                    "img": null
+                },
+                {
+                    "text": "1231231233",
+                    "img": null
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/4282639/3053718/997461_1729794730.png"
+                }
+            ]
         }
-    },
-    {
-        "type": "quiz",
-        "num": 0,
-        "text": "\"\"\"\"\"\"\"\"'\\'\"|\\'''\\'\\n\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\\\\\nn\\\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\n\\n\\n\\n\\''|'|\"|\"|\"\"|\"\"||\"\"||\"\"||\"||\\n\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\\\\\nn\\\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\\\\\nn\\\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\\\\\nn\\\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\\\\\\\\\'\\\"\"\"|'\\'\\\\'///////",
-        "img": "None",
-        "answers": [
-            {
-                "text": "n\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\\\\\nn\\\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\n\\n\\\\n\\n\\n\\n\\\\n\\n\\n\\n\\''''\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"",
-                "img": null
-            },
-            {
-                "text": "fsdfsdfsdfd;'''\"\"\"\"\"\"'\"'''\"\"\"\"\"\"\"\"\"\"\"\"'",
-                "img": null
-            },
-            {
-                "text": "fsdfsdfsdf\"\"''\"\"\"''''''",
-                "img": null
-            },
-            {
-                "text": "sdffsdffffffffffffffffdfsdfdsdfsdfsdfsdf'\"\"\"\"\"\"\"\"\"\"\"",
-                "img": null
-            }
-        ]
-    },
-    {
-        "type": "quiz",
-        "num": 1,
-        "text": "turutrutrtietireiteriertieriertertiertiertertiertiertieriterdfgsdgfsdgfsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfgsdfg",
-        "img": "None",
-        "answers": [
-            {
-                "text": "sdfgsdfgdfgdfgdfg",
-                "img": null
-            },
-            {
-                "text": "dfgdfgdfgdfgdfgdfgdfgdfgdfg",
-                "img": null
-            },
-            {
-                "text": "dfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfg",
-                "img": null
-            },
-            {
-                "text": "dfgdfgdfgdfgdfgdfgdfg",
-                "img": null
-            }
-        ]
-    }
-]
+    ]
+}
