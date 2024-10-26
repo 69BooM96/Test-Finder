@@ -4,25 +4,10 @@ import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+from modules.decorators import *
 
-
-def async_session(funk):
-	async def wrapper(*agrs, **kwagrs):
-		async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}) as session:
-			return await funk(session, *agrs, **kwagrs)
-	return wrapper
 
 class Load_data:
-	list_object = [
-					"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
-					"/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
-					"/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika", 
-					"/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo", 
-					"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
-					"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
-					]
-	
 	def search(self, object="", klass=0, q="", storinka=(1,11), proxy=None):
 		@async_session
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
@@ -68,6 +53,15 @@ class Load_data:
 		return asyncio.run(run())
 
 def main():
+	list_object = [
+				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
+				"/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
+				"/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika", 
+				"/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo", 
+				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
+				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
+				]
+	
 	naurok = Load_data()
 
 	b = naurok.processing_data(["https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html"])
