@@ -1095,7 +1095,7 @@ QPushButton:pressed {
     <item row="2" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_8">
@@ -2316,7 +2316,7 @@ border-bottom: 0px;</string>
 }</string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>11</number>
           </property>
           <widget class="QWidget" name="page_11">
            <layout class="QGridLayout" name="gridLayout_27">
@@ -3504,6 +3504,51 @@ QPushButton:pressed {
                </size>
               </property>
              </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_24">
+           <layout class="QGridLayout" name="gridLayout_57">
+            <item row="0" column="0">
+             <widget class="Line" name="line_33">
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(35, 36, 40);</string>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_47">
+              <property name="font">
+               <font>
+                <pointsize>11</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Logs</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="Line" name="line_32">
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(35, 36, 40);</string>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QTextBrowser" name="textBrowser_5">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
