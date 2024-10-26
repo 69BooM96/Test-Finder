@@ -6,4 +6,6 @@ test2.py
 *.log
 *.log
 *.log
+*.temp_data/json
+*.temp_data/imgs
 __pycache__
