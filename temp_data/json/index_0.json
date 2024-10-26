@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Зазначте, як називають сукупність генів, розташованих в одній хромосомі:",
+    "answers": [
+        {
+            "text": "група зчеплення",
+            "correctness": true
+        },
+        {
+            "text": "каріотип",
+            "correctness": false
+        },
+        {
+            "text": "плазміда",
+            "correctness": false
+        },
+        {
+            "text": "геном",
+            "correctness": false
+        }
+    ]
+}
