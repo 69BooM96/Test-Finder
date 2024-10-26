@@ -1,108 +1,79 @@
-import time
-
 import json
-
-import numpy
 import asyncio
-import threading
-
 import aiohttp
-import multiprocessing
-
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-class Load_img():
-	def __init__(self):
-		super().__init__()
 
-class Load_data():
-	def __init__(self):
-		super().__init__()
+def async_session(funk):
+	async def wrapper(*agrs, **kwagrs):
+		async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}) as session:
+			return await funk(session, *agrs, **kwagrs)
+	return wrapper
+
+class Load_data:
+	list_object = [
+					"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
+					"/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
+					"/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika", 
+					"/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo", 
+					"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
+					"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
+					]
 	
-	def search_url(self, pages, text="", subject=1, klas=0, prox=None):
-		self.url_list = []
-		self.list_subject = ["/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
-						"/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
-						"/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika", 
-						"/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo", 
-						"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
-						"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"]
-		async def get_test(session, page, text=text, subject=subject, klas=klas):
-			subject = self.list_subject[subject-1] if subject != 0 else ""
-
-			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klas}/storinka-{page}?q={text}", proxy=prox) as req:
+	def search(self, object="", klass=0, q="", storinka=(1,11), proxy=None):
+		@async_session
+		async def async_search(session: aiohttp.ClientSession, storinka=1):
+			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-
-			for item in soup.find_all(class_="headline"):
-				self.url_list.append("https://naurok.com.ua"+item.find("a").get("href"))
-
-		async def async_run():
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}) as session:
-				task = [get_test(session, page) for page in range(1, pages+1)]
-				await asyncio.gather(*task)
 		
-		start = time.perf_counter()
-		asyncio.run(async_run())
-		print(time.perf_counter()-start)
-		return self.url_list
-	
-	def load_test(self, index_, url_list):
-		self.index = index_
-		async def get_test(session, url):
-			async with session.get(url) as req:
+			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
+		
+		async def run():
+			task = [async_search(storinka=item) for item in range(*storinka)]
+			return await asyncio.gather(*task)
+		
+		return sum(asyncio.run(run()), [])
+
+	def processing_data(self, url: list, proxy=None):
+		@async_session
+		async def async_processing_data(session: aiohttp.ClientSession, url):
+			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-			data = [{"INFO":{"type": "test",
-							"resp_code": req.status,
-							"name": soup.find_all(itemprop="name")[1].text,
-							"class": soup.find_all(itemprop="name")[2].text,
-							"questions": len(soup.find_all(class_="content-block entry-item question-view-item")),
-							"url": url,
-							"platform": "naurok",
-							"answers": "None"}}]
-
-			for index, sp in enumerate(soup.find_all(class_="content-block entry-item question-view-item")):
-				text = sp.find(class_="question-view-item-content")
-				if text:
-					text = text.text.replace(" ", " ").rstrip().lstrip()
-					if text[0] == " ": text = text[1:]
-					if text[-1] == " ": text = text[:-1]
-				else: text = "None"
-				
-				img = sp.find(class_="question-view-item-content").find("img")
-				if img:
-					img = img.get("src")
-				else: img = "None"
-
-				data.append({"type": "quiz" if sp.find(class_="option-marker quiz") else "multiquiz",
-							"num": index,
-							"text": text,
-							"img": img,
-							"answers": [{"text": item.text.replace(" ", " ").rstrip().lstrip() if item else "None",
-										 "img": item.get("src") if item else "None"}
-										 for item in sp.find_all(class_=["option-text", "option-image"])]
-							})
 			
-			self.index += 1
-			
-			with open(f"temp_data/json/index_{self.index}.json", "w", encoding="utf-8") as file:
-				json.dump(data, file, indent=4, ensure_ascii=False)
+			return {
+				"platform": "naurok",
+				"name_test": soup.find(class_="h1-block h1-single").text,
+				"object": soup.find_all(attrs={"itemprop": "name"})[1].text,
+				"klass": soup.find_all(attrs={"itemprop": "name"})[2].text,
+				"questions": soup.find(class_="block-head").text.split()[0],
 
-		async def async_run():
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}) as session:
-				task = [get_test(session, url) for url in url_list]
-				await asyncio.gather(*task)
+				"answers": [{
+					"type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
+					"text": obj.find(class_="question-view-item-content").text.strip().replace(" ", "") if obj.find(class_="question-view-item-content") else None,
+					"img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
+					"value": [{
+						"text": item.find("p").text.strip().replace(" ", "") if item.find("p") else None,
+						"img": item.find("img").get("src") if item.find("img") else None
+					} for item in obj.select('.question-options > div')]
+					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
+			}
+		
+		async def run():
+			task = [async_processing_data(url=item) for item in url]
+			return await asyncio.gather(*task)
 
-		start = time.perf_counter()
-		asyncio.run(async_run())
-		print(time.perf_counter()-start)
+		return asyncio.run(run())
 
+def main():
+	naurok = Load_data()
 
+	b = naurok.processing_data(["https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html"])
+	print(b)
+	with open("temp_data/json/index_1.json", "w", encoding="utf-8") as file:
+		json.dump(b, file, indent=4, ensure_ascii=False)
 
-
-class Main():
-	def work(status):
-		return status
+if __name__ == "__main__":
+	main()
