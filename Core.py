@@ -22,19 +22,19 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
 		path = f'res/gif/giphy ({random.randint(0, 40)}).webp'
-		gif = QtGui.QMovie(path)
-		self.label_2.setMovie(gif)
-		gif.start()
+		self.gif = QtGui.QMovie(path)
+		self.label_2.setMovie(self.gif)
+		self.gif.start()
 
 		self.logs("INFO", "START LOAD")
 
-		self.end_update()
+		# self.load_core_start
 
-	def end_update(self):
+
+	def load_core_start(self):
 		self.hide()
-		self.window2 = ExampleApp()
-		self.window2.show()
-
+		self.app2 = ExampleApp()
+		self.app2.show()
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		data_log = f'[{time.strftime("%H:%M:%S")}] <{type_log}> [{theme_log}]{text_log}'
@@ -65,14 +65,13 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		except:
 			pass
 
+
 class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
 		self.setupUi(self)
 
 		self.logs("INFO", "START")
-
-
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
@@ -93,7 +92,7 @@ if __name__ == '__main__':
 
 	if start_core < 2:
 		app = QtWidgets.QApplication(sys.argv)
-		window = Core_load()
+		window = ExampleApp()
 		window.show()
 		sys.exit(app.exec_())
 	else:

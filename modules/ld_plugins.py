@@ -18,9 +18,9 @@ def check_pl(self):
 					mt_data = json.load(metadata)
 
 				update = True if json.loads(requests.get(mt_data['check']).text)["version"] != mt_data["version"] else False
-				plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
+				# plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 
-				self.logs("INFO", "load plugin", f" [{pl_index}][{pl_name}] [version][{mt_data['version']}] [update][{update}] [status][{plugin.Main.work('works')}]")
+				self.logs("INFO", "load plugin", f" [{pl_index}][{pl_name}] [version][{mt_data['version']}] [update][{update}] [status][{mt_data['status']}]")
 				if update == True:
 					list_update.append(mt_data['update'])
 			except Exception as e:
