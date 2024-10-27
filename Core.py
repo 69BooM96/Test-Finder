@@ -15,6 +15,12 @@ from modules import GUI
 from modules import GUI_update
 
 
+class Core_load_flow(QThread):
+	def __init__(self, mainwindows_g):
+        super().__init__()
+
+
+
 class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
