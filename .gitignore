@@ -1,5 +1,5 @@
 .gitignore
-data\cookie
+data/cookies
 test.py
 test2.py
 *.pyc
@@ -9,3 +9,4 @@ test2.py
 *.temp_data/json
 *.temp_data/imgs
 __pycache__
+modules.__pycache__

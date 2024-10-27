@@ -4,10 +4,20 @@ import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from modules.decorators import *
+from pprint import pprint
 
+def async_session(funk):
+	async def wrapper(*agrs, **kwagrs):
+		try:
+			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15)) as session:
+				return await funk(session, *agrs, **kwagrs)
+		except BaseException as ex: return ex
+	return wrapper
 
 class Load_data:
+	def __init__(self, cookies=None):
+		self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
+
 	def search(self, object="", klass=0, q="", storinka=(1,11), proxy=None):
 		@async_session
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
@@ -52,6 +62,96 @@ class Load_data:
 
 		return asyncio.run(run())
 
+	def get_test(self, url: list, proxy=None):
+		@async_session
+		async def async_get_test(session: aiohttp.ClientSession, url):
+			session.cookie_jar.update_cookies(self.cookies)
+			async with session.get(url, proxy=proxy) as req:
+				soup = BeautifulSoup(await req.text(), "lxml")
+			
+			data = {
+				"_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
+				"Homework[name]": "Test-Finder",
+				"Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[3].get("value"),
+				"Homework[deadline_hour]": "18:00",
+				"Homework[shuffle_question]": "0",
+				"Homework[shuffle_options]": [
+					"0",
+					"1"
+				],
+				"Homework[show_answer]": "0",
+				"Homework[show_review]": [
+					"0",
+					"1"
+				],
+				"Homework[show_leaderbord]": [
+					"0",
+					"1"
+				],
+				"Homework[available_attempts]": "0",
+				"Homework[duration]": "40",
+				"Homework[show_timer]": "0",
+				"Homework[show_flashcard]": "0",
+				"Homework[show_match]": "0"
+			}
+			
+			async with session.get(url, data=data, proxy=proxy) as req:
+				soup = BeautifulSoup(await req.text(), "lxml")
+			
+			return soup.find(class_="form-control input-xs").get("value")
+
+		async def run():
+			task = [async_get_test(f"{url[:-5]}/set") for url in url]
+			return await asyncio.gather(*task)
+
+		return asyncio.run(run())
+	
+	def test_pass(self, gamecode: list, proxy=None):
+		@async_session
+		async def async_test_pass(session: aiohttp.ClientSession, gamecode):
+			async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
+				soup = BeautifulSoup(await req.text(), "lxml")
+
+			data = {
+				"_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
+				"JoinForm[gamecode]": gamecode,
+				"JoinForm[name]": "Test-Finder"
+			}
+			
+			async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req:
+				soup = BeautifulSoup(await req.text(), "lxml")
+			
+			session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
+
+			async with session.get(f"https://naurok.com.ua/api2/test/sessions/{session_id}", proxy=proxy) as req:
+				session_res = await req.json()
+
+			data = {
+				"answer": [
+					session_res["questions"][0]["options"][0]["id"]
+				],
+				"homework": True,
+				"homeworkType": 1,
+				"point":  session_res["questions"][0]["point"],
+				"question_id": session_res["questions"][0]["id"],
+				"session_id": session_res["session"]["id"],
+				"show_answer": session_res["settings"]["show_answer"],
+				"type": session_res["questions"][0]["type"]
+				}
+			
+			async with session.put("https://naurok.com.ua/api2/test/responses/answer", data=data) as req: await req.text()
+			async with session.put(f"https://naurok.com.ua/api2/test/sessions/end/{session_id}") as req:
+				uuid = await req.json()
+				return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
+			
+			
+		async def run():
+			task = [async_test_pass(gamecode) for gamecode in gamecode]
+			return await asyncio.gather(*task)
+
+		return asyncio.run(run())			
+
+
 def main():
 	list_object = [
 				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
@@ -62,12 +162,9 @@ def main():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	
-	naurok = Load_data()
+	naurok = Load_data(json.load(open("data/cookies", "r")))
 
-	b = naurok.processing_data(["https://naurok.com.ua/test/olimpiada-mova-i-literatura-11-klas-3054071.html"])
-	print(b)
-	with open("temp_data/json/index_1.json", "w", encoding="utf-8") as file:
-		json.dump(b, file, indent=4, ensure_ascii=False)
+	print(naurok.test_pass(["1925182"]))
 
 if __name__ == "__main__":
 	main()

@@ -4,8 +4,14 @@ import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from modules.decorators import *
 
+def async_session(funk):
+	async def wrapper(*agrs, **kwagrs):
+		try:
+			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15)) as session:
+				return await funk(session, *agrs, **kwagrs)
+		except BaseException as ex: return ex
+	return wrapper
 
 class Load_data:
 	def search(self, object, storinka=(1,4), proxy=None):
