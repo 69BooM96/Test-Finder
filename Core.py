@@ -27,6 +27,10 @@ class Core_load_flow(QThread):
 	
 	def run(self):
 		ld_plugins.check_pl(self.log_signal, self.progress_signal, self.text_signal)
+
+		sr_data.plugin_data()
+
+
 		self.core_start_signal.emit()
 
 
@@ -205,7 +209,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	def close_settings(self):
 		self.stackedWidget.setCurrentIndex(0)
-
 
 #System|==============================================|
 

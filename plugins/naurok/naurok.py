@@ -153,6 +153,9 @@ class Load_data:
 		return asyncio.run(run())			
 
 
+def data_info():
+	return {"": ""}
+
 def main():
 	list_object = [
 				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
@@ -162,5 +165,17 @@ def main():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
+	start = perf_counter()
+
+	naurok = Load_data(json.load(open("data/cookies", "r")))
+	
+	a = naurok.search(storinka=(1,4))
+	b = naurok.processing_data(a)
+
+	for index in range(len(b)):
+		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
+			json.dump(b[index], file, indent=4, ensure_ascii=False)
+		
+	print(perf_counter()-start)
 if __name__ == "__main__":
 	main()

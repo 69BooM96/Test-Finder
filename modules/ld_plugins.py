@@ -29,7 +29,6 @@ def check_pl(log_signal, progress_signal, text_signal):
 
 				# update = True if json.loads(requests.get(mt_data['check']).text)["version"] != mt_data["version"] else False
 				update = True
-				# plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 				
 				log_signal.emit("INFO", "load plugin", f" [{pl_index}][{pl_name}] [version][{mt_data['version']}] [update][{update}] [status][{mt_data['status']}]")
 				text_signal.emit(f"[{mt_data['name']}]")

@@ -51,6 +51,8 @@ class Load_data:
 
 		return asyncio.run(run())
 
+def data_info():
+	return {"": ""}
 
 def main():
 	list_object = [
