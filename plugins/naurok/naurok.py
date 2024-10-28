@@ -4,7 +4,8 @@ import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from pprint import pprint
+from time import perf_counter
+
 
 def async_session(funk):
 	async def wrapper(*agrs, **kwagrs):
@@ -18,7 +19,7 @@ class Load_data:
 	def __init__(self, cookies=None):
 		self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-	def search(self, object="", klass=0, q="", storinka=(1,11), proxy=None):
+	def search(self, object="", klass=0, q="", storinka=(1,2), proxy=None):
 		@async_session
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
@@ -37,13 +38,14 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-			
+
 			return {
 				"platform": "naurok",
+				"utl": str(req.url),
 				"name_test": soup.find(class_="h1-block h1-single").text,
-				"object": soup.find_all(attrs={"itemprop": "name"})[1].text,
-				"klass": soup.find_all(attrs={"itemprop": "name"})[2].text,
-				"questions": soup.find(class_="block-head").text.split()[0],
+				"object": soup.find_all(attrs={"itemprop": "name"})[1].text if len(soup.find_all(attrs={"itemprop": "name"})) >= 2 else None,
+				"klass": soup.find_all(attrs={"itemprop": "name"})[2].text if len(soup.find_all(attrs={"itemprop": "name"})) >= 3 else None,
+				"questions": int(soup.find(class_="block-head").text.split()[0]),
 
 				"answers": [{
 					"type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
@@ -98,7 +100,7 @@ class Load_data:
 			async with session.get(url, data=data, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
-			return soup.find(class_="form-control input-xs").get("value")
+			return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
 		async def run():
 			task = [async_get_test(f"{url[:-5]}/set") for url in url]
@@ -118,7 +120,7 @@ class Load_data:
 				"JoinForm[name]": "Test-Finder"
 			}
 			
-			async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req:
+			async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req: 
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
 			session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
@@ -161,10 +163,16 @@ def main():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
-	
+	start = perf_counter()
 	naurok = Load_data(json.load(open("data/cookies", "r")))
+	
+	a = naurok.search(storinka=(1,4))
+	b = naurok.processing_data(a)
 
-	print(naurok.test_pass(["1925182"]))
-
+	for index in range(len(b)):
+		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
+			json.dump(b[index], file, indent=4, ensure_ascii=False)
+		
+	print(perf_counter()-start)
 if __name__ == "__main__":
 	main()
