@@ -116,23 +116,71 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
 		self.pushButton_25.clicked.connect(self.close_settings_general)
+		self.pushButton_45.clicked.connect(self.close_settings_general)
+		self.pushButton_48.clicked.connect(self.close_settings_general)
 
 	#Open Button
-		self.pushButton_17.clicked.connect(self.open_settings_general)
+		self.pushButton_17.clicked.connect(self.open_settings)
 		self.pushButton_26.clicked.connect(self.open_settings_general)
 		self.pushButton_28.clicked.connect(self.open_settings_search)
 		self.pushButton_29.clicked.connect(self.open_settings_security)
 		self.pushButton_30.clicked.connect(self.open_settings_addons)
 		self.pushButton_27.clicked.connect(self.open_settings_info)
+		self.pushButton_47.clicked.connect(self.open_settings_info)
+		self.pushButton_39.clicked.connect(self.open_settings_info)
+		self.pushButton_35.clicked.connect(self.open_settings_info)
 		self.pushButton_34.clicked.connect(self.open_settings_general)
 		self.pushButton_38.clicked.connect(self.open_settings_accounts)
+		self.pushButton_33.clicked.connect(self.open_settings_history)
+		self.pushButton_40.clicked.connect(self.open_settings_history_search)
+		self.pushButton_44.clicked.connect(self.open_settings_history_answers)
+		self.pushButton_42.clicked.connect(self.open_settings_history_logs)
+		self.pushButton_31.clicked.connect(self.open_settings_addons_search)
+		self.pushButton_41.clicked.connect(self.open_settings_addons_plugins)
+		self.pushButton_32.clicked.connect(self.open_settings_addons)
+		self.pushButton_37.clicked.connect(self.open_settings_manual)
+		self.pushButton_16.clicked.connect(self.open_settings_manual)
+		self.pushButton_43.clicked.connect(self.open_settings_logs)
 
+#Settings|==============================================|
+	#History
+	def open_settings_history_search(self):
+		self.stackedWidget_5.setCurrentIndex(7)
+
+	def open_settings_history_answers(self):
+		self.stackedWidget_5.setCurrentIndex(8)
+
+	def open_settings_history_logs(self):
+		self.stackedWidget_5.setCurrentIndex(9)
+
+	def open_settings_history(self):
+		self.pushButton_40.setChecked(True)
+		self.stackedWidget_4.setCurrentIndex(3)
+		self.stackedWidget_5.setCurrentIndex(7)
+
+	#Addons
+	def open_settings_addons(self):
+		self.stackedWidget_4.setCurrentIndex(2)
+		self.stackedWidget_5.setCurrentIndex(3)
+		self.pushButton_31.setChecked(True)
+
+	def open_settings_addons_search(self):
+		self.stackedWidget_5.setCurrentIndex(3)
+
+	def open_settings_addons_plugins(self):
+		self.stackedWidget_5.setCurrentIndex(6)
+
+	#Settings|=======|
+	def open_settings_manual(self):
+		self.stackedWidget_5.setCurrentIndex(4)
+		self.open_settings()
+		self.pushButton_37.setChecked(True)
+
+	def open_settings_logs(self):
+		self.stackedWidget_5.setCurrentIndex(11)
 
 	def open_settings_accounts(self):
 		self.stackedWidget_5.setCurrentIndex(5)
-
-	def open_settings_addons(self):
-		self.stackedWidget_4.setCurrentIndex(2)
 
 	def open_settings_security(self):
 		self.stackedWidget_5.setCurrentIndex(2)
@@ -144,15 +192,22 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget_5.setCurrentIndex(1)
 
 	def open_settings_general(self):
-		self.stackedWidget.setCurrentIndex(2)
+		self.pushButton_26.setChecked(True)
 		self.stackedWidget_4.setCurrentIndex(0)
 		self.stackedWidget_5.setCurrentIndex(0)
 
+	def open_settings(self):
+		self.stackedWidget.setCurrentIndex(2)
+
+	#Close
 	def close_settings_general(self):
 		self.stackedWidget_4.setCurrentIndex(1)
 
 	def close_settings(self):
 		self.stackedWidget.setCurrentIndex(0)
+
+
+#System|==============================================|
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")

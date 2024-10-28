@@ -562,12 +562,11 @@ border-bottom: 0px;</string>
 }
 
 QPushButton:hover {
-	background-color: rgb(76, 78, 84);
+	background-color: rgb(59, 61, 66);
 }
 
 QPushButton:pressed {
-	background-color: rgb(40, 45, 52);
-	color: rgb(30, 31, 34);
+	background-color: rgb(76, 78, 84);
 }</string>
           </property>
           <property name="frameShape">
@@ -2686,7 +2685,7 @@ QPushButton:pressed {
            <string notr="true">color: rgb(255, 255, 255);</string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page_9">
            <layout class="QGridLayout" name="gridLayout_24">
