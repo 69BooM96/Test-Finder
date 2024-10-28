@@ -19,6 +19,7 @@ class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
 	text_signal = QtCore.pyqtSignal(str)
+	core_start_signal = QtCore.pyqtSignal()
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
@@ -26,7 +27,7 @@ class Core_load_flow(QThread):
 	
 	def run(self):
 		ld_plugins.check_pl(self.log_signal, self.progress_signal, self.text_signal)
-		# self.mainwindows.load_core_start
+		self.core_start_signal.emit()
 
 
 class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
@@ -47,11 +48,12 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		self.load_process.log_signal.connect(self.logs)
 		self.load_process.progress_signal.connect(self.progress_load)
 		self.load_process.text_signal.connect(self.text_load)
+		self.load_process.core_start_signal.connect(self.load_core_start)
 		self.load_process.start()
 
 
 	def load_core_start(self):
-		self.hide()
+		self.close()
 		self.app2 = ExampleApp()
 		self.app2.show()
 
@@ -95,8 +97,62 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
 		self.setupUi(self)
-
 		self.logs("INFO", "START")
+		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+
+		#Data
+		self.show_w = True
+		self.win_resizing_left = False
+		self.win_resizing_right = False
+		self.win_resizing_top = False
+		self.win_resizing_bottom = False
+		self.win_resizing_px = 4
+
+	#Button
+		self.pushButton_10.clicked.connect(self.close_)
+		self.pushButton_18.clicked.connect(self.show_)
+		self.pushButton_19.clicked.connect(self.show_winow_)
+
+	#Close Button
+		self.pushButton_36.clicked.connect(self.close_settings)
+		self.pushButton_25.clicked.connect(self.close_settings_general)
+
+	#Open Button
+		self.pushButton_17.clicked.connect(self.open_settings_general)
+		self.pushButton_26.clicked.connect(self.open_settings_general)
+		self.pushButton_28.clicked.connect(self.open_settings_search)
+		self.pushButton_29.clicked.connect(self.open_settings_security)
+		self.pushButton_30.clicked.connect(self.open_settings_addons)
+		self.pushButton_27.clicked.connect(self.open_settings_info)
+		self.pushButton_34.clicked.connect(self.open_settings_general)
+		self.pushButton_38.clicked.connect(self.open_settings_accounts)
+
+
+	def open_settings_accounts(self):
+		self.stackedWidget_5.setCurrentIndex(5)
+
+	def open_settings_addons(self):
+		self.stackedWidget_4.setCurrentIndex(2)
+
+	def open_settings_security(self):
+		self.stackedWidget_5.setCurrentIndex(2)
+
+	def open_settings_info(self):
+		self.stackedWidget_5.setCurrentIndex(10)
+
+	def open_settings_search(self):
+		self.stackedWidget_5.setCurrentIndex(1)
+
+	def open_settings_general(self):
+		self.stackedWidget.setCurrentIndex(2)
+		self.stackedWidget_4.setCurrentIndex(0)
+		self.stackedWidget_5.setCurrentIndex(0)
+
+	def close_settings_general(self):
+		self.stackedWidget_4.setCurrentIndex(1)
+
+	def close_settings(self):
+		self.stackedWidget.setCurrentIndex(0)
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
@@ -105,6 +161,83 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			log_wr.write(f'{data_log}\n')
 		print(data_log)
 		self.textBrowser_5.append(f'[{time_}] <{type_log}> [{theme_log}]{text_log}')
+
+	def mousePressEvent(self, event):
+		try:
+			if self.show_w == True:
+				if event.button() == QtCore.Qt.LeftButton:
+					self.old_pos = event.pos()
+					if self.win_resizing_px >= self.old_pos.x():
+						self.win_resizing_left = True
+
+					if (self.size().width() - self.win_resizing_px) <= self.old_pos.x():
+						self.win_resizing_right = True
+
+					if self.win_resizing_px >= self.old_pos.y():
+						self.win_resizing_top = True
+
+					if (self.size().height() - self.win_resizing_px) <= self.old_pos.y():
+						self.win_resizing_bottom = True
+		except:
+			pass
+
+	def mouseReleaseEvent(self, event):
+		try:
+			if self.show_w == True:
+				if event.button() == QtCore.Qt.LeftButton:
+					self.old_pos = None
+					self.win_resizing_left = False
+					self.win_resizing_right = False
+					self.win_resizing_top = False
+					self.win_resizing_bottom = False
+		except:
+			pass
+
+	def mouseMoveEvent(self, event):
+		try:
+			if self.show_w == True:
+				if not self.old_pos:
+					return
+
+				delta = event.pos() - self.old_pos
+				if self.win_resizing_left == True:
+					if self.geometry().width() > 616:
+						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), self.geometry().y(), self.geometry().width() - delta.x(), self.geometry().height()))
+					else:
+						if delta.x() < 0:
+							self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), self.geometry().y(), self.geometry().width() - delta.x(), self.geometry().height()))
+
+				elif self.win_resizing_right == True:
+					self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y(), event.pos().x(), self.geometry().height()))
+				
+				elif self.win_resizing_top == True:
+					if self.geometry().height() > 434:
+						self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y() + delta.y(), self.geometry().width(), self.geometry().height() - delta.y()))
+					else:
+						if delta.y() < 0:
+							self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y() + delta.y(), self.geometry().width(), self.geometry().height() - delta.y()))
+				
+				elif self.win_resizing_bottom == True:
+					self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y(), self.geometry().width(), event.pos().y()))
+				
+				else:
+					self.move(self.pos() + delta)
+		except:
+			pass
+
+	def close_(self):
+		sys.exit()
+
+	def show_(self):
+		if self.show_w == True:
+			self.showMaximized()
+			self.show_w = False
+		else:
+			self.showNormal()
+			self.show_w = True
+
+	def show_winow_(self):
+		self.showMinimized()
 
 
 if __name__ == '__main__':
