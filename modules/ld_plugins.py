@@ -27,8 +27,8 @@ def check_pl(log_signal, progress_signal, text_signal):
 				with open(f"plugins/{pl_name}/metadata.json") as metadata:
 					mt_data = json.load(metadata)
 
-				# update = True if json.loads(requests.get(mt_data['check']).text)["version"] != mt_data["version"] else False
-				update = True
+				update = True if json.loads(requests.get(mt_data['check']).text)["version"] != mt_data["version"] else False
+				# update = True
 				# plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 				
 				log_signal.emit("INFO", "load plugin", f" [{pl_index}][{pl_name}] [version][{mt_data['version']}] [update][{update}] [status][{mt_data['status']}]")

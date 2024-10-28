@@ -164,7 +164,7 @@ def main():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	start = perf_counter()
-	naurok = Load_data(json.load(open("data/cookies", "r")))
+	naurok = Load_data()
 	
 	a = naurok.search(storinka=(1,4))
 	b = naurok.processing_data(a)
