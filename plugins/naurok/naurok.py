@@ -3,9 +3,8 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-
 from time import perf_counter
-
+from pprint import pprint
 
 def async_session(funk):
 	async def wrapper(*agrs, **kwagrs):
@@ -154,6 +153,9 @@ class Load_data:
 		return asyncio.run(run())			
 
 
+def data_info():
+	return {"": ""}
+
 def main():
 	list_object = [
 				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
@@ -164,7 +166,8 @@ def main():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	start = perf_counter()
-	naurok = Load_data()
+
+	naurok = Load_data(json.load(open("data/cookies", "r")))
 	
 	a = naurok.search(storinka=(1,4))
 	b = naurok.processing_data(a)

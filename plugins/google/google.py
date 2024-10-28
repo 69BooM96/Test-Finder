@@ -38,6 +38,5 @@ class Load_data():
 # a = Load_data().search_url(15, "на урок тест укр мова")
 # print(a)
 
-class Main():
-	def work(status):
-		return status
+def data_info():
+	return {"": ""}

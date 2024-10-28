@@ -346,12 +346,11 @@ class Ui_MainWindow(object):
 "}\n"
 "\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(76, 78, 84);\n"
+"    background-color: rgb(59, 61, 66);\n"
 "}\n"
 "\n"
 "QPushButton:pressed {\n"
-"    background-color: rgb(40, 45, 52);\n"
-"    color: rgb(30, 31, 34);\n"
+"    background-color: rgb(76, 78, 84);\n"
 "}")
         self.stackedWidget_6.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.stackedWidget_6.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -2632,7 +2631,7 @@ class Ui_MainWindow(object):
         self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_6.setCurrentIndex(0)
         self.stackedWidget_5.setCurrentIndex(0)
-        self.stackedWidget_4.setCurrentIndex(0)
+        self.stackedWidget_4.setCurrentIndex(1)
         self.stackedWidget_2.setCurrentIndex(0)
         self.stackedWidget_3.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
