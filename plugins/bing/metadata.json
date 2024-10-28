@@ -1,1 +1,11 @@
-
+{
+  "name": "Bing",
+  "file": "bing",
+  "type": "search_engine",
+  "author": "Test-Finder",
+  "version": "0.0.1",
+  "status": "works",
+  "git": "https://github.com/69BooM96/Test-Finder/plugin/bing",
+  "check": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/bing/metadata.json",
+  "update": "update://"
+}

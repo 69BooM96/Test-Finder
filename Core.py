@@ -16,9 +16,17 @@ from modules import GUI_update
 
 
 class Core_load_flow(QThread):
-	def __init__(self, mainwindows_g):
-        super().__init__()
+	log_signal = QtCore.pyqtSignal(str, str, str)
+	progress_signal = QtCore.pyqtSignal(int)
+	text_signal = QtCore.pyqtSignal(str)
 
+	def __init__(self, mainwindows):
+		QThread.__init__(self)
+		self.mainwindows = mainwindows
+	
+	def run(self):
+		ld_plugins.check_pl(self.log_signal, self.progress_signal, self.text_signal)
+		# self.mainwindows.load_core_start
 
 
 class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
@@ -34,13 +42,24 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 
 		self.logs("INFO", "START LOAD")
 
-		# self.load_core_start
+		#Flow start
+		self.load_process = Core_load_flow(mainwindows=self)
+		self.load_process.log_signal.connect(self.logs)
+		self.load_process.progress_signal.connect(self.progress_load)
+		self.load_process.text_signal.connect(self.text_load)
+		self.load_process.start()
 
 
 	def load_core_start(self):
 		self.hide()
 		self.app2 = ExampleApp()
 		self.app2.show()
+
+	def progress_load(self, progress_set):
+		self.progressBar.setValue(progress_set)
+
+	def text_load(self, text_set):
+		self.label.setText(text_set)
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		data_log = f'[{time.strftime("%H:%M:%S")}] <{type_log}> [{theme_log}]{text_log}'
@@ -98,7 +117,7 @@ if __name__ == '__main__':
 
 	if start_core < 2:
 		app = QtWidgets.QApplication(sys.argv)
-		window = ExampleApp()
+		window = Core_load()
 		window.show()
 		sys.exit(app.exec_())
 	else:

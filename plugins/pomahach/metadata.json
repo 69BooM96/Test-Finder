@@ -1,0 +1,12 @@
+{
+  "name": "Pomahach",
+  "file": "pomahach",
+  "type": "search",
+  "data": [{"url": "https://pomahach.com/","type": "test"}],
+  "author": "Test-Finder",
+  "version": "0.0.1",
+  "status": "works",
+  "git": "https://github.com/69BooM96/Test-Finder/plugin/pomahach",
+  "check": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/pomahach/metadata.json",
+  "update": "update://"
+}
