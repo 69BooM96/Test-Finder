@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 from modules.decorate import async_session
 
 class Load_data:
-	def search(self, objects, storinka=(1,2), proxy=None):
+	def search(self, subject, storinka=(1,2), proxy=None):
 		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
-			async with session.get(f"https://pomahach.com{objects}/page/{storinka}/", proxy=proxy) as req:
+			async with session.get(f"https://pomahach.com{subject}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
@@ -87,7 +87,7 @@ def data_info():
 		'/cat/turizm/', '/cat/finansoviy-rinok/', '/cat/teoriya-rozmischennya-produktivnih-sil/', '/cat/upovnovazhena-osoba-z-publichnih-zakupivel/']
 
 	return {"search": {
-				"objects": [list_object, False],
+				"subject": [list_object, False],
 				"klass": [False, True],
 				"q": [False, True],
 				"storinka": [True, True],
