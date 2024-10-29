@@ -86,15 +86,15 @@ def data_info():
 		'/cat/elektrichni-mashini-i-aparati/', '/cat/politologiya/', '/cat/psihologiya/', '/cat/analitichna-himiya/', '/cat/strahuvannya/', '/cat/literaturoznavstvo/', 
 		'/cat/turizm/', '/cat/finansoviy-rinok/', '/cat/teoriya-rozmischennya-produktivnih-sil/', '/cat/upovnovazhena-osoba-z-publichnih-zakupivel/']
 
-	return {"search": {"objects": list_object,
-				"klass": False,
-				"q": False,
-				"storinka": True,
-				"proxy": True,
-				"cookie": False},
-
-			"processing_data": {"url": "list",
-				"proxy": True}}
+	return {"search": {
+				"objects": [list_object, False],
+				"klass": [False, True],
+				"q": [False, True],
+				"storinka": [True, True],
+				"proxy": [True, True],
+				"cookie": [False, True]},
+			"processing_data": {"url": ["list", True],
+				"proxy": [True, True]}}
 
 def main():
 	pomahach = Load_data()

@@ -153,14 +153,16 @@ def data_info():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
-	return {"search": {"objects": list_object,
-				"klass": True,
-				"q": True,
-				"storinka": True,
-				"proxy": True,
-				"cookie": True},
-			"processing_data": {"url": "list",
-				"proxy": True}}
+	return {"search": {
+				"objects": [list_object, True],
+				"klass": [True, True],
+				"q": [True, True],
+				"storinka": [True, True],
+				"proxy": [True, True],
+				"cookie": [True, False]},
+			"processing_data": {
+				"url": ["list", True],
+				"proxy": [True, True]}}
 
 def main():
 	
