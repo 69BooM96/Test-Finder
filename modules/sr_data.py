@@ -8,6 +8,8 @@ import Core
 def plugin_data(self, subject="/cat/algebra/", klass=None, q="hello", storinka=(1, 2), proxy=None):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
 	plugins_list = [name for name in os.listdir("plugins")]
+	list_data_urls = []
+
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
 		start_time = time.perf_counter()
@@ -37,9 +39,9 @@ def plugin_data(self, subject="/cat/algebra/", klass=None, q="hello", storinka=(
 					else:
 						if data_info_pl['search']['cookie'][0]:
 							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
-							print(session_pl.search(**args_pl))
+							list_data_urls.append(session_pl.search(**args_pl))
 						else:
-							print(plugin.Load_data.search(self, **args_pl))
+							list_data_urls.append(plugin.Load_data.search(self, **args_pl))
 
 				elif mt_data['type'] == "search_engine":
 					pass
