@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 from modules.decorate import async_session
 
 class Load_data:
-	def search(self, object, storinka=(1,2), proxy=None):
+	def search(self, objects, storinka=(1,2), proxy=None):
 		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
-			async with session.get(f"https://pomahach.com{object}/page/{storinka}/", proxy=proxy) as req:
+			async with session.get(f"https://pomahach.com{objects}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
@@ -86,14 +86,15 @@ def data_info():
 		'/cat/elektrichni-mashini-i-aparati/', '/cat/politologiya/', '/cat/psihologiya/', '/cat/analitichna-himiya/', '/cat/strahuvannya/', '/cat/literaturoznavstvo/', 
 		'/cat/turizm/', '/cat/finansoviy-rinok/', '/cat/teoriya-rozmischennya-produktivnih-sil/', '/cat/upovnovazhena-osoba-z-publichnih-zakupivel/']
 
-	return {"search": {"object": list_object,
-				"klass": False,
-				"q": False,
-				"storinka": True,
-				"proxy": True},
-
-			"processing_data": {"url": "list",
-				"proxy": True}}
+	return {"search": {
+				"objects": [list_object, False],
+				"klass": [False, True],
+				"q": [False, True],
+				"storinka": [True, True],
+				"proxy": [True, True],
+				"cookie": [False, True]},
+			"processing_data": {"url": ["list", True],
+				"proxy": [True, True]}}
 
 def main():
 	pomahach = Load_data()
