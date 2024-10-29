@@ -1,0 +1,254 @@
+{
+    "platform": "naurok",
+    "utl": "https://naurok.com.ua/test/diagnostichna-robota-2-fakti-i-zdogadki-3058884.html",
+    "name_test": "Діагностична робота № 2 \"Факти і здогадки\"",
+    "object": "Я досліджую світ",
+    "klass": "2 клас",
+    "questions": 12,
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "Як звали головну героїню оповідань Валентини Табур",
+            "img": null,
+            "value": [
+                {
+                    "text": "Марійка",
+                    "img": null
+                },
+                {
+                    "text": "Вероніка",
+                    "img": null
+                },
+                {
+                    "text": "Оленка",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Пригадайте оповідання В.Табур \"Вероніка і рожева парасолька\" та дайте відповідь на запитання .Що розквітає,коли йде дощ?",
+            "img": null,
+            "value": [
+                {
+                    "text": "Дерева",
+                    "img": null
+                },
+                {
+                    "text": "Сонце",
+                    "img": null
+                },
+                {
+                    "text": "Парасолька",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "multiquiz",
+            "text": "Які факти ти можеш дізнатися з цієї фотокартки",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/608359_1730201145.jpg",
+            "value": [
+                {
+                    "text": "На фото маленький песик",
+                    "img": null
+                },
+                {
+                    "text": "Фото зроблено восени",
+                    "img": null
+                },
+                {
+                    "text": "Кошеня сірого кольору",
+                    "img": null
+                },
+                {
+                    "text": "Тваринка п\"є молочко",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Сонце це",
+            "img": null,
+            "value": [
+                {
+                    "text": "Планета",
+                    "img": null
+                },
+                {
+                    "text": "Зоря",
+                    "img": null
+                },
+                {
+                    "text": "Метеорит",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Пригадай та обери один із способів отримання інформації людям,які з порушенням зору",
+            "img": null,
+            "value": [
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/680046_1730201924.jpg"
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/462247_1730201934.jpg"
+                },
+                {
+                    "text": null,
+                    "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/623463_1730202117.jpg"
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Про яке магічне число розповів батько Вероніці",
+            "img": null,
+            "value": [
+                {
+                    "text": "9",
+                    "img": null
+                },
+                {
+                    "text": "15",
+                    "img": null
+                },
+                {
+                    "text": "7",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Скільки днів у тижні",
+            "img": null,
+            "value": [
+                {
+                    "text": "5",
+                    "img": null
+                },
+                {
+                    "text": "7",
+                    "img": null
+                },
+                {
+                    "text": "6",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Де можуть зберігатись старовинні речі?",
+            "img": null,
+            "value": [
+                {
+                    "text": "В музеї",
+                    "img": null
+                },
+                {
+                    "text": "В крамниці",
+                    "img": null
+                },
+                {
+                    "text": "На спортивному майданчику",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Реліквія -це",
+            "img": null,
+            "value": [
+                {
+                    "text": "Річ,яку особливо шанують і зберігають ,як пам\"ять про минуле",
+                    "img": null
+                },
+                {
+                    "text": "Улюблена іграшка",
+                    "img": null
+                },
+                {
+                    "text": "Сучасні предмети",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Сонячні проміння насичують організм вітаміном",
+            "img": null,
+            "value": [
+                {
+                    "text": "A",
+                    "img": null
+                },
+                {
+                    "text": "C",
+                    "img": null
+                },
+                {
+                    "text": "D",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "multiquiz",
+            "text": "Розглянь прогноз погоди натиждень. Уякіднінеможливо побачити сонячних зайчиків?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/226587_1730202797.png",
+            "value": [
+                {
+                    "text": "Понеділок",
+                    "img": null
+                },
+                {
+                    "text": "Вівторок",
+                    "img": null
+                },
+                {
+                    "text": "Середа",
+                    "img": null
+                },
+                {
+                    "text": "П\"ятниця",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "multiquiz",
+            "text": "Прочитай твердження. Обери  істинні (правильні)",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/174187/3058884/385558_1730204354.png",
+            "value": [
+                {
+                    "text": "Ґрунт— верхній, родючий шарземлі.",
+                    "img": null
+                },
+                {
+                    "text": "Домівкою длядеяких тварин єґрунт.",
+                    "img": null
+                },
+                {
+                    "text": "Уґрунті живуть всіптахи.",
+                    "img": null
+                },
+                {
+                    "text": "Уґрунті немає води таповітря.",
+                    "img": null
+                },
+                {
+                    "text": "Перегній надає ґрунтові чорного кольору.",
+                    "img": null
+                }
+            ]
+        }
+    ]
+}

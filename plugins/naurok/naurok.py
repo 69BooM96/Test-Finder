@@ -6,20 +6,24 @@ from fake_useragent import UserAgent
 from time import perf_counter
 from pprint import pprint
 
-def async_session(funk):
-	async def wrapper(*agrs, **kwagrs):
-		try:
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15)) as session:
-				return await funk(session, *agrs, **kwagrs)
-		except BaseException as ex: return ex
-	return wrapper
+def async_session(cookies):
+	def wrappers(funk):
+		async def wrapper(*agrs, **kwagrs):
+			try:
+				async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15), cookies=cookies) as session:
+					return await funk(session, *agrs, **kwagrs)
+			except BaseException as ex: 
+				return ex
+		return wrapper
+	return wrappers
+	
 
 class Load_data:
 	def __init__(self, cookies=None):
 		self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
 	def search(self, object="", klass=0, q="", storinka=(1,2), proxy=None):
-		@async_session
+		@async_session(self.cookies)
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
@@ -33,7 +37,7 @@ class Load_data:
 		return sum(asyncio.run(run()), [])
 
 	def processing_data(self, url: list, proxy=None):
-		@async_session
+		@async_session(self.cookies)
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
@@ -64,9 +68,8 @@ class Load_data:
 		return asyncio.run(run())
 
 	def get_test(self, url: list, proxy=None):
-		@async_session
+		@async_session(self.cookies)
 		async def async_get_test(session: aiohttp.ClientSession, url):
-			session.cookie_jar.update_cookies(self.cookies)
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
@@ -108,7 +111,7 @@ class Load_data:
 		return asyncio.run(run())
 	
 	def test_pass(self, gamecode: list, proxy=None):
-		@async_session
+		@async_session(self.cookies)
 		async def async_test_pass(session: aiohttp.ClientSession, gamecode):
 			async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
@@ -145,7 +148,6 @@ class Load_data:
 				uuid = await req.json()
 				return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
 			
-			
 		async def run():
 			task = [async_test_pass(gamecode) for gamecode in gamecode]
 			return await asyncio.gather(*task)
@@ -169,13 +171,11 @@ def main():
 
 	naurok = Load_data(json.load(open("data/cookies", "r")))
 	
-	a = naurok.search(storinka=(1,4))
-	b = naurok.processing_data(a)
-
-	for index in range(len(b)):
-		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
-			json.dump(b[index], file, indent=4, ensure_ascii=False)
-		
+	a = naurok.search()
+	b =  naurok.get_test(a)
+	c = naurok.test_pass(b)
+	print(c)
+	
 	print(perf_counter()-start)
 if __name__ == "__main__":
 	main()

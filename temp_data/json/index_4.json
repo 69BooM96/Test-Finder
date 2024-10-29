@@ -1,0 +1,246 @@
+{
+    "platform": "naurok",
+    "utl": "https://naurok.com.ua/test/who-are-you-3058995.html",
+    "name_test": "Who are you",
+    "object": "Англійська мова",
+    "klass": "9 клас",
+    "questions": 12,
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "What is your date of birth?",
+            "img": null,
+            "value": [
+                {
+                    "text": "I was born on May 15th, 2009.",
+                    "img": null
+                },
+                {
+                    "text": "I enjoy reading books.",
+                    "img": null
+                },
+                {
+                    "text": "I live in New York.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "What social media platform do teens use the most?",
+            "img": null,
+            "value": [
+                {
+                    "text": "They often use Facebook.",
+                    "img": null
+                },
+                {
+                    "text": "Instagram and TikTok are popular among teens.",
+                    "img": null
+                },
+                {
+                    "text": "They don’t use the internet.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "multiquiz",
+            "text": "What sort of people are you?",
+            "img": null,
+            "value": [
+                {
+                    "text": "guy",
+                    "img": null
+                },
+                {
+                    "text": "likes",
+                    "img": null
+                },
+                {
+                    "text": "cute",
+                    "img": null
+                },
+                {
+                    "text": "honest",
+                    "img": null
+                },
+                {
+                    "text": "positive",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "What kind of music is popular among teenagers today?",
+            "img": null,
+            "value": [
+                {
+                    "text": "Classical music is trending.",
+                    "img": null
+                },
+                {
+                    "text": "Teenagers prefer pop and hip-hop.",
+                    "img": null
+                },
+                {
+                    "text": "They don’t listen to music.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "I enjoy _______ (read) books in my free time.",
+            "img": null,
+            "value": [
+                {
+                    "text": "reading",
+                    "img": null
+                },
+                {
+                    "text": "read",
+                    "img": null
+                },
+                {
+                    "text": "to read",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "He is going _______ (cheat) on the test.",
+            "img": null,
+            "value": [
+                {
+                    "text": "cheating",
+                    "img": null
+                },
+                {
+                    "text": "to cheat",
+                    "img": null
+                },
+                {
+                    "text": "cheat",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "We are looking forward to _______ (see) you soon.",
+            "img": null,
+            "value": [
+                {
+                    "text": "see",
+                    "img": null
+                },
+                {
+                    "text": "to seeing",
+                    "img": null
+                },
+                {
+                    "text": "seeing",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "How do teenagers prefer to communicate with friends?",
+            "img": null,
+            "value": [
+                {
+                    "text": "They write letters.",
+                    "img": null
+                },
+                {
+                    "text": "Texting and social media are common methods.",
+                    "img": null
+                },
+                {
+                    "text": "They usually send messages.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "What challenges do teenagers face today?",
+            "img": null,
+            "value": [
+                {
+                    "text": "They struggle with managing social media pressure.",
+                    "img": null
+                },
+                {
+                    "text": "They have no challenges.",
+                    "img": null
+                },
+                {
+                    "text": "They mostly focus on collecting stamps.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "What does \"Mr.\" mean?",
+            "img": null,
+            "value": [
+                {
+                    "text": "single or married man",
+                    "img": null
+                },
+                {
+                    "text": "first language",
+                    "img": null
+                },
+                {
+                    "text": "family name",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "What does the \"mother tongue\" mean?",
+            "img": null,
+            "value": [
+                {
+                    "text": "single woman",
+                    "img": null
+                },
+                {
+                    "text": "your name",
+                    "img": null
+                },
+                {
+                    "text": "first language",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "12. 10, What does the \"no. of dependants\" mean?",
+            "img": null,
+            "value": [
+                {
+                    "text": "where are you from",
+                    "img": null
+                },
+                {
+                    "text": "have you got any children",
+                    "img": null
+                },
+                {
+                    "text": "marital status",
+                    "img": null
+                }
+            ]
+        }
+    ]
+}

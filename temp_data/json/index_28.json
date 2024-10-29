@@ -1,0 +1,240 @@
+{
+    "platform": "naurok",
+    "utl": "https://naurok.com.ua/test/cili-virazi-7-klas-3058844.html",
+    "name_test": "Цілі вирази. 7 клас",
+    "object": "Алгебра",
+    "klass": "7 клас",
+    "questions": 10,
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "Одночленом є вираз",
+            "img": null,
+            "value": [
+                {
+                    "text": "2х-4",
+                    "img": null
+                },
+                {
+                    "text": "6х3+3у",
+                    "img": null
+                },
+                {
+                    "text": "9х3у6",
+                    "img": null
+                },
+                {
+                    "text": "-8х7:4у",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "а8⋅а5=",
+            "img": null,
+            "value": [
+                {
+                    "text": "а3",
+                    "img": null
+                },
+                {
+                    "text": "а40",
+                    "img": null
+                },
+                {
+                    "text": "а13",
+                    "img": null
+                },
+                {
+                    "text": "а25",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "у25:у14=",
+            "img": null,
+            "value": [
+                {
+                    "text": "у39",
+                    "img": null
+                },
+                {
+                    "text": "у11",
+                    "img": null
+                },
+                {
+                    "text": "у350",
+                    "img": null
+                },
+                {
+                    "text": "а11",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "(х6)4=",
+            "img": null,
+            "value": [
+                {
+                    "text": "х1296",
+                    "img": null
+                },
+                {
+                    "text": "х10",
+                    "img": null
+                },
+                {
+                    "text": "х2",
+                    "img": null
+                },
+                {
+                    "text": "х24",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "(2х5у3с7)3=",
+            "img": null,
+            "value": [
+                {
+                    "text": "23х8у6с10",
+                    "img": null
+                },
+                {
+                    "text": "2х15у9с21",
+                    "img": null
+                },
+                {
+                    "text": "8х15у9с21",
+                    "img": null
+                },
+                {
+                    "text": "2х8у6с10",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Значення виразу -0,5⋅х3 при х=-2 буде дорівнювати",
+            "img": null,
+            "value": [
+                {
+                    "text": "4",
+                    "img": null
+                },
+                {
+                    "text": "-4",
+                    "img": null
+                },
+                {
+                    "text": "-3",
+                    "img": null
+                },
+                {
+                    "text": "3",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Значення виразу 163:84 дорівнює",
+            "img": null,
+            "value": [
+                {
+                    "text": "2",
+                    "img": null
+                },
+                {
+                    "text": "16",
+                    "img": null
+                },
+                {
+                    "text": "1",
+                    "img": null
+                },
+                {
+                    "text": "8",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Значення виразу 8х2у4 , якщо 2ху2=-5 буде дорівнювати",
+            "img": null,
+            "value": [
+                {
+                    "text": "25",
+                    "img": null
+                },
+                {
+                    "text": "-25",
+                    "img": null
+                },
+                {
+                    "text": "-50",
+                    "img": null
+                },
+                {
+                    "text": "50",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "(3х5у4)2⋅(2х4у3)3 =",
+            "img": null,
+            "value": [
+                {
+                    "text": "72х22у17",
+                    "img": null
+                },
+                {
+                    "text": "6х14у12",
+                    "img": null
+                },
+                {
+                    "text": "72х14у12",
+                    "img": null
+                },
+                {
+                    "text": "12х14у12",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Одночлен записаний в стандартному вигляді",
+            "img": null,
+            "value": [
+                {
+                    "text": "2⋅(-ху2)⋅3",
+                    "img": null
+                },
+                {
+                    "text": "ххху5",
+                    "img": null
+                },
+                {
+                    "text": "1,123х6у3с7",
+                    "img": null
+                },
+                {
+                    "text": "(ав)4⋅2а",
+                    "img": null
+                }
+            ]
+        }
+    ]
+}
