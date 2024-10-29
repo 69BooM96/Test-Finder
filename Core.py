@@ -15,6 +15,17 @@ from modules import GUI
 from modules import GUI_update
 
 
+class Search_parser(QThread):
+	log_signal = QtCore.pyqtSignal(str, str, str)
+	progress_signal = QtCore.pyqtSignal(int)
+
+	def __init__(self, mainwindows):
+		QThread.__init__(self)
+		self.mainwindows = mainwindows
+	
+	def run(self):
+		sr_data.plugin_data()
+
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
@@ -27,12 +38,7 @@ class Core_load_flow(QThread):
 	
 	def run(self):
 		ld_plugins.check_pl(self.log_signal, self.progress_signal, self.text_signal)
-
-		sr_data.plugin_data()
-
-
 		self.core_start_signal.emit()
-
 
 class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 	def __init__(self):
@@ -112,10 +118,16 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.win_resizing_bottom = False
 		self.win_resizing_px = 4
 
+	#Class
+		self.parser_search = Search_parser(mainwindows=self)
+		self.parser_search.log_signal.connect(self.logs)
+		self.parser_search.progress_signal.connect(self.progress_search)
+
 	#Button
 		self.pushButton_10.clicked.connect(self.close_)
 		self.pushButton_18.clicked.connect(self.show_)
 		self.pushButton_19.clicked.connect(self.show_winow_)
+		self.pushButton_11.clicked.connect(self.start_search_menu)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
@@ -146,6 +158,15 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_16.clicked.connect(self.open_settings_manual)
 		self.pushButton_43.clicked.connect(self.open_settings_logs)
 
+#Core
+	#Search|============================================|
+	def start_search_menu(self):
+		self.stackedWidget.setCurrentIndex(1)
+		self.parser_search.start()
+
+	def progress_search(self, value_pr):
+		self.progressBar.setValue(value_pr)
+
 #Settings|==============================================|
 	#History
 	def open_settings_history_search(self):
@@ -174,7 +195,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def open_settings_addons_plugins(self):
 		self.stackedWidget_5.setCurrentIndex(6)
 
-	#Settings|=======|
+	#Settings|==========================================|
 	def open_settings_manual(self):
 		self.stackedWidget_5.setCurrentIndex(4)
 		self.open_settings()
@@ -210,7 +231,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def close_settings(self):
 		self.stackedWidget.setCurrentIndex(0)
 
-#System|==============================================|
+#System|================================================|
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
