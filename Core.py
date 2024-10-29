@@ -1,14 +1,15 @@
 import os
 import time
 import json
+import psutil
+import sys
+import random
+import multiprocessing
 from typing import Literal
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, QProcess
-import psutil
-import sys
-import random
 from modules import ld_plugins
 from modules import sr_data
 from modules import GUI
@@ -24,7 +25,7 @@ class Search_parser(QThread):
 		self.mainwindows = mainwindows
 	
 	def run(self):
-		sr_data.plugin_data()
+		multiprocessing.Process(target=sr_data.plugin_data(self)).start()
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -110,7 +111,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.logs("INFO", "START")
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
-		#Data
+	#Data
 		self.show_w = True
 		self.win_resizing_left = False
 		self.win_resizing_right = False
@@ -163,6 +164,15 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def start_search_menu(self):
 		self.stackedWidget.setCurrentIndex(1)
 		self.parser_search.start()
+
+	def start_search_1(self):
+		self.plainTextEdit.setText(self.plainTextEdit_2.text())
+		self.start_search_menu()
+
+	def start_search_0(self):
+		self.plainTextEdit_2.setText(self.plainTextEdit.text())
+		self.start_search_menu()
+		
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
@@ -273,36 +283,54 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			pass
 
 	def mouseMoveEvent(self, event):
-		try:
-			if self.show_w == True:
-				if not self.old_pos:
-					return
+	    try:
+	        if self.show_w == True:
+	            if not self.old_pos:
+	                return
 
-				delta = event.pos() - self.old_pos
-				if self.win_resizing_left == True:
-					if self.geometry().width() > 616:
-						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), self.geometry().y(), self.geometry().width() - delta.x(), self.geometry().height()))
-					else:
-						if delta.x() < 0:
-							self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), self.geometry().y(), self.geometry().width() - delta.x(), self.geometry().height()))
+	            delta = event.pos() - self.old_pos
+	            if self.win_resizing_left == True:
+	                if self.geometry().width() > 616:
+	                    self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+	                                                  self.geometry().y(), 
+	                                                  self.geometry().width() - delta.x(), 
+	                                                  self.geometry().height()))
+	                else:
+	                    if delta.x() < 0:
+	                        self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+	                                                      self.geometry().y(), 
+	                                                      self.geometry().width() - delta.x(), 
+	                                                      self.geometry().height()))
 
-				elif self.win_resizing_right == True:
-					self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y(), event.pos().x(), self.geometry().height()))
-				
-				elif self.win_resizing_top == True:
-					if self.geometry().height() > 434:
-						self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y() + delta.y(), self.geometry().width(), self.geometry().height() - delta.y()))
-					else:
-						if delta.y() < 0:
-							self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y() + delta.y(), self.geometry().width(), self.geometry().height() - delta.y()))
-				
-				elif self.win_resizing_bottom == True:
-					self.setGeometry(QtCore.QRect(self.geometry().x(), self.geometry().y(), self.geometry().width(), event.pos().y()))
-				
-				else:
-					self.move(self.pos() + delta)
-		except:
-			pass
+	            elif self.win_resizing_right == True:
+	                self.setGeometry(QtCore.QRect(self.geometry().x(), 
+	                                              self.geometry().y(), 
+	                                              event.pos().x(), 
+	                                              self.geometry().height()))
+	            
+	            elif self.win_resizing_top == True:
+	                if self.geometry().height() > 434:
+	                    self.setGeometry(QtCore.QRect(self.geometry().x(), 
+	                                                  self.geometry().y() + delta.y(), 
+	                                                  self.geometry().width(), 
+	                                                  self.geometry().height() - delta.y()))
+	                else:
+	                    if delta.y() < 0:
+	                        self.setGeometry(QtCore.QRect(self.geometry().x(), 
+	                                                      self.geometry().y() + delta.y(), 
+	                                                      self.geometry().width(), 
+	                                                      self.geometry().height() - delta.y()))
+	            
+	            elif self.win_resizing_bottom == True:
+	                self.setGeometry(QtCore.QRect(self.geometry().x(), 
+	                                              self.geometry().y(), 
+	                                              self.geometry().width(), 
+	                                              event.pos().y()))
+
+	            else:
+	                self.move(self.pos() + delta)
+	    except:
+	        pass
 
 	def close_(self):
 		sys.exit()
