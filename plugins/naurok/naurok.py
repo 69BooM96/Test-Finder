@@ -169,7 +169,7 @@ def data_info():
 				"q": True,
 				"storinka": True,
 				"proxy": True},
-			"processing_data": {"url": "list"
+			"processing_data": {"url": "list",
 				"proxy": True}}
 
 def main():

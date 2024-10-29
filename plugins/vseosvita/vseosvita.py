@@ -154,6 +154,7 @@ class Load_data:
 		return asyncio.run(run())			
 
 
+
 def main():
 	list_object = [
 				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",

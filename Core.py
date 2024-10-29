@@ -112,6 +112,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
 	#Data
+		self.text_search = ""
 		self.show_w = True
 		self.win_resizing_left = False
 		self.win_resizing_right = False
@@ -128,7 +129,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_10.clicked.connect(self.close_)
 		self.pushButton_18.clicked.connect(self.show_)
 		self.pushButton_19.clicked.connect(self.show_winow_)
-		self.pushButton_11.clicked.connect(self.start_search_menu)
+		self.pushButton_11.clicked.connect(self.start_search_0)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
@@ -161,17 +162,16 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 #Core
 	#Search|============================================|
-	def start_search_menu(self):
-		self.stackedWidget.setCurrentIndex(1)
+	def start_search_1(self):
+		self.text_search = self.plainTextEdit_2.toPlainText()
 		self.parser_search.start()
 
-	def start_search_1(self):
-		self.plainTextEdit.setText(self.plainTextEdit_2.text())
-		self.start_search_menu()
-
 	def start_search_0(self):
-		self.plainTextEdit_2.setText(self.plainTextEdit.text())
-		self.start_search_menu()
+		self.plainTextEdit_2.setPlainText(self.plainTextEdit.toPlainText())
+		self.text_search = self.plainTextEdit.toPlainText()
+		self.plainTextEdit.setPlainText("")
+		self.stackedWidget.setCurrentIndex(1)
+		self.parser_search.start()
 		
 
 	def progress_search(self, value_pr):
@@ -249,7 +249,20 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		with open(f"logs/{time.strftime('%Y-%m-%d')}.log", "a", encoding="utf-8") as log_wr:
 			log_wr.write(f'{data_log}\n')
 		print(data_log)
-		self.textBrowser_5.append(f'[{time_}] <{type_log}> [{theme_log}]{text_log}')
+
+		if type_log == "ERROR":
+			data_log = f'<span style="color:#F23F43;">[{time_}] &lt;ERROR&gt; <{type_log}> [{theme_log}]{text_log}</span>'
+
+		elif type_log == "info":
+			data_log = f'<span>[{time_}] &lt;INFO&gt; <{type_log}> [{theme_log}]{text_log}</span>'
+
+		elif type_log == "INFO":
+			data_log = f'<span style="color:#23A55A;">[{time_}] &lt;INFO&gt; <{type_log}> [{theme_log}]{text_log}</span>'
+
+		elif type_log == "WARN":
+			data_log = f'<span style="color:#F0B232;">[{time_}] &lt;INFO&gt; <{type_log}> [{theme_log}]{text_log}</span>'
+
+		self.textBrowser_5.append(data_log)
 
 	def mousePressEvent(self, event):
 		try:
@@ -283,54 +296,54 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			pass
 
 	def mouseMoveEvent(self, event):
-	    try:
-	        if self.show_w == True:
-	            if not self.old_pos:
-	                return
+		try:
+			if self.show_w == True:
+				if not self.old_pos:
+					return
 
-	            delta = event.pos() - self.old_pos
-	            if self.win_resizing_left == True:
-	                if self.geometry().width() > 616:
-	                    self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
-	                                                  self.geometry().y(), 
-	                                                  self.geometry().width() - delta.x(), 
-	                                                  self.geometry().height()))
-	                else:
-	                    if delta.x() < 0:
-	                        self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
-	                                                      self.geometry().y(), 
-	                                                      self.geometry().width() - delta.x(), 
-	                                                      self.geometry().height()))
+				delta = event.pos() - self.old_pos
+				if self.win_resizing_left == True:
+					if self.geometry().width() > 616:
+						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+													  self.geometry().y(), 
+													  self.geometry().width() - delta.x(), 
+													  self.geometry().height()))
+					else:
+						if delta.x() < 0:
+							self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+														  self.geometry().y(), 
+														  self.geometry().width() - delta.x(), 
+														  self.geometry().height()))
 
-	            elif self.win_resizing_right == True:
-	                self.setGeometry(QtCore.QRect(self.geometry().x(), 
-	                                              self.geometry().y(), 
-	                                              event.pos().x(), 
-	                                              self.geometry().height()))
-	            
-	            elif self.win_resizing_top == True:
-	                if self.geometry().height() > 434:
-	                    self.setGeometry(QtCore.QRect(self.geometry().x(), 
-	                                                  self.geometry().y() + delta.y(), 
-	                                                  self.geometry().width(), 
-	                                                  self.geometry().height() - delta.y()))
-	                else:
-	                    if delta.y() < 0:
-	                        self.setGeometry(QtCore.QRect(self.geometry().x(), 
-	                                                      self.geometry().y() + delta.y(), 
-	                                                      self.geometry().width(), 
-	                                                      self.geometry().height() - delta.y()))
-	            
-	            elif self.win_resizing_bottom == True:
-	                self.setGeometry(QtCore.QRect(self.geometry().x(), 
-	                                              self.geometry().y(), 
-	                                              self.geometry().width(), 
-	                                              event.pos().y()))
+				elif self.win_resizing_right == True:
+					self.setGeometry(QtCore.QRect(self.geometry().x(), 
+												  self.geometry().y(), 
+												  event.pos().x(), 
+												  self.geometry().height()))
+				
+				elif self.win_resizing_top == True:
+					if self.geometry().height() > 434:
+						self.setGeometry(QtCore.QRect(self.geometry().x(), 
+													  self.geometry().y() + delta.y(), 
+													  self.geometry().width(), 
+													  self.geometry().height() - delta.y()))
+					else:
+						if delta.y() < 0:
+							self.setGeometry(QtCore.QRect(self.geometry().x(), 
+														  self.geometry().y() + delta.y(), 
+														  self.geometry().width(), 
+														  self.geometry().height() - delta.y()))
+				
+				elif self.win_resizing_bottom == True:
+					self.setGeometry(QtCore.QRect(self.geometry().x(), 
+												  self.geometry().y(), 
+												  self.geometry().width(), 
+												  event.pos().y()))
 
-	            else:
-	                self.move(self.pos() + delta)
-	    except:
-	        pass
+				else:
+					self.move(self.pos() + delta)
+		except:
+			pass
 
 	def close_(self):
 		sys.exit()
