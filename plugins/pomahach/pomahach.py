@@ -91,8 +91,9 @@ def data_info():
 				"q": False,
 				"storinka": True,
 				"proxy": True},
-				"processing_data": {"url": "list"},
-				"proxy": True}
+
+			"processing_data": {"url": "list",
+				"proxy": True}}
 
 def main():
 	pomahach = Load_data()

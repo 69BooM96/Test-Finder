@@ -154,12 +154,12 @@ def data_info():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	return {"search": {"object": list_object,
-						"klass": True,
-						"q": True,
-						"storinka": True,
-						"proxy": True},
-						"processing_data": {"url": "list"},
-						"proxy": True}
+				"klass": True,
+				"q": True,
+				"storinka": True,
+				"proxy": True},
+			"processing_data": {"url": "list",
+				"proxy": True}}
 
 def main():
 	
