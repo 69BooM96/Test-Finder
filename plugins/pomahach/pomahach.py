@@ -9,7 +9,7 @@ class Load_data:
 	def search(self, subject, storinka=(1,2), proxy=None):
 		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
-			async with session.get(f"https://pomahach.com{subject}/page/{storinka}/", proxy=proxy) as req:
+			async with session.get(f"https://pomahach.com/cat{subject}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
@@ -45,46 +45,46 @@ class Load_data:
 
 def data_info():
 	list_object = [
-		'/cat/biologiya/', '/cat/geografiya/', '/cat/himiya/', '/cat/istoriya-ukrayini/', '/cat/pravoznavstvo/', '/cat/ekonomika/', 
-		'/cat/pdr/', '/cat/algebra/', '/cat/gigiyena-ta-ekologiya/', '/cat/ukrayinska-mova-i-literatura/', '/cat/notarius/', 
-		'/cat/bankivska-sistema/', '/cat/zagalna-ta-specialna-hirurgiya/', '/cat/viyskova-i-ekstremalna-medicina/', '/cat/dilova-ukrayinska-mova/', 
-		'/cat/kulturologiya/', '/cat/angliyska-mova/', '/cat/agrohimiya/', '/cat/ispanska-mova/', '/cat/francuzka-mova/', '/cat/imunologiya/', 
-		'/cat/menedzhment-i-administruvannya/', '/cat/pozhezhna-bezpeka/', '/cat/osnovi-virobnichoyi-sanitariyi/', '/cat/normuvannya-prirodnogo-ta-shtuchnogo-osvitlennya/', 
-		'/cat/podannya-pershoyi-dolikarskoyi-dopomogi/', '/cat/osnovni-zakonodavchi-akti-pro-ohoronu-praci/', '/cat/organizaciyni-pitannya-ohoroni-praci/', 
-		'/cat/ekonomika-praci-y-socialno-trudovi-vidnosini/', '/cat/informatika/', '/cat/prirodnichi-nauki/', '/cat/stomatologiya/', '/cat/abdominalna-hirurgiya/', 
-		'/cat/anesteziologiya-reanimatologiya-intensivna-terapiya-v-hirurgiyi/', '/cat/nevidkladna-hirurgiya-v-urologiyi-ta-ginekologiyi/', '/cat/onkologiya/', 
-		'/cat/opiki-i-vidmorozhennya/', '/cat/osnovi-travmatologiyi-i-neyrohirurgiyi/', '/cat/proktologiya/', '/cat/sercevo-sudinnoyi-hirurgiya/', '/cat/sudinna-hirurgiya/', 
-		'/cat/infekciyni-zahvoryuvannya/', '/cat/akusherstvo-ta-ginekologiya/', '/cat/astronomiya/', '/cat/fizika/', '/cat/matematika/', '/cat/stolici-krayin/', 
-		'/cat/rozvitok-geografichnih-znan-pro-zemlyu/', '/cat/alergologiya/', '/cat/anesteziologiya/', '/cat/mistectvo/', '/cat/sport/', '/cat/kosmetologiya/', '/cat/muzika/', 
-		'/cat/istoriya-svitu/', '/cat/mifologiya/', '/cat/svitova-literatura/', '/cat/ekologiya/', '/cat/ekonomika-pidpriyemstva/', 
-		'/cat/mashini-ta-obladnannya-dlya-pererobki-silskogospodarskoyi-produkciyi/', '/cat/tehnichniy-servis-v-agropromislovomu-kompleksi/', 
-		'/cat/ekspluataciya-mashin-i-obladnannya/', '/cat/finansoviy-oblik/', '/cat/tehnichna-mehanika/', '/cat/mashini-i-obladnannya-dlya-tvarinnictva/', 
-		'/cat/marketing/', '/cat/metrologiya-i-standartizaciya/', '/cat/zahist-vitchizni/', '/cat/oblik-i-audit/', '/cat/literaturne-chitannya/', '/cat/muzichne-mistectvo/', 
-		'/cat/lyudina-i-svit/', '/cat/etika/', '/cat/fizkultura/', '/cat/administrativne-pravo/', '/cat/marketingova-cinova-politika/', '/cat/cinoutvorennya-brendiv/', 
-		'/cat/derzhavne-regulyuvannya-procesu-cinoutvorennya-v-ukrayini/', '/cat/ocinyuvannya-pomilki-i-riziku-v-cinoutvorenni/', '/cat/cinoutvorennya-v-mizhnarodnomu-marketingu/', 
-		'/cat/marketingova-strategiya-cinoutvorennya/', '/cat/osoblivosti-doslidzhennya-rinkovoyi-konyunkturi/', '/cat/roriguvannya-cini/', 
-		'/cat/procedura-priynyattya-rishen-schodo-viznachennya-cini/', '/cat/metodichni-pidhodi-do-cinoutvorennya-v-sistemi-marketingu/', '/cat/faktori-marketingovogo-cinoutvorennya/', 
-		'/cat/sistema-cin-ta-yih-klasifikaciya/', '/cat/cina-yak-instrument-marketingovoyi-cinovoyi-politiki/', '/cat/formuvannya-cinovoyi-politiki/', '/cat/vvedennya-v-cinoutvorennya/', 
-		'/cat/logistika-u-rinkoviy-ekonomici/', '/cat/klasifikaciya-form-logistichnih-utvoren/', '/cat/harakteristika-osnovnih-elementiv-logistiki/', 
-		'/cat/tehnologichni-procesi-ta-upravlinnya-materialnimi-potokami/', '/cat/faktori-formuvannya-logistichnih-sistem/', 
-		'/cat/upravlinnya-materialnimi-potokami-v-logistichnih-sistemah/', '/cat/zagotivelna-logistika/', '/cat/sutnist-rozpodilchoyi-logistiki/', '/cat/vnutrishnovirobnicha-logistika/', 
-		'/cat/logistika-skladuvannya/', '/cat/transportna-logistika/', '/cat/globalizaciya-logistichnih-procesiv/', '/cat/groshi-i-kredit/', 
-		'/cat/finansova-politika-i-finansoviy-mehanizm/', '/cat/osnovni-principi-regulyaciyi-fiziologichnih-funkciy/', '/cat/gumoralna-regulyaciya-fiziologichnih-funkciy-organizmu/', 
-		'/cat/biznes-planuvannya-zed-aviaciynogo-pidpriyemstva/', '/cat/fiziologiya-centralnoyi-nervovoyi-sistemi/', '/cat/fizichna-ta-koloyidna-himiya/', '/cat/epidemiologiya/', 
-		'/cat/endoskopiya/', '/cat/normalna-ta-patologichna-anatomiya-topografichna-anatomiya-z-operativnoyu-hirurgiyeyu/', '/cat/gistologiya-embriologiya/', '/cat/sudova-medicina/', 
-		'/cat/zarubizhna-literatura/', '/cat/medicina/', '/cat/biohimiya/', '/cat/dermatologiya/', '/cat/virusologiya/', '/cat/dityacha-hirurgiya/', '/cat/gigiyena-ta-ekologiya/', 
-		'/cat/kliniko-laboratorna-funkcionalna-diagnostika/', '/cat/infekciyni-hvorobi-epidemiologiya/', '/cat/vnutrishnya-medicina/', '/cat/geometriya/', '/cat/medichna-genetika/', 
-		'/cat/neyrohirurgiya/', '/cat/otolaringologiya/', '/cat/oftalmologiya/', '/cat/nevidkladna-dopomoga/', '/cat/litnya-praktika/', '/cat/onkologiya-radiologiya/', '/cat/pediatriya/', 
-		'/cat/tovaroznavstvo/', '/cat/byudzhetna-sistema/', '/cat/dilovodstvo/', '/cat/kriminologiya/', '/cat/gerbologiya/', '/cat/ekonomichna-teoriya/', 
-		'/cat/ekonomika-starodavnogo-svitu/', '/cat/ekonomika-antichnosti/', '/cat/ekonomika-serednovichchya/', '/cat/ekonomika-epohi-pervisnogo-nagromadzhennya-kapitalu/', 
-		'/cat/ekonomika-v-epohu-vilnoyi-konkurenciyi/', '/cat/istoriya-ekonomiki/', '/cat/istoriya-mistectv/', '/cat/ukrayinska-kultura/', '/cat/makroekonomika/', '/cat/filosofiya/', 
-		'/cat/legka-atletika/', '/cat/pedagogika-pochatkovoyi-osviti/', '/cat/biogeografiya/', '/cat/radiobiologiya/', '/cat/finansi/', '/cat/teoriya-i-metodika-plavannya/', 
-		'/cat/fizichna-geografiya-materikiv-i-okeaniv/', '/cat/dokumentno-informaciyni-komunikaciyi/', '/cat/religiya/', '/cat/etika-i-estetika/', 
-		'/cat/istoriya-ukrayinskoyi-literaturi/', '/cat/rekreaciyna-geografiya/', '/cat/fiziologiya-lyudini-i-tvarin/', '/cat/fizika-z-osnovami-biofiziki/', 
-		'/cat/matematichna-statistika/', '/cat/regionalna-ekonomichna-i-socialna-geografiya-svitu/', '/cat/ekonomichna-i-socialna-geografiya-ukrayini/', 
-		'/cat/silskogospodarske-virobnictvo/', '/cat/vikova-fiziologiya/', '/cat/podatkova-sistema/', '/cat/rinok-finansovih-poslug/', '/cat/arheologiya/', 
-		'/cat/elektrichni-mashini-i-aparati/', '/cat/politologiya/', '/cat/psihologiya/', '/cat/analitichna-himiya/', '/cat/strahuvannya/', '/cat/literaturoznavstvo/', 
-		'/cat/turizm/', '/cat/finansoviy-rinok/', '/cat/teoriya-rozmischennya-produktivnih-sil/', '/cat/upovnovazhena-osoba-z-publichnih-zakupivel/']
+		'/biologiya/', '/geografiya/', '/himiya/', '/istoriya-ukrayini/', '/pravoznavstvo/', '/ekonomika/', 
+		'/pdr/', '/algebra/', '/gigiyena-ta-ekologiya/', '/ukrayinska-mova-i-literatura/', '/notarius/', 
+		'/bankivska-sistema/', '/zagalna-ta-specialna-hirurgiya/', '/viyskova-i-ekstremalna-medicina/', '/dilova-ukrayinska-mova/', 
+		'/kulturologiya/', '/angliyska-mova/', '/agrohimiya/', '/ispanska-mova/', '/francuzka-mova/', '/imunologiya/', 
+		'/menedzhment-i-administruvannya/', '/pozhezhna-bezpeka/', '/osnovi-virobnichoyi-sanitariyi/', '/normuvannya-prirodnogo-ta-shtuchnogo-osvitlennya/', 
+		'/podannya-pershoyi-dolikarskoyi-dopomogi/', '/osnovni-zakonodavchi-akti-pro-ohoronu-praci/', '/organizaciyni-pitannya-ohoroni-praci/', 
+		'/ekonomika-praci-y-socialno-trudovi-vidnosini/', '/informatika/', '/prirodnichi-nauki/', '/stomatologiya/', '/abdominalna-hirurgiya/', 
+		'/anesteziologiya-reanimatologiya-intensivna-terapiya-v-hirurgiyi/', '/nevidkladna-hirurgiya-v-urologiyi-ta-ginekologiyi/', '/onkologiya/', 
+		'/opiki-i-vidmorozhennya/', '/osnovi-travmatologiyi-i-neyrohirurgiyi/', '/proktologiya/', '/sercevo-sudinnoyi-hirurgiya/', '/sudinna-hirurgiya/', 
+		'/infekciyni-zahvoryuvannya/', '/akusherstvo-ta-ginekologiya/', '/astronomiya/', '/fizika/', '/matematika/', '/stolici-krayin/', 
+		'/rozvitok-geografichnih-znan-pro-zemlyu/', '/alergologiya/', '/anesteziologiya/', '/mistectvo/', '/sport/', '/kosmetologiya/', '/muzika/', 
+		'/istoriya-svitu/', '/mifologiya/', '/svitova-literatura/', '/ekologiya/', '/ekonomika-pidpriyemstva/', 
+		'/mashini-ta-obladnannya-dlya-pererobki-silskogospodarskoyi-produkciyi/', '/tehnichniy-servis-v-agropromislovomu-kompleksi/', 
+		'/ekspluataciya-mashin-i-obladnannya/', '/finansoviy-oblik/', '/tehnichna-mehanika/', '/mashini-i-obladnannya-dlya-tvarinnictva/', 
+		'/marketing/', '/metrologiya-i-standartizaciya/', '/zahist-vitchizni/', '/oblik-i-audit/', '/literaturne-chitannya/', '/muzichne-mistectvo/', 
+		'/lyudina-i-svit/', '/etika/', '/fizkultura/', '/administrativne-pravo/', '/marketingova-cinova-politika/', '/cinoutvorennya-brendiv/', 
+		'/derzhavne-regulyuvannya-procesu-cinoutvorennya-v-ukrayini/', '/ocinyuvannya-pomilki-i-riziku-v-cinoutvorenni/', '/cinoutvorennya-v-mizhnarodnomu-marketingu/', 
+		'/marketingova-strategiya-cinoutvorennya/', '/osoblivosti-doslidzhennya-rinkovoyi-konyunkturi/', '/roriguvannya-cini/', 
+		'/procedura-priynyattya-rishen-schodo-viznachennya-cini/', '/metodichni-pidhodi-do-cinoutvorennya-v-sistemi-marketingu/', '/faktori-marketingovogo-cinoutvorennya/', 
+		'/sistema-cin-ta-yih-klasifikaciya/', '/cina-yak-instrument-marketingovoyi-cinovoyi-politiki/', '/formuvannya-cinovoyi-politiki/', '/vvedennya-v-cinoutvorennya/', 
+		'/logistika-u-rinkoviy-ekonomici/', '/klasifikaciya-form-logistichnih-utvoren/', '/harakteristika-osnovnih-elementiv-logistiki/', 
+		'/tehnologichni-procesi-ta-upravlinnya-materialnimi-potokami/', '/faktori-formuvannya-logistichnih-sistem/', 
+		'/upravlinnya-materialnimi-potokami-v-logistichnih-sistemah/', '/zagotivelna-logistika/', '/sutnist-rozpodilchoyi-logistiki/', '/vnutrishnovirobnicha-logistika/', 
+		'/logistika-skladuvannya/', '/transportna-logistika/', '/globalizaciya-logistichnih-procesiv/', '/groshi-i-kredit/', 
+		'/finansova-politika-i-finansoviy-mehanizm/', '/osnovni-principi-regulyaciyi-fiziologichnih-funkciy/', '/gumoralna-regulyaciya-fiziologichnih-funkciy-organizmu/', 
+		'/biznes-planuvannya-zed-aviaciynogo-pidpriyemstva/', '/fiziologiya-centralnoyi-nervovoyi-sistemi/', '/fizichna-ta-koloyidna-himiya/', '/epidemiologiya/', 
+		'/endoskopiya/', '/normalna-ta-patologichna-anatomiya-topografichna-anatomiya-z-operativnoyu-hirurgiyeyu/', '/gistologiya-embriologiya/', '/sudova-medicina/', 
+		'/zarubizhna-literatura/', '/medicina/', '/biohimiya/', '/dermatologiya/', '/virusologiya/', '/dityacha-hirurgiya/', '/gigiyena-ta-ekologiya/', 
+		'/kliniko-laboratorna-funkcionalna-diagnostika/', '/infekciyni-hvorobi-epidemiologiya/', '/vnutrishnya-medicina/', '/geometriya/', '/medichna-genetika/', 
+		'/neyrohirurgiya/', '/otolaringologiya/', '/oftalmologiya/', '/nevidkladna-dopomoga/', '/litnya-praktika/', '/onkologiya-radiologiya/', '/pediatriya/', 
+		'/tovaroznavstvo/', '/byudzhetna-sistema/', '/dilovodstvo/', '/kriminologiya/', '/gerbologiya/', '/ekonomichna-teoriya/', 
+		'/ekonomika-starodavnogo-svitu/', '/ekonomika-antichnosti/', '/ekonomika-serednovichchya/', '/ekonomika-epohi-pervisnogo-nagromadzhennya-kapitalu/', 
+		'/ekonomika-v-epohu-vilnoyi-konkurenciyi/', '/istoriya-ekonomiki/', '/istoriya-mistectv/', '/ukrayinska-kultura/', '/makroekonomika/', '/filosofiya/', 
+		'/legka-atletika/', '/pedagogika-pochatkovoyi-osviti/', '/biogeografiya/', '/radiobiologiya/', '/finansi/', '/teoriya-i-metodika-plavannya/', 
+		'/fizichna-geografiya-materikiv-i-okeaniv/', '/dokumentno-informaciyni-komunikaciyi/', '/religiya/', '/etika-i-estetika/', 
+		'/istoriya-ukrayinskoyi-literaturi/', '/rekreaciyna-geografiya/', '/fiziologiya-lyudini-i-tvarin/', '/fizika-z-osnovami-biofiziki/', 
+		'/matematichna-statistika/', '/regionalna-ekonomichna-i-socialna-geografiya-svitu/', '/ekonomichna-i-socialna-geografiya-ukrayini/', 
+		'/silskogospodarske-virobnictvo/', '/vikova-fiziologiya/', '/podatkova-sistema/', '/rinok-finansovih-poslug/', '/arheologiya/', 
+		'/elektrichni-mashini-i-aparati/', '/politologiya/', '/psihologiya/', '/analitichna-himiya/', '/strahuvannya/', '/literaturoznavstvo/', 
+		'/turizm/', '/finansoviy-rinok/', '/teoriya-rozmischennya-produktivnih-sil/', '/upovnovazhena-osoba-z-publichnih-zakupivel/']
 
 	return {"search": {
 				"subject": [list_object, False],
@@ -98,7 +98,7 @@ def data_info():
 
 def main():
 	pomahach = Load_data()
-	listik = pomahach.search('/cat/biologiya/', storinka=(1,2))
+	listik = pomahach.search('/biologiya/', storinka=(1,2))
 	
 	a = pomahach.processing_data(listik)
 	print(a)

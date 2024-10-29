@@ -5,6 +5,8 @@ import psutil
 import sys
 import random
 import multiprocessing
+import asyncio
+import aiohttp
 from typing import Literal
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
@@ -16,9 +18,13 @@ from modules import GUI
 from modules import GUI_update
 
 
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
+	update_data_signal = QtCore.pyqtSignal(int, int, str)
+
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
@@ -26,6 +32,7 @@ class Search_parser(QThread):
 	
 	def run(self):
 		multiprocessing.Process(target=sr_data.plugin_data(self)).start()
+		multiprocessing.Process(target=sr_data.plugin_processing_data(self)).start()
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)

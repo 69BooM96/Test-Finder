@@ -5,8 +5,9 @@ import json
 import threading
 import Core
 
-def plugin_data(self, subject="/cat/algebra/", klass=None, q="hello", storinka=(1, 2), proxy=None):
+def plugin_data(self, subject="/geografiya/", klass=None, q="вулканізм", storinka=(1, 2), proxy=None):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
+	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
 	list_data_urls = []
 
@@ -37,16 +38,25 @@ def plugin_data(self, subject="/cat/algebra/", klass=None, q="hello", storinka=(
 					elif data_info_pl['search']['storinka'][1] == False and storinka == None: pass
 					elif data_info_pl['search']['proxy'][1] == False and proxy == None: pass
 					else:
+						urls_lists = []
 						if data_info_pl['search']['cookie'][0]:
 							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
-							list_data_urls.append(session_pl.search(**args_pl))
+							urls_lists = session_pl.search(**args_pl)
+							list_data_urls.append({"platform": pl_name, "urls": urls_lists})
 						else:
-							list_data_urls.append(plugin.Load_data.search(self, **args_pl))
+							urls_lists = plugin.Load_data.search(self, **args_pl)
+							list_data_urls.append({"platform": pl_name, "urls": urls_lists})
+
+					# print(list_data_urls)
 
 				elif mt_data['type'] == "search_engine":
 					pass
 
 
-			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [endTime][{time.perf_counter() - start_time}]s")
+			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [results][{len(urls_lists)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [{e}]")
+	self.log_signal.emit("INFO", f"Stop_search", f" [endTime][{time.perf_counter() - big_start_time:.02f}]s")
+
+def plugin_processing_data(self, proxy=None):
+	self.log_signal.emit("INFO", f"Start_load", f" [urls][]")
