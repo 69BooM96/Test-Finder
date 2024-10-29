@@ -2,20 +2,12 @@ import json
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
 
-
-def async_session(funk):
-	async def wrapper(*agrs, **kwagrs):
-		try:
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15)) as session:
-				return await funk(session, *agrs, **kwagrs)
-		except BaseException as ex: return ex
-	return wrapper
+from modules.decorate import async_session
 
 class Load_data:
 	def search(self, object, storinka=(1,2), proxy=None):
-		@async_session
+		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com{object}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
@@ -29,7 +21,7 @@ class Load_data:
 		return sum(asyncio.run(run()), [])
 	
 	def processing_data(self, url: list, proxy=None):
-		@async_session
+		@async_session(None)
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
@@ -99,8 +91,8 @@ def data_info():
 				"q": False,
 				"storinka": True,
 				"proxy": True},
-			"processing_data": {"url": "list"
-				"proxy": True}}
+				"processing_data": {"url": "list"},
+				"proxy": True}
 
 def main():
 	pomahach = Load_data()

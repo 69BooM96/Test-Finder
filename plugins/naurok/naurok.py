@@ -2,21 +2,10 @@ import json
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
 from time import perf_counter
-from pprint import pprint
 
-def async_session(cookies):
-	def wrappers(funk):
-		async def wrapper(*agrs, **kwagrs):
-			try:
-				async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15), cookies=cookies) as session:
-					return await funk(session, *agrs, **kwagrs)
-			except BaseException as ex: 
-				return ex
-		return wrapper
-	return wrappers
-	
+from modules.decorate import async_session
+
 
 class Load_data:
 	def __init__(self, cookies=None):
@@ -165,12 +154,12 @@ def data_info():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	return {"search": {"object": list_object,
-				"klass": True,
-				"q": True,
-				"storinka": True,
-				"proxy": True},
-			"processing_data": {"url": "list"
-				"proxy": True}}
+						"klass": True,
+						"q": True,
+						"storinka": True,
+						"proxy": True},
+						"processing_data": {"url": "list"},
+						"proxy": True}
 
 def main():
 	
