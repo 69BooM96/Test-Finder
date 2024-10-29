@@ -14,7 +14,7 @@ def async_session(funk):
 	return wrapper
 
 class Load_data:
-	def search(self, object, storinka=(1,4), proxy=None):
+	def search(self, object, storinka=(1,2), proxy=None):
 		@async_session
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com{object}/page/{storinka}/", proxy=proxy) as req:
@@ -52,9 +52,6 @@ class Load_data:
 		return asyncio.run(run())
 
 def data_info():
-	return {"": ""}
-
-def main():
 	list_object = [
 		'/cat/biologiya/', '/cat/geografiya/', '/cat/himiya/', '/cat/istoriya-ukrayini/', '/cat/pravoznavstvo/', '/cat/ekonomika/', 
 		'/cat/pdr/', '/cat/algebra/', '/cat/gigiyena-ta-ekologiya/', '/cat/ukrayinska-mova-i-literatura/', '/cat/notarius/', 
@@ -97,6 +94,15 @@ def main():
 		'/cat/elektrichni-mashini-i-aparati/', '/cat/politologiya/', '/cat/psihologiya/', '/cat/analitichna-himiya/', '/cat/strahuvannya/', '/cat/literaturoznavstvo/', 
 		'/cat/turizm/', '/cat/finansoviy-rinok/', '/cat/teoriya-rozmischennya-produktivnih-sil/', '/cat/upovnovazhena-osoba-z-publichnih-zakupivel/']
 
+	return {"search": {"object": list_object,
+				"klass": False,
+				"q": False,
+				"storinka": True,
+				"proxy": True},
+			"processing_data": {"url": "list"
+				"proxy": True}}
+
+def main():
 	pomahach = Load_data()
 	listik = pomahach.search('/cat/biologiya/', storinka=(1,2))
 	

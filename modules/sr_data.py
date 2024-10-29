@@ -12,9 +12,8 @@ def plugin_data():
 				mt_data = json.load(metadata)
 
 			if mt_data['type'] == "search":
-				print(mt_data['name'], mt_data['type'])
-
-			plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
-			print(plugin.data_info())
+				plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
+				print(plugin.data_info())
+			
 		except Exception as e:
 			pass

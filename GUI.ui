@@ -833,7 +833,7 @@ QListWidget::item:hover {
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="2" column="3">
+        <item row="3" column="3">
          <widget class="QFrame" name="frame_13">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -943,7 +943,49 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="2" column="0" colspan="4">
+         <widget class="Line" name="line_3">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(35, 36, 40);</string>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="Line" name="line_6">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(35, 36, 40);</string>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="Line" name="line_2">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(35, 36, 40);</string>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QListWidget" name="listWidget_3">
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
          <widget class="QFrame" name="frame_9">
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
@@ -952,7 +994,44 @@ p, li { white-space: pre-wrap; }
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_19">
-           <item row="0" column="2">
+           <item row="1" column="1">
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>16</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="pushButton_24">
+             <property name="styleSheet">
+              <string notr="true">border-radius: 0px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normalon>res/icon.png</normalon>
+              </iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>38</width>
+               <height>38</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
             <widget class="QFrame" name="frame_10">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -1203,47 +1282,10 @@ border-bottom: 0px;</string>
              </layout>
             </widget>
            </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>16</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="pushButton_24">
-             <property name="styleSheet">
-              <string notr="true">border-radius: 0px;</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normalon>res/icon.png</normalon>
-              </iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>38</width>
-               <height>38</height>
-              </size>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
-        <item row="0" column="3">
+        <item row="1" column="3">
          <widget class="QFrame" name="frame_12">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -1362,45 +1404,35 @@ border-bottom: 0px;</string>
           </layout>
          </widget>
         </item>
-        <item row="1" column="0" colspan="4">
-         <widget class="Line" name="line_3">
+        <item row="0" column="0" colspan="4">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>3</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>3</height>
+           </size>
+          </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(35, 36, 40);</string>
+           <string notr="true">QProgressBar {
+    border-radius: 1px;
+}
+
+QProgressBar::chunk {
+    background-color: rgb(86, 88, 94);
+    width: 5px;
+}</string>
           </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+          <property name="value">
+           <number>0</number>
           </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="Line" name="line_6">
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(35, 36, 40);</string>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="Line" name="line_2">
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(35, 36, 40);</string>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QListWidget" name="listWidget_3">
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-           </font>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+          <property name="textVisible">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -2664,6 +2696,9 @@ QPushButton:pressed {
             </item>
             <item row="3" column="0">
              <widget class="QTextBrowser" name="textBrowser_5">
+              <property name="styleSheet">
+               <string notr="true">background-color: rgb(20, 21, 24);</string>
+              </property>
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
               </property>

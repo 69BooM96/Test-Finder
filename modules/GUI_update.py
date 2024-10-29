@@ -64,7 +64,6 @@ class Ui_MainWindow(object):
         self.progressBar.setStyleSheet("QProgressBar {\n"
 "    border: 2px solid rgb(13, 14, 16);\n"
 "    border-radius: 5px;\n"
-"    value: 25;\n"
 "}\n"
 "\n"
 "QProgressBar::chunk {\n"

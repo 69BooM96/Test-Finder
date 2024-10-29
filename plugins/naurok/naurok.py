@@ -156,9 +156,6 @@ class Load_data:
 
 
 def data_info():
-	return {"": ""}
-
-def main():
 	list_object = [
 				"/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
 				"/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
@@ -167,6 +164,16 @@ def main():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
+	return {"search": {"object": list_object,
+				"klass": True,
+				"q": True,
+				"storinka": True,
+				"proxy": True},
+			"processing_data": {"url": "list"
+				"proxy": True}}
+
+def main():
+	
 	start = perf_counter()
 
 	naurok = Load_data(json.load(open("data/cookies", "r")))
