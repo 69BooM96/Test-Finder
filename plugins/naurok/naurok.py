@@ -11,10 +11,10 @@ class Load_data:
 	def __init__(self, cookies=None):
 		self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-	def search(self, object="", klass=0, q="", storinka=(1,2), proxy=None):
+	def search(self, objects="", klass=0, q="", storinka=(1,2), proxy=None):
 		@async_session(self.cookies)
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
-			async with session.get(f"https://naurok.com.ua/test{object}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
+			async with session.get(f"https://naurok.com.ua/test{objects}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 		
 			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
@@ -153,11 +153,12 @@ def data_info():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
-	return {"search": {"object": list_object,
+	return {"search": {"objects": list_object,
 				"klass": True,
 				"q": True,
 				"storinka": True,
-				"proxy": True},
+				"proxy": True,
+				"cookie": True},
 			"processing_data": {"url": "list",
 				"proxy": True}}
 
