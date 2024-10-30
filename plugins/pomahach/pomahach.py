@@ -6,11 +6,12 @@ from bs4 import BeautifulSoup
 from modules.decorate import async_session
 
 class Load_data:
-	def search(self, subject, storinka=(1,2), proxy=None):
+	def search(self, subject, storinka=(1,2), proxy=None, qt_logs=None):
 		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com/cat{subject}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
+				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{req.status}] [https://pomahach.com/cat{subject}/page/{storinka}/]")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
 		
@@ -20,12 +21,12 @@ class Load_data:
 		
 		return sum(asyncio.run(run()), [])
 	
-	def processing_data(self, url: list, proxy=None):
+	def processing_data(self, url: list, proxy=None, qt_logs=None):
 		@async_session(None)
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				print(url)
+				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{req.status}] [{url}]")
 
 			return {
 				"platform": "pomahach",
@@ -97,7 +98,9 @@ def data_info():
 				"proxy": [True, False],
 				"cookie": [False, False]},
 			"processing_data": {"url": ["list", False],
-				"proxy": [True, False]}}
+				"proxy": [True, False],
+				"cookie": [False, False]},
+			"qt_logs": [True, False]}
 
 def main():
 	pomahach = Load_data()

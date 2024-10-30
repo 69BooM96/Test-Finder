@@ -30,12 +30,16 @@ class Search_parser(QThread):
 		self.mainwindows = mainwindows
 	
 	def run(self):
+		start_time = time.perf_counter()
 		index_sessions = 0
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 		self.urls_data_list = []
+		self.platforms_num = 0
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
+
 		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
+		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -189,11 +193,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			"results": results,
 			"platforms": platforms,
 			"times": times,
-			"lists_data": lists_data
+			"lists_data": lists_data,
+			"page": 0
 		}
-		with open(f"temp_data/session/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
+		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
 			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
-
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)

@@ -7,7 +7,8 @@ test2.py
 *.log
 *.log
 *.log
-*.temp_data/json
-*.temp_data/imgs
+*.temp_data/json/
+*.temp_data/imgs/
 __pycache__
 modules.__pycache__
+*.json
