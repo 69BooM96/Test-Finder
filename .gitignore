@@ -11,3 +11,4 @@ test2.py
 *.temp_data/imgs/
 __pycache__
 modules.__pycache__
+*.json
