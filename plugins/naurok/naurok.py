@@ -51,7 +51,7 @@ class Load_data:
 			}
 		
 		async def run():
-			task = [async_processing_data(url=item) for item in url]
+			task = [async_processing_data(url) for url in url if url if url[:27] == "https://naurok.com.ua/test/"]
 			return await asyncio.gather(*task)
 
 		return asyncio.run(run())
@@ -94,7 +94,7 @@ class Load_data:
 			return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
 		async def run():
-			task = [async_get_test(f"{url[:-5]}/set") for url in url]
+			task = [async_get_test(f"{url[:-5]}/set") for url in url if url[:27] == "https://naurok.com.ua/test/"]
 			return await asyncio.gather(*task)
 
 		return asyncio.run(run())
