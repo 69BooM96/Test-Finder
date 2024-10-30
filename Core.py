@@ -30,12 +30,16 @@ class Search_parser(QThread):
 		self.mainwindows = mainwindows
 	
 	def run(self):
+		start_time = time.perf_counter()
 		index_sessions = 0
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 		self.urls_data_list = []
+		self.platforms_num = 0
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
+
 		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
+		self.update_data_signal.emit(index_sessions, len(list_urls), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
