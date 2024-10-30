@@ -42,10 +42,10 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 						if data_info_pl['search']['cookie'][0]:
 							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
 							urls_lists = session_pl.search(**args_pl)
-							self.urls_data_list.append({"platform": pl_name, "urls": urls_lists})
+							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 						else:
 							urls_lists = plugin.Load_data.search(self, **args_pl)
-							self.urls_data_list.append({"platform": pl_name, "urls": urls_lists})
+							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 
 				elif mt_data['type'] == "search_engine":
 					pass
@@ -54,11 +54,10 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [results][{len(urls_lists)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [{e}]")
-	self.log_signal.emit("INFO", f"Stop_search", f" [endTime][{time.perf_counter() - big_start_time:.02f}]s")
-	# print(list_data_urls)
-	self.urls_data_list
+	self.log_signal.emit("INFO", f"Stop_search", f" [results][{len(self.urls_data_list)}] [endTime][{time.perf_counter() - big_start_time:.02f}]s")
+	self.urls_data_list = self.urls_data_list
 
 def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None):
 	print(index_session, list_urls)
-	self.log_signal.emit("INFO", f"Start_load", f" [urls][]")
-	return 0
+	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
+
