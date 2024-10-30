@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from modules.decorate import async_session
 
 class Load_data:
-	def search(self, subject, storinka=(1,2), proxy=None):
+	def search(self, subject, storinka=(1,2), proxy=None, qt_logs=None):
 		@async_session(None)
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com/cat{subject}/page/{storinka}/", proxy=proxy) as req:
@@ -20,7 +20,7 @@ class Load_data:
 		
 		return sum(asyncio.run(run()), [])
 	
-	def processing_data(self, url: list, proxy=None):
+	def processing_data(self, url: list, proxy=None, qt_logs=None):
 		@async_session(None)
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
