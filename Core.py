@@ -23,8 +23,7 @@ asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
-	update_data_signal = QtCore.pyqtSignal(int, int, str)
-
+	update_data_signal = QtCore.pyqtSignal(int, int, str, list)
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
@@ -110,7 +109,6 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		except:
 			pass
 
-
 class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
@@ -180,6 +178,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget.setCurrentIndex(1)
 		self.parser_search.start()
 		
+	def set_search_data(self, list_data)
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
