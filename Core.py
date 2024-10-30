@@ -5,6 +5,8 @@ import psutil
 import sys
 import random
 import multiprocessing
+import asyncio
+import aiohttp
 from typing import Literal
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
@@ -16,16 +18,24 @@ from modules import GUI
 from modules import GUI_update
 
 
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
+	update_data_signal = QtCore.pyqtSignal(int, int, int, str, list)
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
 		self.mainwindows = mainwindows
 	
 	def run(self):
-		multiprocessing.Process(target=sr_data.plugin_data(self)).start()
+		index_sessions = 0
+		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
+		self.urls_data_list = []
+		multiprocessing.Process(target=sr_data.plugin_data(self, q=self.mainwindows.text_search)).start()
+		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -103,7 +113,6 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		except:
 			pass
 
-
 class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
 		super().__init__()
@@ -124,6 +133,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.parser_search = Search_parser(mainwindows=self)
 		self.parser_search.log_signal.connect(self.logs)
 		self.parser_search.progress_signal.connect(self.progress_search)
+		self.parser_search.update_data_signal.connect(self.set_session_data)
 
 	#Button
 		self.pushButton_10.clicked.connect(self.close_)
@@ -173,6 +183,17 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget.setCurrentIndex(1)
 		self.parser_search.start()
 		
+	def set_session_data(self, index_session, results, platforms, times, lists_data):
+		data_write = {
+			"session_index": index_session,
+			"results": results,
+			"platforms": platforms,
+			"times": times,
+			"lists_data": lists_data
+		}
+		with open(f"temp_data/session/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
+			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
+
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
