@@ -33,11 +33,11 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 					if data_info_pl['search']['storinka'][0] and storinka: args_pl["storinka"]= storinka
 					if data_info_pl['search']['proxy'][0] and proxy:       args_pl["proxy"]= proxy
 
-					if data_info_pl['search']['subject'][1] == False and subject == None: pass
-					elif data_info_pl['search']['klass'][1] == False and klass == None: pass
-					elif data_info_pl['search']['q'][1] == False and q == None: pass
-					elif data_info_pl['search']['storinka'][1] == False and storinka == None: pass
-					elif data_info_pl['search']['proxy'][1] == False and proxy == None: pass
+					if data_info_pl['search']['subject'][1] and not subject: pass
+					elif data_info_pl['search']['klass'][1] and not klass: pass
+					elif data_info_pl['search']['q'][1] and not q: pass
+					elif data_info_pl['search']['storinka'][1] and not storinka: pass
+					elif data_info_pl['search']['proxy'][1] and not proxy: pass
 					else:
 						if data_info_pl['search']['cookie'][0]:
 							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
@@ -48,7 +48,7 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 
 				elif mt_data['type'] == "search_engine":
-					pass
+					...
 
 
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [results][{len(urls_lists)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
@@ -59,5 +59,6 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 
 def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None):
 	print(index_session, list_urls)
+
 	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
 

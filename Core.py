@@ -34,7 +34,7 @@ class Search_parser(QThread):
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 		self.urls_data_list = []
-		multiprocessing.Process(target=sr_data.plugin_data(self, q=self.mainwindows.text_search)).start()
+		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
 		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
 
 class Core_load_flow(QThread):

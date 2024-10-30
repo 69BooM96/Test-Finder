@@ -16,7 +16,7 @@ class Load_data:
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-		
+			
 			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 		
 		async def run():
@@ -154,15 +154,15 @@ def data_info():
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
 	return {"search": {
-				"subject": [list_object, True],
-				"klass": [True, True],
-				"q": [True, True],
-				"storinka": [True, True],
-				"proxy": [True, True],
-				"cookie": [True, False]},
+				"subject": [list_object, False],
+				"klass": [True, False],
+				"q": [True, False],
+				"storinka": [True, False],
+				"proxy": [True, False],
+				"cookie": [True, True]},
 			"processing_data": {
-				"url": ["list", True],
-				"proxy": [True, True]}}
+				"url": ["list", False],
+				"proxy": [True, False]}}
 
 def main():
 	
