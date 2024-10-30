@@ -97,5 +97,6 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 							json.dump(dict_data[index_item], session_set_sr_data, ensure_ascii=False, indent=4)
 					dict_num += len(dict_data)
 
+			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
 		except Exception as e:
 			print(e)

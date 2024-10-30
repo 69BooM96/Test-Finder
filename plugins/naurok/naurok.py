@@ -5,7 +5,6 @@ import aiohttp.client_exceptions
 from bs4 import BeautifulSoup
 from time import perf_counter
 from pprint import pprint
-
 from modules.decorate import async_session
 
 
@@ -203,14 +202,14 @@ def data_info():
 def main():
 	start = perf_counter()
 
-	naurok = Load_data(json.load(open("data/cookies", "r")))
-	a = naurok.search(storinka=(1, 6))
+	naurok = Load_data()
+	a = naurok.search()
 	b = naurok.get_test(a)
 	c = naurok.test_pass(b)
 	d = naurok.get_answer(c)
 	
 	for index, item in enumerate(d):
-		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
+		with open(f"index_{index}.json", "w", encoding="utf-8") as file:
 			json.dump(item, file, indent=4, ensure_ascii=False)
 	
 	print(perf_counter()-start)

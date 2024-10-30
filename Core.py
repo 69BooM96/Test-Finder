@@ -38,7 +38,7 @@ class Search_parser(QThread):
 		self.platforms_num = 0
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
 
-		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
+		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list, qtLogs=False)).start()
 		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
 
 class Core_load_flow(QThread):
@@ -144,6 +144,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_18.clicked.connect(self.show_)
 		self.pushButton_19.clicked.connect(self.show_winow_)
 		self.pushButton_11.clicked.connect(self.start_search_0)
+		self.pushButton_22.clicked.connect(self.start_search_1)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
