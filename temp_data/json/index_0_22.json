@@ -1,0 +1,238 @@
+{
+    "platform": "naurok",
+    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-geyzeri-1669291.html",
+    "name_test": " Вулканізм і вулкани.Гейзери",
+    "object": "Географія",
+    "klass": "6 клас",
+    "questions": 12,
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "Наука, що вивчає вулкани",
+            "img": null,
+            "value": [
+                {
+                    "text": "географія",
+                    "img": null
+                },
+                {
+                    "text": "геологія",
+                    "img": null
+                },
+                {
+                    "text": "сейсмологія",
+                    "img": null
+                },
+                {
+                    "text": "вулканологія",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": ". Як називається магма, коли вона вийшла на поверхню землі?",
+            "img": null,
+            "value": [
+                {
+                    "text": "магма",
+                    "img": null
+                },
+                {
+                    "text": "лава",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "канал,яким піднімається магма,називають",
+            "img": null,
+            "value": [
+                {
+                    "text": "конусом вулкану",
+                    "img": null
+                },
+                {
+                    "text": "жерлом",
+                    "img": null
+                },
+                {
+                    "text": "кратером",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Ключевська Сопка -це діючий чи згаслий вулкан",
+            "img": null,
+            "value": [
+                {
+                    "text": "діючий",
+                    "img": null
+                },
+                {
+                    "text": "згаслий",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "що на малюнку",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/930871/1190496/183792_1638777312.jpg",
+            "value": [
+                {
+                    "text": "джерело",
+                    "img": null
+                },
+                {
+                    "text": "гейзер",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Який вулкан знищив Помпею",
+            "img": null,
+            "value": [
+                {
+                    "text": "Кракатау",
+                    "img": null
+                },
+                {
+                    "text": "Везувій",
+                    "img": null
+                },
+                {
+                    "text": "Еребус",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "що зображено на малюнку під номером 3",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/304833/1669291/325845_1664299908.jpeg",
+            "value": [
+                {
+                    "text": "кратер",
+                    "img": null
+                },
+                {
+                    "text": "жерло",
+                    "img": null
+                },
+                {
+                    "text": "боковий кратер",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Який принцип роботи гейзера",
+            "img": null,
+            "value": [
+                {
+                    "text": "сковороди",
+                    "img": null
+                },
+                {
+                    "text": "чайника",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Вкажіть тип вулкану, вказаного на малюнку",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/304833/1669291/225611_1664299824.jpeg",
+            "value": [
+                {
+                    "text": "кратерний",
+                    "img": null
+                },
+                {
+                    "text": "щитовий",
+                    "img": null
+                },
+                {
+                    "text": "змішаний",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Назвати продукти вулканічнох діяльности",
+            "img": null,
+            "value": [
+                {
+                    "text": "бомби",
+                    "img": null
+                },
+                {
+                    "text": "попіл",
+                    "img": null
+                },
+                {
+                    "text": "лава",
+                    "img": null
+                },
+                {
+                    "text": "газ",
+                    "img": null
+                },
+                {
+                    "text": "всі відповіді правильні",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Що хзображено на малюнку під номером 2",
+            "img": null,
+            "value": [
+                {
+                    "text": "жерло",
+                    "img": null
+                },
+                {
+                    "text": "кратер",
+                    "img": null
+                },
+                {
+                    "text": "шари застиглої лави",
+                    "img": null
+                },
+                {
+                    "text": "шари попелу й каміння",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Найбільше діючих вулканів розташовано:",
+            "img": null,
+            "value": [
+                {
+                    "text": "на рівнинах",
+                    "img": null
+                },
+                {
+                    "text": "на платформах",
+                    "img": null
+                },
+                {
+                    "text": "у районах, де проходять межі літосферних плит",
+                    "img": null
+                }
+            ]
+        }
+    ]
+}

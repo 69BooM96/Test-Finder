@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Визначте особливості процессу урбанізації в розвинених країнах.",
+    "answers": [
+        {
+            "text": "хибна урбанізація",
+            "correctness": false
+        },
+        {
+            "text": "високі темпи урбанізіції",
+            "correctness": false
+        },
+        {
+            "text": "субурбанізація.",
+            "correctness": true
+        },
+        {
+            "text": "низький рівень урбанізації",
+            "correctness": false
+        }
+    ]
+}

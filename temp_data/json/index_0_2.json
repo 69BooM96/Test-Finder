@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Який населений пункт на території України знаходиться найближче до Ґринвіцького меридіана?",
+    "answers": [
+        {
+            "text": "смт Добровеличівка",
+            "correctness": false
+        },
+        {
+            "text": "м. Чоп",
+            "correctness": true
+        },
+        {
+            "text": "м. Київ",
+            "correctness": false
+        },
+        {
+            "text": "с. Грем’яч",
+            "correctness": false
+        }
+    ]
+}

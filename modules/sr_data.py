@@ -58,7 +58,30 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 	self.urls_data_list = self.urls_data_list
 
 def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None):
-	print(index_session, list_urls)
-
 	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
+	big_start_time = time.perf_counter()
+	plugins_list = [name for name in os.listdir("plugins")]
+	self.urls_data_list = []
+
+	for pl_index, pl_name in enumerate(plugins_list, start=1):
+		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
+		start_time = time.perf_counter()
+		try:
+			urls_lists = []
+			with open(f"plugins/{pl_name}/metadata.json") as metadata:
+				mt_data = json.load(metadata)
+
+			if mt_data['status'] == "works":
+				if mt_data['type'] == "search":
+					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
+					print(list_urls)
+					pl_load_data = plugin.Load_data()
+					dict_data = pl_load_data.processing_data(url=list_urls)
+					print(dict_data)
+					for index_item in range(len(dict_data)):
+						with open(f"temp_data/json/index_{index_session}_{index_item}.json", "w", encoding="utf-8") as session_set_sr_data:
+							json.dump(dict_data[index_item], session_set_sr_data, ensure_ascii=False, indent=4)
+		except Exception as e:
+			print(e)
+	
 

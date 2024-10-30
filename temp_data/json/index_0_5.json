@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Земна вісь – це уявна пряма лінія, що проходить через центр Землі та",
+    "answers": [
+        {
+            "text": "точку з кординатами 0° ш. і 0° д.",
+            "correctness": false
+        },
+        {
+            "text": "географічні полюси.",
+            "correctness": true
+        },
+        {
+            "text": "магнітні полюси",
+            "correctness": false
+        },
+        {
+            "text": "лінію екватора",
+            "correctness": false
+        }
+    ]
+}
