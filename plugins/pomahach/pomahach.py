@@ -11,6 +11,7 @@ class Load_data:
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com/cat{subject}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
+				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{req.status}] [https://pomahach.com/cat{subject}/page/{storinka}/]")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
 		
@@ -25,7 +26,7 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{url}]")
+				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{req.status}] [{url}]")
 
 			return {
 				"platform": "pomahach",

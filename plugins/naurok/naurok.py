@@ -16,6 +16,7 @@ class Load_data:
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
+				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}]")
 			
 			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 		
@@ -30,7 +31,7 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{url}]")
+				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{url}]")
 
 			return {
 				"platform": "naurok",
