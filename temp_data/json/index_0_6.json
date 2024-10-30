@@ -1,6 +1,6 @@
 {
     "platform": "naurok",
-    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-geyzeri-1190496.html",
+    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-geyzeri-1669291.html",
     "name_test": " Вулканізм і вулкани.Гейзери",
     "object": "Географія",
     "klass": "6 клас",
@@ -8,7 +8,7 @@
     "answers": [
         {
             "type": "quiz",
-            "text": "Наука, що вивчає землетруси",
+            "text": "Наука, що вивчає вулкани",
             "img": null,
             "value": [
                 {
@@ -21,6 +21,10 @@
                 },
                 {
                     "text": "сейсмологія",
+                    "img": null
+                },
+                {
+                    "text": "вулканологія",
                     "img": null
                 }
             ]
@@ -55,21 +59,6 @@
                 },
                 {
                     "text": "кратером",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
-            "text": "Вулканізм-цепроцес утворення і руху магми від шару астеносфери до поверхні Землі",
-            "img": null,
-            "value": [
-                {
-                    "text": "так",
-                    "img": null
-                },
-                {
-                    "text": "ні",
                     "img": null
                 }
             ]
@@ -125,8 +114,8 @@
         },
         {
             "type": "quiz",
-            "text": "що зображено на малюнку під номером 5",
-            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/930871/1190496/489736_1638777551.jpg",
+            "text": "що зображено на малюнку під номером 3",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/304833/1669291/325845_1664299908.jpeg",
             "value": [
                 {
                     "text": "кратер",
@@ -159,30 +148,15 @@
         },
         {
             "type": "quiz",
-            "text": "Як називається сейсмічний пояс , виділений на малюнку",
-            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/930871/1190496/114522_1638778009.jpg",
-            "value": [
-                {
-                    "text": "Середземноморський",
-                    "img": null
-                },
-                {
-                    "text": "Тихоокеанський",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
             "text": "Вкажіть тип вулкану, вказаного на малюнку",
-            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/930871/1190496/901212_1638778463.jpg",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/304833/1669291/225611_1664299824.jpeg",
             "value": [
                 {
                     "text": "кратерний",
                     "img": null
                 },
                 {
-                    "text": "площинний",
+                    "text": "щитовий",
                     "img": null
                 },
                 {
@@ -214,6 +188,48 @@
                 },
                 {
                     "text": "всі відповіді правильні",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Що хзображено на малюнку під номером 2",
+            "img": null,
+            "value": [
+                {
+                    "text": "жерло",
+                    "img": null
+                },
+                {
+                    "text": "кратер",
+                    "img": null
+                },
+                {
+                    "text": "шари застиглої лави",
+                    "img": null
+                },
+                {
+                    "text": "шари попелу й каміння",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Найбільше діючих вулканів розташовано:",
+            "img": null,
+            "value": [
+                {
+                    "text": "на рівнинах",
+                    "img": null
+                },
+                {
+                    "text": "на платформах",
+                    "img": null
+                },
+                {
+                    "text": "у районах, де проходять межі літосферних плит",
                     "img": null
                 }
             ]

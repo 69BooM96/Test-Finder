@@ -25,7 +25,7 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				# print(url)
+				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{url}]")
 
 			return {
 				"platform": "pomahach",

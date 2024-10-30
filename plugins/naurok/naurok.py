@@ -30,8 +30,7 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				if qt_logs:
-					qt_logs.emit("")
+				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{url}]")
 
 			return {
 				"platform": "naurok",

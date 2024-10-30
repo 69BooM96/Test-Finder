@@ -63,7 +63,7 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None)
 	plugins_list = [name for name in os.listdir("plugins")]
 	self.urls_data_list = []
 
-	dict_data = []
+	dict_num = 0
 
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
@@ -75,16 +75,15 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None)
 
 			if mt_data['status'] == "works":
 				if mt_data['type'] == "search":
+					dict_data = []
 					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 					
 					pl_load_data = plugin.Load_data()
-					dict_data.append(pl_load_data.processing_data(url=list_urls))
+					dict_data = pl_load_data.processing_data(url=list_urls, qt_logs=self.log_signal)
+
+					for index_item in range(len(dict_data)):
+						with open(f"temp_data/json/index_{index_session}_{index_item+dict_num}.json", "w", encoding="utf-8") as session_set_sr_data:
+							json.dump(dict_data[index_item], session_set_sr_data, ensure_ascii=False, indent=4)
+					dict_num += len(dict_data)
 		except Exception as e:
 			print(e)
-
-	try:
-		for index_item in range(len(dict_data)):
-			with open(f"temp_data/json/index_{index_session}_{index_item}.json", "w", encoding="utf-8") as session_set_sr_data:
-				json.dump(dict_data[index_item], session_set_sr_data, ensure_ascii=False, indent=4)
-	except Exception as e:
-		print(e)

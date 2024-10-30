@@ -1,10 +1,10 @@
 {
     "platform": "naurok",
-    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-zovnishni-procesi-scho-zumovlyuyut-zminu-zemno-kori-1184971.html",
+    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-zovnishni-procesi-scho-zumovlyuyut-zminu-zemno-kori-2495044.html",
     "name_test": "Вулканізм і вулкани. Зовнішні процеси, що зумовлюють зміну земної кори",
     "object": "Географія",
     "klass": "6 клас",
-    "questions": 15,
+    "questions": 12,
     "answers": [
         {
             "type": "quiz",
@@ -188,52 +188,6 @@
         },
         {
             "type": "quiz",
-            "text": "Зовнішні геологічні процеси – це…",
-            "img": null,
-            "value": [
-                {
-                    "text": "процеси, які відбуваються в атмосфері Землі",
-                    "img": null
-                },
-                {
-                    "text": "сукупність явищ, пов’язаних із підняттям магми з надр Землі та виливанням її на поверхню",
-                    "img": null
-                },
-                {
-                    "text": "процеси, які відбуваються на земній поверхні або у верхній частині земної кори",
-                    "img": null
-                },
-                {
-                    "text": "процеси, які відбуваються в надрах Землі",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
-            "text": "Якого виду вивітрювання не існує?",
-            "img": null,
-            "value": [
-                {
-                    "text": "математичного",
-                    "img": null
-                },
-                {
-                    "text": "органічного",
-                    "img": null
-                },
-                {
-                    "text": "хімічного",
-                    "img": null
-                },
-                {
-                    "text": "фізичного",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
             "text": "До зовнішніх геологічних процесів належать…",
             "img": null,
             "value": [
@@ -251,29 +205,6 @@
                 },
                 {
                     "text": "горизонтальні рухи земної кори",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
-            "text": "Що таке печери?",
-            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/200917/1184971/668367_1638369374.jpg",
-            "value": [
-                {
-                    "text": "заглиблення глибиною 1-2 м, які утворюються внаслідок діяльності тимчасових водних потоків",
-                    "img": null
-                },
-                {
-                    "text": "піщані горби висотою 70-150 м у вигляді півмісяця",
-                    "img": null
-                },
-                {
-                    "text": "великі порожнини під землею, що утворюються внаслідок розчинення і вимивання гірських порід підземними водами",
-                    "img": null
-                },
-                {
-                    "text": "піщані горби заввишки 10-20 м, рідко – 100 м",
                     "img": null
                 }
             ]
@@ -303,29 +234,6 @@
         },
         {
             "type": "quiz",
-            "text": "Яка найбільша печера у світі?",
-            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/200917/1184971/124991_1638369765.jpg",
-            "value": [
-                {
-                    "text": "Кришталева",
-                    "img": null
-                },
-                {
-                    "text": "Озерна",
-                    "img": null
-                },
-                {
-                    "text": "Оптимістична",
-                    "img": null
-                },
-                {
-                    "text": "Мамонтова",
-                    "img": null
-                }
-            ]
-        },
-        {
-            "type": "quiz",
             "text": "Руйнування гірських порід до уламків під впливом коливань температури та замерзання води в її тріщинах називається…",
             "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/200917/1184971/560744_1638369958.jpg",
             "value": [
@@ -343,6 +251,29 @@
                 },
                 {
                     "text": "землетрусом",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Найвищий вулкан Європи",
+            "img": null,
+            "value": [
+                {
+                    "text": "Ключевська Сопка",
+                    "img": null
+                },
+                {
+                    "text": "Етна",
+                    "img": null
+                },
+                {
+                    "text": "Везувій",
+                    "img": null
+                },
+                {
+                    "text": "Кракатау",
                     "img": null
                 }
             ]

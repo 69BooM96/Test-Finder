@@ -1,0 +1,240 @@
+{
+    "platform": "naurok",
+    "utl": "https://naurok.com.ua/test/vulkanizm-i-vulkani-geyzeri-seysmichni-poyasi-zemli-1842628.html",
+    "name_test": "Вулканізм і вулкани, гейзери. Сейсмічні пояси Землі",
+    "object": "Географія",
+    "klass": "6 клас",
+    "questions": 10,
+    "answers": [
+        {
+            "type": "quiz",
+            "text": "Що таке Вулкан ?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/447529_1595233458.jpg",
+            "value": [
+                {
+                    "text": "Це гора конічної форми, що виникла в наслідок дії вітру.",
+                    "img": null
+                },
+                {
+                    "text": "Це гора конічної форми, що виникає під час виверження магми.",
+                    "img": null
+                },
+                {
+                    "text": "Це гора конічної форми, що виникла в наслідок дії людини.",
+                    "img": null
+                },
+                {
+                    "text": "Це гора конічної форми, що виникла в наслідок впливу води на сушу.",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Перед виверженням вулкана, з жерла виходить",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/803063_1595234659.jpg",
+            "value": [
+                {
+                    "text": "Вулканічні бомби",
+                    "img": null
+                },
+                {
+                    "text": "Стовп гарячої води",
+                    "img": null
+                },
+                {
+                    "text": "грязь",
+                    "img": null
+                },
+                {
+                    "text": "Вулканічний попіл",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Фонтануюче джерело гарячої води і пара називається:",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/183599_1595234863.jpg",
+            "value": [
+                {
+                    "text": "Джерелом",
+                    "img": null
+                },
+                {
+                    "text": "Водоспад",
+                    "img": null
+                },
+                {
+                    "text": "Гейзером",
+                    "img": null
+                },
+                {
+                    "text": "Лавою",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "як називається канал по якому магма виходить на поверхню?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/921432_1595235150.jpg",
+            "value": [
+                {
+                    "text": "Жерло",
+                    "img": null
+                },
+                {
+                    "text": "Літосферні пустоти",
+                    "img": null
+                },
+                {
+                    "text": "Кратер",
+                    "img": null
+                },
+                {
+                    "text": "Магмові канали",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Гейзер, це прояв якої стадії вулканізму?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/170971_1595235462.jpg",
+            "value": [
+                {
+                    "text": "Пізня стадія вулканізму",
+                    "img": null
+                },
+                {
+                    "text": "Початкова стадія вулканізму",
+                    "img": null
+                },
+                {
+                    "text": "Відбувається тільки в момент виверження вулкану",
+                    "img": null
+                },
+                {
+                    "text": "Жодна відповідь не правильна",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Найвищий вулкан світу є?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/376155_1595235720.jpg",
+            "value": [
+                {
+                    "text": "Кіліманджаро",
+                    "img": null
+                },
+                {
+                    "text": "Сідлей",
+                    "img": null
+                },
+                {
+                    "text": "Орісаба",
+                    "img": null
+                },
+                {
+                    "text": "Охос-дель-Саладо",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Приладдля автоматичного запису коливань земної поверхні, зумовлених сейсмічними хвилями (при землетрусах та сейсморозвідці).",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/489000_1595235901.jpg",
+            "value": [
+                {
+                    "text": "Компас",
+                    "img": null
+                },
+                {
+                    "text": "Сейсмограф",
+                    "img": null
+                },
+                {
+                    "text": "Барометр",
+                    "img": null
+                },
+                {
+                    "text": "Флюгер",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Сила землетрусу буває (від і до) балів",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/545234_1595236176.jpg",
+            "value": [
+                {
+                    "text": "1 - 10",
+                    "img": null
+                },
+                {
+                    "text": "1 - 12",
+                    "img": null
+                },
+                {
+                    "text": "1 - 5",
+                    "img": null
+                },
+                {
+                    "text": "1 - 15",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Які бувають Сейсмічні пояси?",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/719436_1595236374.jpg",
+            "value": [
+                {
+                    "text": "Середземноморський",
+                    "img": null
+                },
+                {
+                    "text": "Середземноморсько-Азійський, Тихоокеанський.",
+                    "img": null
+                },
+                {
+                    "text": "Північно Американський",
+                    "img": null
+                },
+                {
+                    "text": "Азійський",
+                    "img": null
+                }
+            ]
+        },
+        {
+            "type": "quiz",
+            "text": "Наука що вивчає Землетруси",
+            "img": "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/1458589/542333/773617_1595236672.jpg",
+            "value": [
+                {
+                    "text": "Сейсмологія",
+                    "img": null
+                },
+                {
+                    "text": "Геологія",
+                    "img": null
+                },
+                {
+                    "text": "Геоморфологія",
+                    "img": null
+                },
+                {
+                    "text": "Кліматологія",
+                    "img": null
+                }
+            ]
+        }
+    ]
+}
