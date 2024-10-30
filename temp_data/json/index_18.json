@@ -1,0 +1,27 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Вкажіть генотип ІІІ групи крові.",
+    "answers": [
+        {
+            "text": "ІВІ0",
+            "correctness": true
+        },
+        {
+            "text": "ІАІА",
+            "correctness": false
+        },
+        {
+            "text": "ІАІ0",
+            "correctness": false
+        },
+        {
+            "text": "І0І0",
+            "correctness": false
+        },
+        {
+            "text": "ІАІВ",
+            "correctness": false
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Укажіть хімічний елемент, що належить до органогенних:",
+    "answers": [
+        {
+            "text": "Сульфур",
+            "correctness": false
+        },
+        {
+            "text": "Фосфор",
+            "correctness": false
+        },
+        {
+            "text": "Ферум",
+            "correctness": false
+        },
+        {
+            "text": "Карбон",
+            "correctness": true
+        }
+    ]
+}

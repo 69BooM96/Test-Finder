@@ -1,0 +1,23 @@
+{
+    "platform": "pomahach",
+    "type": "quiz",
+    "name_test": "Укажіть властивості мутацій:",
+    "answers": [
+        {
+            "text": "завжди мають пристосувальне значення",
+            "correctness": false
+        },
+        {
+            "text": "можуть успадковуватись",
+            "correctness": true
+        },
+        {
+            "text": "здатні зникати протягом життя особини",
+            "correctness": false
+        },
+        {
+            "text": "можуть виникати лише у нестатевих клітинах",
+            "correctness": false
+        }
+    ]
+}

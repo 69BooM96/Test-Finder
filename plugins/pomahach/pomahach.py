@@ -25,6 +25,7 @@ class Load_data:
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
+				print(url)
 
 			return {
 				"platform": "pomahach",
@@ -38,7 +39,7 @@ class Load_data:
 		
 		
 		async def run():
-			task = [async_processing_data(url) for url in url]
+			task = [async_processing_data(url) for url in url if url[:30] == "https://pomahach.com/question/"]
 			return await asyncio.gather(*task)
 
 		return asyncio.run(run())
@@ -98,10 +99,12 @@ def data_info():
 
 def main():
 	pomahach = Load_data()
-	listik = pomahach.search('/cat/biologiya/', storinka=(1,2))
+	listik = pomahach.search('/cat/biologiya/', storinka=(1,6))
 	
 	a = pomahach.processing_data(listik)
-	print(a)
-	
+	for item in range(len(a)):
+		with open(f"temp_data/json/index_{item}.json", "w", encoding="utf-8") as file:
+			json.dump(a[item], file, indent=4, ensure_ascii=False)
+
 if __name__ == "__main__":
 	main()
