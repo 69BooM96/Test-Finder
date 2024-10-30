@@ -39,7 +39,7 @@ class Search_parser(QThread):
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
 
 		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
-		self.update_data_signal.emit(index_sessions, len(list_urls), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
+		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
