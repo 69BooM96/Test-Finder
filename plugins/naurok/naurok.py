@@ -23,7 +23,7 @@ class Load_data:
 			task = [async_search(storinka=item) for item in range(*storinka)]
 			return await asyncio.gather(*task)
 		
-		return sum(asyncio.run(run()), [])
+		return list(set(sum(asyncio.run(run()), [])))
 
 	def processing_data(self, url: list, proxy=None):
 		@async_session(self.cookies)
