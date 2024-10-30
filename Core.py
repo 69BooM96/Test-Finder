@@ -193,11 +193,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			"results": results,
 			"platforms": platforms,
 			"times": times,
-			"lists_data": lists_data
+			"lists_data": lists_data,
+			"page": 0
 		}
-		with open(f"temp_data/session/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
+		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
 			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
-
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
