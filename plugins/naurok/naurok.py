@@ -155,6 +155,7 @@ def data_info():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
+
 	return {"search": {
 				"subject": [list_object, False],
 				"klass": [True, False],
@@ -164,7 +165,9 @@ def data_info():
 				"cookie": [True, True]},
 			"processing_data": {
 				"url": ["list", False],
-				"proxy": [True, False]}}
+				"proxy": [True, False],
+				"cookie": [True, True]},
+			"qt_logs": [True, False]}
 
 def main():
 	
