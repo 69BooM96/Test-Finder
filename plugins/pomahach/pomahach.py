@@ -29,11 +29,13 @@ class Load_data:
 
 			return {
 				"platform": "pomahach",
+				"url": str(req.url),
 				"type": "quiz" if soup.find(class_="option-marker quiz") else "multiquiz",
 				"name_test": soup.find(class_="panel-body").text,
 
 				"answers": [{
 					"text": obj.text.strip(),
+					"img": None,
 					"correctness": bool("list-group-item-success" in obj.get("class", []))
 				} for obj in soup.find_all(class_="list-group")[1].find_all("li")]}
 		

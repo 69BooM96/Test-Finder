@@ -1,8 +1,10 @@
 import json
 import asyncio
 import aiohttp
+import aiohttp.client_exceptions
 from bs4 import BeautifulSoup
 from time import perf_counter
+from pprint import pprint
 
 from modules.decorate import async_session
 
@@ -143,6 +145,35 @@ class Load_data:
 
 		return asyncio.run(run())			
 
+	def get_answer(self, url: list, proxy=None):
+		@async_session(self.cookies)
+		async def async_get_answer(session: aiohttp.ClientSession, url):
+			async with session.get(url, proxy=proxy) as req:
+				soup = BeautifulSoup(await req.text(), "lxml")
+			
+			blok = soup.find(class_="homework-stats").find_all(class_="content-block")
+
+			data = []
+			
+			for obj in blok:
+				all_answer = obj.find(class_="homework-stat-options").find_all(class_="row")
+				data.append({
+					"type": obj.find("span")['class'][1],
+					"text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]),
+					"img": obj.find("img").get("src") if obj.find(class_="col-md-6") else None,
+					"answer": [{
+						"text": item.find("p").text.strip() if item.find("p") else None,
+						"img": item.find("img").get("src") if item.find("img") else None,
+						"correctness": True if item.find("span")['class'][0] == "correct" else False
+					} for item in all_answer]
+				})
+			return data
+
+		async def run():
+			task = [async_get_answer(url) for url in url if url[:36] == "https://naurok.com.ua/test/complete/"]
+			return await asyncio.gather(*task)
+
+		return asyncio.run(run())
 
 def data_info():
 	list_object = [
@@ -165,16 +196,19 @@ def data_info():
 				"proxy": [True, False]}}
 
 def main():
-	
 	start = perf_counter()
 
 	naurok = Load_data(json.load(open("data/cookies", "r")))
-	
-	a = naurok.search()
-	b =  naurok.get_test(a)
+	a = naurok.search(storinka=(1, 6))
+	b = naurok.get_test(a)
 	c = naurok.test_pass(b)
-	print(c)
+	d = naurok.get_answer(c)
+	
+	for index, item in enumerate(d):
+		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
+			json.dump(item, file, indent=4, ensure_ascii=False)
 	
 	print(perf_counter()-start)
+
 if __name__ == "__main__":
 	main()
