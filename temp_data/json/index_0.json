@@ -1,1 +1,28 @@
-"https://naurok.com.ua/test/complete/43c291a6-1b26-4fa1-b256-2b0fdfaa16b4"
+{
+    "platform": "pomahach",
+    "url": "https://pomahach.com/question/593729-65726/zaznachte-yak-nazivayut-sukupnist-geniv-roztashovanih-v-odni/",
+    "type": "quiz",
+    "name_test": "Зазначте, як називають сукупність генів, розташованих в одній хромосомі:",
+    "answers": [
+        {
+            "text": "група зчеплення",
+            "img": null,
+            "correctness": true
+        },
+        {
+            "text": "каріотип",
+            "img": null,
+            "correctness": false
+        },
+        {
+            "text": "плазміда",
+            "img": null,
+            "correctness": false
+        },
+        {
+            "text": "геном",
+            "img": null,
+            "correctness": false
+        }
+    ]
+}

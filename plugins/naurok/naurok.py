@@ -13,12 +13,11 @@ class Load_data:
 	def __init__(self, cookies=None):
 		self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-	def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None):
+	def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None):
 		@async_session(self.cookies)
 		async def async_search(session: aiohttp.ClientSession, storinka=1):
 			async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}]")
 			
 			return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 		
@@ -28,12 +27,11 @@ class Load_data:
 		
 		return list(set(sum(asyncio.run(run()), [])))
 
-	def processing_data(self, url: list, proxy=None, qt_logs=None):
+	def processing_data(self, url: list, proxy=None):
 		@async_session(self.cookies)
 		async def async_processing_data(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
-				if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{url}]")
 
 			return {
 				"platform": "naurok",
@@ -60,7 +58,7 @@ class Load_data:
 
 		return asyncio.run(run())
 
-	def get_test(self, url: list, proxy=None, qt_logs=None):
+	def get_test(self, url: list, proxy=None):
 		@async_session(self.cookies)
 		async def async_get_test(session: aiohttp.ClientSession, url):
 			async with session.get(url, proxy=proxy) as req:
@@ -103,7 +101,7 @@ class Load_data:
 
 		return asyncio.run(run())
 	
-	def test_pass(self, gamecode: list, proxy=None, qt_logs=None):
+	def test_pass(self, gamecode: list, proxy=None):
 		@async_session(self.cookies)
 		async def async_test_pass(session: aiohttp.ClientSession, gamecode):
 			async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
@@ -160,7 +158,7 @@ class Load_data:
 			for obj in blok:
 				all_answer = obj.find(class_="homework-stat-options").find_all(class_="row")
 				data.append({
-					"type": obj.find("span")['class'][1],
+					"type": ['class'][1] if obj.find("span") else None,
 					"text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]),
 					"img": obj.find("img").get("src") if obj.find(class_="col-md-6") else None,
 					"answer": [{
@@ -186,7 +184,6 @@ def data_info():
 				"/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
 				"/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
 				]
-
 	return {"search": {
 				"subject": [list_object, False],
 				"klass": [True, False],
@@ -196,15 +193,14 @@ def data_info():
 				"cookie": [True, True]},
 			"processing_data": {
 				"url": ["list", False],
-				"proxy": [True, False],
-				"cookie": [True, True]},
-			"qt_logs": [True, False]}
+				"proxy": [True, False]}}
 
 def main():
 	start = perf_counter()
 
 	naurok = Load_data(json.load(open("data/cookies", "r")))
-	a = naurok.search(storinka=(1, 6))
+	a = naurok.search(storinka=(1, 2))
+	print(a)
 	b = naurok.get_test(a)
 	c = naurok.test_pass(b)
 	d = naurok.get_answer(c)
@@ -214,6 +210,5 @@ def main():
 			json.dump(item, file, indent=4, ensure_ascii=False)
 	
 	print(perf_counter()-start)
-
 if __name__ == "__main__":
 	main()
