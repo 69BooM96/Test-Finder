@@ -225,6 +225,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		for index_files in session_sr['lists_data'][(session_sr['page']*10):(session_sr['page']*10+10)]:
 			with open(f"temp_data/json/index_{index_sessions}_{index_files}.json", "r", encoding="utf-8") as file_r:
 				file_sr = json.load(file_r)
+				
 			ItemQWidget = set_GUI_item_sr.Item_search()
 			ItemQWidget.setPl_sr(f"  {file_sr['platform']}  ")
 			ItemQWidget.setUrl_sr(f"  {file_sr['url']}  ")
