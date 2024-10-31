@@ -10,13 +10,13 @@ class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
 		super(Item_search, self).__init__(parent)
 		self.setupUi(self)
 
-	def setPl_sr(self, sr_name):
+	def setPl_sr(self, sr_name=None):
 		self.label.setText(sr_name)
 
-	def setUrl_sr(self, sr_url):
+	def setUrl_sr(self, sr_url=None):
 		self.label_2.setText(sr_url)
 
-	def setPl_icon_sr(self, sr_ico):
+	def setPl_icon_sr(self, sr_ico=None):
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap(sr_ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
 		self.pushButton.setIcon(icon)
