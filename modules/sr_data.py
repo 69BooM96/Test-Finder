@@ -1,9 +1,15 @@
-import importlib
+import requests
+
 import os
 import time
 import json
+import importlib
 import threading
 import Core
+
+from bs4 import BeautifulSoup
+
+from modules.decorate import async_session
 
 def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
@@ -103,9 +109,21 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
+			
 
-def wiki_data(self):
+def wiki_data():
 	try:
-		...
-	except Exception as e:
+		req = requests.get("https://ru.wikipedia.org/wiki/Python")		
+		soup = BeautifulSoup(req.text, "lxml")
+		b = [
+			soup.find(class_="mw-page-title-main").text,
+			soup.find(class_="mw-content-ltr mw-parser-output").find("p").text.strip().replace("\xa0", ""),
+			"https:"+str(soup.find("img", class_="mw-file-element").get("src") if soup.find("img", class_="mw-file-element") else None)
+			]
+
+		print(b)
+	except BaseException as e:
 		print(e)
+
+if __name__ == "__main__":
+	wiki_data()

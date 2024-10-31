@@ -198,16 +198,16 @@ def main():
 	start = perf_counter()
 
 	naurok = Load_data()
-	a = naurok.search()
-	b = naurok.get_test(a)
-	c = naurok.test_pass(b)
-	d = naurok.get_answer(c)
+	a = naurok.search(       proxy="http://18.135.133.116:3128/")
+	b = naurok.get_test(a,   proxy="http://18.135.133.116:3128/")
+	c = naurok.test_pass(b,  proxy="http://18.135.133.116:3128/")
+	d = naurok.get_answer(c, proxy="http://18.135.133.116:3128/")
 	
 	for index, item in enumerate(d):
 		with open(f"index_{index}.json", "w", encoding="utf-8") as file:
 			json.dump(item, file, indent=4, ensure_ascii=False)
 	
-	print(perf_counter()-start)
+	print(perf_counter() - start)
 
 if __name__ == "__main__":
 	main()
