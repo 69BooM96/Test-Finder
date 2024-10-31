@@ -3,7 +3,6 @@ import os
 import time
 import json
 import threading
-import wikipedia
 import Core
 
 def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
@@ -107,9 +106,6 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 
 def wiki_data(self):
 	try:
-		wikipedia.set_lang("ru")
-		wiki_q = wikipedia.page(self.mainwindows.text_search)
-		self.wiki_text_data = wiki_q.summary
-		self.wiki_title_data = f"{wiki_q.title}\n{wiki_q.original_title}"
+		...
 	except Exception as e:
 		print(e)

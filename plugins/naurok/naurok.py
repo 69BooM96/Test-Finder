@@ -1,10 +1,9 @@
 import json
 import asyncio
 import aiohttp
-import aiohttp.client_exceptions
 from bs4 import BeautifulSoup
 from time import perf_counter
-from pprint import pprint
+
 from modules.decorate import async_session
 
 
@@ -100,7 +99,7 @@ class Load_data:
 			return await asyncio.gather(*task)
 
 		return asyncio.run(run())
-	
+
 	def test_pass(self, gamecode: list, proxy=None):
 		@async_session(self.cookies)
 		async def async_test_pass(session: aiohttp.ClientSession, gamecode):
@@ -199,7 +198,7 @@ def main():
 	start = perf_counter()
 
 	naurok = Load_data()
-	a = naurok.search(proxy="http://18.135.133.116:3128/")
+	a = naurok.search()
 	b = naurok.get_test(a)
 	c = naurok.test_pass(b)
 	d = naurok.get_answer(c)
@@ -209,5 +208,6 @@ def main():
 			json.dump(item, file, indent=4, ensure_ascii=False)
 	
 	print(perf_counter()-start)
+
 if __name__ == "__main__":
 	main()
