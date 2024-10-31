@@ -3,13 +3,14 @@ import os
 import time
 import json
 import threading
+import wikipedia
 import Core
 
 def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
 	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
-	self.urls_data_list = []
+	# self.urls_data_list = []
 
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
@@ -52,7 +53,7 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 				elif mt_data['type'] == "search_engine":
 					...
 
-
+			self.platforms_num += 1
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [results][{len(urls_lists)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [{e}]")
@@ -63,9 +64,8 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
 	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
-	self.urls_data_list = []
-
 	dict_num = 0
+	self.urls_data_list = []
 
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
@@ -94,9 +94,22 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 
 					for index_item in range(len(dict_data)):
 						with open(f"temp_data/json/index_{index_session}_{index_item+dict_num}.json", "w", encoding="utf-8") as session_set_sr_data:
-							json.dump(dict_data[index_item], session_set_sr_data, ensure_ascii=False, indent=4)
+							test_data = dict_data[index_item]
+							test_data["index_file"] = (index_item+dict_num)
+							test_data["index_session"] = index_session
+							json.dump(test_data, session_set_sr_data, ensure_ascii=False, indent=4)
+							self.urls_data_list.append(index_item+dict_num)
 					dict_num += len(dict_data)
 
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
 		except Exception as e:
-			print(e)
+			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
+
+def wiki_data(self):
+	try:
+		wikipedia.set_lang("ru")
+		wiki_q = wikipedia.page(self.mainwindows.text_search)
+		self.wiki_text_data = wiki_q.summary
+		self.wiki_title_data = f"{wiki_q.title}\n{wiki_q.original_title}"
+	except Exception as e:
+		print(e)

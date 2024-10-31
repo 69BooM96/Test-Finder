@@ -36,11 +36,11 @@ class Load_data:
 
 			return {
 				"platform": "naurok",
-				"utl": str(req.url),
+				"type_data": "test",
+				"url": str(req.url),
 				"name_test": soup.find(class_="h1-block h1-single").text,
 				"object": soup.find_all(attrs={"itemprop": "name"})[1].text if len(soup.find_all(attrs={"itemprop": "name"})) >= 2 else None,
 				"klass": soup.find_all(attrs={"itemprop": "name"})[2].text if len(soup.find_all(attrs={"itemprop": "name"})) >= 3 else None,
-				"questions": int(soup.find(class_="block-head").text.split()[0]),
 
 				"answers": [{
 					"type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
@@ -48,7 +48,8 @@ class Load_data:
 					"img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
 					"value": [{
 						"text": item.find("p").text.strip().replace(" ", "") if item.find("p") else None,
-						"img": item.find("img").get("src") if item.find("img") else None
+						"img": item.find("img").get("src") if item.find("img") else None,
+						"correctness": None
 					} for item in obj.select('.question-options > div')]
 					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
 			}
@@ -203,7 +204,7 @@ def main():
 	start = perf_counter()
 
 	naurok = Load_data()
-	a = naurok.search()
+	a = naurok.search(proxy="http://18.135.133.116:3128/")
 	b = naurok.get_test(a)
 	c = naurok.test_pass(b)
 	d = naurok.get_answer(c)

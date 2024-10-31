@@ -16,6 +16,7 @@ from modules import ld_plugins
 from modules import sr_data
 from modules import GUI
 from modules import GUI_update
+from modules import set_GUI_item_sr
 
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -23,7 +24,7 @@ asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
-	update_data_signal = QtCore.pyqtSignal(int, int, int, str, list)
+	update_data_signal = QtCore.pyqtSignal(int, int, int, str, dict, list)
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
@@ -36,10 +37,13 @@ class Search_parser(QThread):
 			index_sessions = item_num.row()
 		self.urls_data_list = []
 		self.platforms_num = 0
+		self.wiki_text_data = ""
+		self.wiki_title_data = ""
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
-
-		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list, qtLogs=False)).start()
-		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", [])
+		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
+		sr_data.wiki_data(self)
+		
+		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data}, self.urls_data_list)
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -188,20 +192,54 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget.setCurrentIndex(1)
 		self.parser_search.start()
 		
-	def set_session_data(self, index_session, results, platforms, times, lists_data):
+	def set_session_data(self, index_session, results, platforms, times, wiki_text, lists_data):
 		data_write = {
 			"session_index": index_session,
 			"results": results,
 			"platforms": platforms,
 			"times": times,
 			"lists_data": lists_data,
-			"page": 0
+			"page": 0,
+			"wiki_text": wiki_text
 		}
 		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
 			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
+		self.set_sr_data_GUI()
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
+
+	def set_sr_data_GUI(self):
+		index_sessions = 0
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
+
+		with open(f"temp_data/sessions/session_{index_sessions}.json", "r", encoding="utf-8") as file_r:
+			session_sr = json.load(file_r)
+
+		self.label_3.setText(f"[results]: [{session_sr['results']}]")
+		self.label_4.setText(f"[platforms]: [{session_sr['platforms']}]")
+		self.label_5.setText(f"[time]: [{session_sr['times']}]")
+		self.label_2.setText(session_sr['wiki_text']['title'])
+		self.textBrowser.setText(session_sr['wiki_text']['text'])
+		for index_files in session_sr['lists_data'][(session_sr['page']*10):(session_sr['page']*10+10)]:
+			with open(f"temp_data/json/index_{index_sessions}_{index_files}.json", "r", encoding="utf-8") as file_r:
+				file_sr = json.load(file_r)
+			ItemQWidget = set_GUI_item_sr.Item_search()
+			ItemQWidget.setPl_sr(f"  {file_sr['platform']}  ")
+			ItemQWidget.setUrl_sr(f"  {file_sr['url']}  ")
+			ItemQWidget.setPl_icon_sr(f"plugins/{file_sr['platform']}/res/{file_sr['platform']}.png")
+			ItemQWidget.setPrev_text_sr(file_sr['name_test'])
+			ItemQWidget.setType_sr(file_sr['type_data'])
+			ItemQWidget.setScor_sr("none")
+			ItemQWidget.setQuest_sr(len(file_sr['answers']))
+			ItemQWidget.setLess_sr(file_sr['object'])
+			ItemQWidget.setClass_sr(file_sr['klass'])
+			item = QtWidgets.QListWidgetItem(self.listWidget_3)
+			item.setSizeHint(QtCore.QSize(245, 178))
+			self.listWidget_3.addItem(item)
+			self.listWidget_3.setItemWidget(item, ItemQWidget)
+
 
 #Settings|==============================================|
 	#History

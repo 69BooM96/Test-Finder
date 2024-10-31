@@ -30,15 +30,21 @@ class Load_data:
 
 			return {
 				"platform": "pomahach",
+				"type_data": "test",
 				"url": str(req.url),
-				"type": "quiz" if soup.find(class_="option-marker quiz") else "multiquiz",
-				"name_test": soup.find(class_="panel-body").text,
-
+				"name_test": soup.title.string,
+				"object": soup.find_all("meta")[2].get("content").split(".")[0],
+				"klass": None,
 				"answers": [{
-					"text": obj.text.strip(),
+					"type": "quiz" if soup.find(class_="option-marker quiz") else "multiquiz",
+					"text": soup.find(class_="panel-body").text,
 					"img": None,
-					"correctness": bool("list-group-item-success" in obj.get("class", []))
-				} for obj in soup.find_all(class_="list-group")[1].find_all("li")]}
+					"value": [{
+						"text": obj.text.strip(),
+						"img": None,
+						"correctness": bool("list-group-item-success" in obj.get("class", []))
+					}for obj in soup.find_all(class_="list-group")[1].find_all("li")]
+				}]}
 		
 		
 		async def run():
@@ -108,7 +114,7 @@ def main():
 	
 	a = pomahach.processing_data(listik)
 	for item in range(len(a)):
-		with open(f"temp_data/json/index_{item}.json", "w", encoding="utf-8") as file:
+		with open(f"temp_data/json/P___index_{item}.json", "w", encoding="utf-8") as file:
 			json.dump(a[item], file, indent=4, ensure_ascii=False)
 
 if __name__ == "__main__":
