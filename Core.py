@@ -41,7 +41,7 @@ class Search_parser(QThread):
 		self.wiki_title_data = ""
 		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
 		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
-		sr_data.wiki_data(self)
+		# sr_data.wiki_data(self)
 		
 		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data}, self.urls_data_list)
 
@@ -199,9 +199,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			"platforms": platforms,
 			"times": times,
 			"lists_data": lists_data,
-			"page": 0,
-			"wiki_text": wiki_text
-		}
+			"page": 0,}
+			# "wiki_text": wiki_text
+		
 		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
 			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
 		self.set_sr_data_GUI()
@@ -220,8 +220,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.label_3.setText(f"[results]: [{session_sr['results']}]")
 		self.label_4.setText(f"[platforms]: [{session_sr['platforms']}]")
 		self.label_5.setText(f"[time]: [{session_sr['times']}]")
-		self.label_2.setText(session_sr['wiki_text']['title'])
-		self.textBrowser.setText(session_sr['wiki_text']['text'])
+		# self.label_2.setText(session_sr['wiki_text']['title'])
+		# self.textBrowser.setText(session_sr['wiki_text']['text'])
 		for index_files in session_sr['lists_data'][(session_sr['page']*10):(session_sr['page']*10+10)]:
 			with open(f"temp_data/json/index_{index_sessions}_{index_files}.json", "r", encoding="utf-8") as file_r:
 				file_sr = json.load(file_r)

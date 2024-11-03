@@ -9,7 +9,6 @@ import Core
 
 from bs4 import BeautifulSoup
 
-from modules.decorate import async_session
 
 def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
