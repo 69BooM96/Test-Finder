@@ -48,7 +48,7 @@ class Load_data:
 						"img": item.find("img").get("src") if item.find("img") else None,
 						"correctness": None
 					} for item in obj.select('.question-options > div')]
-					} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
+				} for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
 			}
 		
 		async def run():
@@ -150,23 +150,16 @@ class Load_data:
 			async with session.get(url, proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 			
-			blok = soup.find(class_="homework-stats").find_all(class_="content-block")
-
-			data = []
-			
-			for obj in blok:
-				all_answer = obj.find(class_="homework-stat-options").find_all(class_="row")
-				data.append({
-					"type": ['class'][1] if obj.find("span") else None,
-					"text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]),
-					"img": obj.find("img").get("src") if obj.find(class_="col-md-6") else None,
-					"answer": [{
-						"text": item.find("p").text.strip() if item.find("p") else None,
-						"img": item.find("img").get("src") if item.find("img") else None,
-						"correctness": True if item.find("span")['class'][0] == "correct" else False
-					} for item in all_answer]
-				})
-			return data
+			return [{
+				"type": obj.find(class_="homework-stat-option-line").find("span")['class'][1] if obj.find(class_="homework-stat-option-line").find("span") else None,
+				"text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]).replace("﻿", ""),
+				"img": obj.find("img").get("src") if obj.find(class_="col-md-6") else None,
+				"answer": [{
+					"text": item.find("p").text.strip() if item.find("p") else None,
+					"img": item.find("img").get("src") if item.find("img") else None,
+					"correctness": True if item.find("span")['class'][0] == "correct" else False
+				}	for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
+			}	for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
 
 		async def run():
 			task = [async_get_answer(url) for url in url if url[:36] == "https://naurok.com.ua/test/complete/"]
@@ -198,15 +191,17 @@ def main():
 	start = perf_counter()
 
 	naurok = Load_data()
-	a = naurok.search(       proxy="http://18.135.133.116:3128/")
-	b = naurok.get_test(a,   proxy="http://18.135.133.116:3128/")
-	c = naurok.test_pass(b,  proxy="http://18.135.133.116:3128/")
-	d = naurok.get_answer(c, proxy="http://18.135.133.116:3128/")
-	
+	d = naurok.get_answer(["https://naurok.com.ua/test/complete/b22c93f0-670c-428a-8593-654cc45c5259"])
 	for index, item in enumerate(d):
-		with open(f"index_{index}.json", "w", encoding="utf-8") as file:
+		with open(f"temp_data/json/index_{index}.json", "w", encoding="utf-8") as file:
 			json.dump(item, file, indent=4, ensure_ascii=False)
-	
+
+	q = naurok.processing_data(["https://naurok.com.ua/test/pidsumkovi-testi-z-istori-ukra-ni-za-programoyu-zno-2351141.html"])	
+	for index, item in enumerate(q):
+		with open(f"temp_data/json/index_312.json", "w", encoding="utf-8") as file:
+			json.dump(item, file, indent=4, ensure_ascii=False)
+
+
 	print(perf_counter() - start)
 
 if __name__ == "__main__":
