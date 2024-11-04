@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 from time import perf_counter
 
 from fake_useragent import UserAgent
-from pprint import pprint
 
 from modules.decorate import async_session
 
@@ -181,15 +180,16 @@ class Load_data:
 
         return asyncio.run(run())
 
-
 class Create_Test:
-    def __init__(self, name_test, subject, klass, cookies):
+    def __init__(self, name_test, subject, klass, cookies, qt_logs=None):
         self.session = requests.Session()
         self.session.cookies.update({i["name"]: i["value"] for i in cookies})
         self.session.headers.update({"user-agent": UserAgent().random})
 
         req = self.session.get("https://naurok.com.ua/test/create")
         soup = BeautifulSoup(req.text, "lxml")
+
+        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         data = {
             '_csrf': soup.find('input', attrs={'name': '_csrf'})["value"],
@@ -202,7 +202,7 @@ class Create_Test:
         self.doc_id = req.url.split("/")[-1]
         self.csrf = soup.find('meta', {'name': 'csrf-token'})['content']
 
-    def create_question(self, question, answers):
+    def create_question(self, question, answers, qt_logs=None):
         data = {
             "_csrf": self.csrf,
             "content": question,
@@ -221,10 +221,14 @@ class Create_Test:
             for key in answers]
         }
                
-        self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
+        req = self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
+        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
-    def end_create(self):
+    def end_create(self, qt_logs=None):
         req = self.session.put(f"https://naurok.com.ua/api/test/documents/{self.doc_id}")
+
+        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
         
@@ -254,10 +258,10 @@ def main():
 
     naurok = Load_data()
     
-    test = Create_Test("ЛСД ГЕРОИН КАКАИН АНФЕТОМИН", json.load(open("plugins/naurok/cookies.json")))
+    test = Create_Test("ЛСД ГЕРОИН КАКАИН АНФЕТОМИН", 1, 1, json.load(open("plugins/naurok/cookies.json")))
 
     test.create_question("zov это", {"жизнь": True, # Правельно
-                                    "ещкэрэ": True, # Правельно
+                                    "вап": True, # Правельно
                                     "скибиди минет онлайн": False}) # неправельно
     
     a = test.end_create()

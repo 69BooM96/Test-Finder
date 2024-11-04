@@ -114,10 +114,10 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 
 	def mouseMoveEvent(self, event):
 		try:
-			if not self.old_pos:
-				return
-			delta = event.pos() - self.old_pos
-			self.move(self.pos() + delta)
+			if self.old_pos:
+				delta = event.pos() - self.old_pos
+				
+				self.move(self.pos() + delta)
 		except:
 			pass
 
@@ -362,12 +362,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	def mouseMoveEvent(self, event):
 		try:
-			if self.show_w == True:
-				if not self.old_pos:
-					return
-
+			if self.show_w and self.old_pos:
 				delta = event.pos() - self.old_pos
-				if self.win_resizing_left == True:
+				if self.win_resizing_left:
 					if self.geometry().width() > 616:
 						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
 													  self.geometry().y(), 
@@ -380,13 +377,13 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 														  self.geometry().width() - delta.x(), 
 														  self.geometry().height()))
 
-				elif self.win_resizing_right == True:
+				elif self.win_resizing_right:
 					self.setGeometry(QtCore.QRect(self.geometry().x(), 
 												  self.geometry().y(), 
 												  event.pos().x(), 
 												  self.geometry().height()))
 				
-				elif self.win_resizing_top == True:
+				elif self.win_resizing_top:
 					if self.geometry().height() > 434:
 						self.setGeometry(QtCore.QRect(self.geometry().x(), 
 													  self.geometry().y() + delta.y(), 
@@ -399,7 +396,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 														  self.geometry().width(), 
 														  self.geometry().height() - delta.y()))
 				
-				elif self.win_resizing_bottom == True:
+				elif self.win_resizing_bottom:
 					self.setGeometry(QtCore.QRect(self.geometry().x(), 
 												  self.geometry().y(), 
 												  self.geometry().width(), 
@@ -414,7 +411,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		sys.exit()
 
 	def show_(self):
-		if self.show_w == True:
+		if self.show_w:
 			self.showMaximized()
 			self.show_w = False
 		else:
