@@ -12,3 +12,4 @@ test2.py
 __pycache__
 modules.__pycache__
 *.json
+plugins/naurok/cookies.json

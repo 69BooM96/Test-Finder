@@ -222,7 +222,7 @@ class Create_Test:
         }
                
         self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
-        
+
     def end_create(self):
         req = self.session.put(f"https://naurok.com.ua/api/test/documents/{self.doc_id}")
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
@@ -254,7 +254,7 @@ def main():
 
     naurok = Load_data()
     
-    test = Create_Test("ЛСД ГЕРОИН КАКАИН АНФЕТОМИН", json.load(open("plugins/naurok/cookies")))
+    test = Create_Test("ЛСД ГЕРОИН КАКАИН АНФЕТОМИН", json.load(open("plugins/naurok/cookies.json")))
 
     test.create_question("zov это", {"жизнь": True, # Правельно
                                     "ещкэрэ": True, # Правельно
