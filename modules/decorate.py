@@ -10,3 +10,18 @@ def async_session(cookies):
 			except BaseException as ex: return ex 
 		return wrapper
 	return wrappers
+
+
+def try_except(exp: BaseException, funk=(lambda ex: print(ex))):
+	def wrappers(fun):
+		def wrapper(*agrs, **kwagrs):
+			try:
+				return fun(*agrs, **kwagrs)
+			except exp as ex:
+				funk(ex)
+
+		return wrapper
+	return wrappers
+
+
+

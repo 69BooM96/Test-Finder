@@ -18,6 +18,8 @@ from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
 
+from modules.decorate import try_except
+
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -98,28 +100,23 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 			log_wr.write(f'{data_log}\n')
 		print(data_log)
 
+	@try_except(Exception, funk=(lambda ex: None))
 	def mousePressEvent(self, event):
-		try:
-			if event.button() == QtCore.Qt.LeftButton:
-				self.old_pos = event.pos()
-		except:
-			pass
+		if event.button() == QtCore.Qt.LeftButton:
+			self.old_pos = event.pos()
 
+
+	@try_except(Exception, funk=(lambda ex: None))
 	def mouseReleaseEvent(self, event):
-		try:
-			if event.button() == QtCore.Qt.LeftButton:
-				self.old_pos = None
-		except:
-			pass
+		if event.button() == QtCore.Qt.LeftButton:
+			self.old_pos = None
 
+
+	@try_except(Exception, funk=(lambda ex: None))
 	def mouseMoveEvent(self, event):
-		try:
-			if self.old_pos:
-				delta = event.pos() - self.old_pos
-				
-				self.move(self.pos() + delta)
-		except:
-			pass
+		if self.old_pos:
+			delta = event.pos() - self.old_pos
+			self.move(self.pos() + delta)
 
 class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def __init__(self):
@@ -329,83 +326,80 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 		self.textBrowser_5.append(data_log)
 
+
+	@try_except(Exception, funk=(lambda ex: None))
 	def mousePressEvent(self, event):
-		try:
-			if self.show_w == True:
-				if event.button() == QtCore.Qt.LeftButton:
-					self.old_pos = event.pos()
-					if self.win_resizing_px >= self.old_pos.x():
-						self.win_resizing_left = True
+		if self.show_w == True:
+			if event.button() == QtCore.Qt.LeftButton:
+				self.old_pos = event.pos()
+				if self.win_resizing_px >= self.old_pos.x():
+					self.win_resizing_left = True
 
-					if (self.size().width() - self.win_resizing_px) <= self.old_pos.x():
-						self.win_resizing_right = True
+				if (self.size().width() - self.win_resizing_px) <= self.old_pos.x():
+					self.win_resizing_right = True
 
-					if self.win_resizing_px >= self.old_pos.y():
-						self.win_resizing_top = True
+				if self.win_resizing_px >= self.old_pos.y():
+					self.win_resizing_top = True
 
-					if (self.size().height() - self.win_resizing_px) <= self.old_pos.y():
-						self.win_resizing_bottom = True
-		except:
-			pass
+				if (self.size().height() - self.win_resizing_px) <= self.old_pos.y():
+					self.win_resizing_bottom = True
 
+
+	@try_except(Exception, funk=(lambda ex: None))
 	def mouseReleaseEvent(self, event):
-		try:
-			if self.show_w == True:
-				if event.button() == QtCore.Qt.LeftButton:
-					self.old_pos = None
-					self.win_resizing_left = False
-					self.win_resizing_right = False
-					self.win_resizing_top = False
-					self.win_resizing_bottom = False
-		except:
-			pass
+		if self.show_w == True:
+			if event.button() == QtCore.Qt.LeftButton:
+				self.old_pos = None
+				self.win_resizing_left = False
+				self.win_resizing_right = False
+				self.win_resizing_top = False
+				self.win_resizing_bottom = False
 
+
+	@try_except(Exception, funk=(lambda ex: None))
 	def mouseMoveEvent(self, event):
-		try:
-			if self.show_w and self.old_pos:
-				delta = event.pos() - self.old_pos
-				if self.win_resizing_left:
-					if self.geometry().width() > 616:
+		if self.show_w and self.old_pos:
+			delta = event.pos() - self.old_pos
+			if self.win_resizing_left:
+				if self.geometry().width() > 616:
+					self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+												  self.geometry().y(), 
+												  self.geometry().width() - delta.x(), 
+												  self.geometry().height()))
+				else:
+					if delta.x() < 0:
 						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
 													  self.geometry().y(), 
 													  self.geometry().width() - delta.x(), 
 													  self.geometry().height()))
-					else:
-						if delta.x() < 0:
-							self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
-														  self.geometry().y(), 
-														  self.geometry().width() - delta.x(), 
-														  self.geometry().height()))
 
-				elif self.win_resizing_right:
+			elif self.win_resizing_right:
+				self.setGeometry(QtCore.QRect(self.geometry().x(), 
+											  self.geometry().y(), 
+											  event.pos().x(), 
+											  self.geometry().height()))
+			
+			elif self.win_resizing_top:
+				if self.geometry().height() > 434:
 					self.setGeometry(QtCore.QRect(self.geometry().x(), 
-												  self.geometry().y(), 
-												  event.pos().x(), 
-												  self.geometry().height()))
-				
-				elif self.win_resizing_top:
-					if self.geometry().height() > 434:
+												  self.geometry().y() + delta.y(), 
+												  self.geometry().width(), 
+												  self.geometry().height() - delta.y()))
+				else:
+					if delta.y() < 0:
 						self.setGeometry(QtCore.QRect(self.geometry().x(), 
 													  self.geometry().y() + delta.y(), 
 													  self.geometry().width(), 
 													  self.geometry().height() - delta.y()))
-					else:
-						if delta.y() < 0:
-							self.setGeometry(QtCore.QRect(self.geometry().x(), 
-														  self.geometry().y() + delta.y(), 
-														  self.geometry().width(), 
-														  self.geometry().height() - delta.y()))
-				
-				elif self.win_resizing_bottom:
-					self.setGeometry(QtCore.QRect(self.geometry().x(), 
-												  self.geometry().y(), 
-												  self.geometry().width(), 
-												  event.pos().y()))
+			
+			elif self.win_resizing_bottom:
+				self.setGeometry(QtCore.QRect(self.geometry().x(), 
+											  self.geometry().y(), 
+											  self.geometry().width(), 
+											  event.pos().y()))
 
-				else:
-					self.move(self.pos() + delta)
-		except:
-			pass
+			else:
+				self.move(self.pos() + delta)
 
 	def close_(self):
 		sys.exit()
