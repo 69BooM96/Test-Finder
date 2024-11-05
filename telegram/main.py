@@ -8,13 +8,12 @@ from config import TOKEN
 
 async def main():
     bot = Bot(TOKEN)
-    dp = Dispatcher(bot)
-
+    dp = Dispatcher()
     dp.include_router(router)
     
     print("BOT START")
 
-    dp.start_polling()
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     try:

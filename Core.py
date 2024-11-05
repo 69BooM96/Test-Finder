@@ -19,7 +19,7 @@ from modules import GUI_update
 from modules import set_GUI_item_sr
 
 from modules.decorate import try_except
-
+from rich import print as color_print
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
@@ -307,11 +307,13 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
-		data_log = f'[{time_}] <{type_log}> [{theme_log}]{text_log}'
+		data_log = [f"[{time_}]", f"<{type_log}>", f"[{theme_log}]", f"[{text_log}]"]
+		
 		with open(f"logs/{time.strftime('%Y-%m-%d')}.log", "a", encoding="utf-8") as log_wr:
 			log_wr.write(f'{data_log}\n')
-		print(data_log)
 
+		print(data_log)
+		
 		if type_log == "ERROR":
 			data_log = f'<span style="color:#F23F43;">[{time_}] &lt;ERROR&gt; <{type_log}> [{theme_log}]{text_log}</span>'
 
@@ -429,6 +431,4 @@ if __name__ == '__main__':
 		window = Core_load()
 		window.show()
 		sys.exit(app.exec_())
-	else:
-		pass
 	

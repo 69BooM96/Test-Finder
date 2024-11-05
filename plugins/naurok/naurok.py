@@ -181,7 +181,7 @@ class Load_data:
         return asyncio.run(run())
 
 class Create_Test:
-    def __init__(self, name_test, subject, klass, cookies, qt_logs=None):
+    def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.session = requests.Session()
         self.session.cookies.update({i["name"]: i["value"] for i in cookies})
         self.session.headers.update({"user-agent": UserAgent().random})
@@ -202,7 +202,7 @@ class Create_Test:
         self.doc_id = req.url.split("/")[-1]
         self.csrf = soup.find('meta', {'name': 'csrf-token'})['content']
 
-    def create_question(self, question, answers, qt_logs=None):
+    def create_question(self, question: str, answers: dict[str, bool], qt_logs=None):
         data = {
             "_csrf": self.csrf,
             "content": question,
