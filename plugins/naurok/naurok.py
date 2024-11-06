@@ -1,10 +1,11 @@
-import json
 import requests
 import asyncio
 import aiohttp
-from bs4 import BeautifulSoup
+import json
+
 from time import perf_counter
 
+from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 from modules.decorate import async_session
@@ -231,7 +232,7 @@ class Create_Test:
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
-        
+
 def data_info():
     list_object = [
                 "/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
@@ -256,16 +257,32 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = Load_data()
+    naurok = Load_data(json.load(open("plugins/naurok/cookies.json")))
     
-    test = Create_Test("ЛСД ГЕРОИН КАКАИН АНФЕТОМИН", 1, 1, json.load(open("plugins/naurok/cookies.json")))
-
-    test.create_question("zov это", {"жизнь": True, # Правельно
-                                    "вап": True, # Правельно
-                                    "скибиди минет онлайн": False}) # неправельно
-    
-    a = test.end_create()
+    a = naurok.search(storinka=(1,2))
     print(a)
+    
+
+    for index, proc in enumerate(naurok.processing_data(a), start=1):
+        with open(f"temp_data/json/index_0_{index}.json", "w", encoding="utf-8") as file:
+            json.dump(proc, file, indent=4, ensure_ascii=False)
+
+
+    b = naurok.get_test(a)
+    print(b)
+
+    c = naurok.test_pass(b)
+    print(c)
+
+
+    for index, proc in enumerate(naurok.get_answer(["'https://naurok.com.ua/test/complete/f0689a5a-57c5-4361-8732-ebd88048872b'"]), start=1):
+        with open(f"temp_data/json/index_1_{index}.json", "w", encoding="utf-8") as file:
+            try:
+                json.dump(proc, file, indent=4, ensure_ascii=False)
+            except Exception: 
+                print(proc)
+
+    print(perf_counter()-start)
 
 if __name__ == "__main__":
     main()

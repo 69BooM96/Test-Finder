@@ -8,11 +8,12 @@ from Core import *
 
 
 router = Router()
-
+a = {}
 
 @router.message(CommandStart())
 async def start(message: Message):
-    await message.answer("start")
+    send = await message.answer("start")
+    await send.edit_text("fgkjdhgnjmdhf")
 
 @router.message(Command("help"))
 async def help(message: Message): 
@@ -21,3 +22,6 @@ async def help(message: Message):
 @router.message(F.text)
 async def echo(message: Message):
     await message.answer(message.text)
+    a[str(message.from_user.id)] = {"test": []}
+    a[str(message.from_user.id)]["test"].append(message.text)
+    print(a)
