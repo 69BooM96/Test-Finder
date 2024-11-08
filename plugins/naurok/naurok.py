@@ -31,7 +31,7 @@ class Load_data:
         
         return list(set(sum(asyncio.run(run()), [])))
 
-    def processing_data(self, url: list, proxy=None, qt_logs=None) -> list:
+    def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(self.cookies)
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -231,7 +231,6 @@ class Create_Test:
         if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
-
 
 def data_info():
     list_object = [
