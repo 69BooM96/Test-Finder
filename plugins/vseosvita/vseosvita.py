@@ -47,14 +47,14 @@ class Load_data:
 
                 "answers": [{
                     "type": None,
-                    "text": None,
-                    "img": None,
+                    "text": obj.find(class_="v-test-questions-title").text.strip() if obj.find(class_="v-test-questions-title") else None,
+                    "img": obj.find("img").get("src") if obj.find("img") else None,
                     "value": [{
-                        "text": None,
-                        "img": None,
+                        "text": obj.find("p").text.strip()  if obj.find("p") else None,
+                        "img": obj.find("img").get("src") if obj.find("img") else None,
                         "correctness": None
-                        }]
-                }]
+                        } for obj in soup.find(class_="list-view").find_all("vr-quest")[1:]]
+                } for obj in soup.find(class_="list-view").find_all(class_="question-block_body")]
             }
         #lib-inside__question-block
         
@@ -70,7 +70,7 @@ def main():
      
     vseosvita = Load_data()
      
-    a = vseosvita.processing_data(["https://vseosvita.ua/test/kontrolna-robota-z-alhebry-za-1-semestr-dlia-8-klasu-3716834.html"])
+    a = vseosvita.processing_data(["https://vseosvita.ua/test/mitoz-meioz-3898072.html"])
     pprint(a)
 
     print(perf_counter()-start)

@@ -14,3 +14,4 @@ modules.__pycache__
 *.json
 plugins/naurok/cookies.json
 telegram/config.py
+modules/telegram/config.py
