@@ -29,7 +29,7 @@ class Load_data:
             task = [async_search(storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
         
-        return list(set(sum(asyncio.run(run()), [])))
+        return set(item2 for item in asyncio.run(run()) for item2 in item)
 
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(self.cookies)
@@ -260,26 +260,6 @@ def main():
     
     a = naurok.search(storinka=(1,2))
     print(a)
-    
-
-    for index, proc in enumerate(naurok.processing_data(a), start=1):
-        with open(f"temp_data/json/index_0_{index}.json", "w", encoding="utf-8") as file:
-            json.dump(proc, file, indent=4, ensure_ascii=False)
-
-
-    b = naurok.get_test(a)
-    print(b)
-
-    c = naurok.test_pass(b)
-    print(c)
-
-
-    for index, proc in enumerate(naurok.get_answer(["'https://naurok.com.ua/test/complete/f0689a5a-57c5-4361-8732-ebd88048872b'"]), start=1):
-        with open(f"temp_data/json/index_1_{index}.json", "w", encoding="utf-8") as file:
-            try:
-                json.dump(proc, file, indent=4, ensure_ascii=False)
-            except Exception: 
-                print(proc)
 
     print(perf_counter()-start)
 
