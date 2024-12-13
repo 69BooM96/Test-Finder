@@ -27,7 +27,7 @@ class Load_data:
             task = [async_search(page=item) for item in range(*page)]
             return await asyncio.gather(*task)
         
-        return list(set(sum(asyncio.run(run()), [])))
+        return set(item2 for item in asyncio.run(run()) for item2 in item)
 
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(self.cookies)
