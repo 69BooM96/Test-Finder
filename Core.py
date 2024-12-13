@@ -19,9 +19,9 @@ from modules import GUI_update
 from modules import set_GUI_item_sr
 
 from modules.decorate import try_except
-from rich import print as color_print
+from colorama import *
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+# asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -199,8 +199,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			"page": 0,}
 			# "wiki_text": wiki_text
 		
-		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
-			json.dump(data_write, session_set_sr_data, ensure_ascii=False, indent=4)
+		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as file_w:
+			json.dump(data_write, file_w, ensure_ascii=False, indent=4)
 		self.set_sr_data_GUI()
 
 	def progress_search(self, value_pr):
@@ -327,7 +327,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			data_log = f'<span style="color:#F0B232;">[{time_}] &lt;INFO&gt; <{type_log}> [{theme_log}]{text_log}</span>'
 
 		self.textBrowser_5.append(data_log)
-
 
 	@try_except(Exception, funk=(lambda ex: None))
 	def mousePressEvent(self, event):
