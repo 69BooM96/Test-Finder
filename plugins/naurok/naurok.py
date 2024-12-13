@@ -250,7 +250,8 @@ def data_info():
                 "cookie": [False, False]},
             "processing_data": {
                 "url": ["list", False],
-                "proxy": [True, False]},
+                "proxy": [True, False],
+                "cookie": [False, False]},
             "qt_logs": [True, False]}
 
 def main():
