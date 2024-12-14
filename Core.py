@@ -176,6 +176,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_16.clicked.connect(self.open_settings_manual)
 		self.pushButton_43.clicked.connect(self.open_settings_logs)
 
+	#list Widget
+		self.listWidget_3.clicked.connect(self.set_quiz_data_GUI)
+
 #Core
 	#Search|============================================|
 	def start_search_1(self):
@@ -206,6 +209,34 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
 
+	def set_quiz_data_GUI(self):
+		self.stackedWidget.setCurrentIndex(2)
+		index_sessions = 0
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
+
+		for item_num in self.listWidget_3.selectedIndexes():
+			index_json = item_num.row()
+
+		with open(f"temp_data/json/index_{index_sessions}_{index_json}.json", "r", encoding="utf-8") as file_r:
+			data = json.load(file_r)
+			self.lineEdit.setText(data['url'])
+
+			if data['type_data'] == "test":
+				self.stackedWidget_7.setCurrentIndex(0)
+				for index, data_item in enumerate(data['answers']):
+					ItemQWidget = set_GUI_item_sr.Item_quiz()
+					ItemQWidget.setNum_quiz(f"   {index}   ")
+					ItemQWidget.setImg_quiz(data_item['img'])
+					ItemQWidget.setText_quiz(data_item['text'])
+					ItemQWidget.setList_answer(data_item['value'], data_item['type'], True) #
+					
+					item = QtWidgets.QListWidgetItem(self.listWidget_8)
+					item.setSizeHint(QtCore.QSize(245, 254))
+					self.listWidget_8.addItem(item)
+					self.listWidget_8.setItemWidget(item, ItemQWidget)
+
+
 	def set_sr_data_GUI(self):
 		index_sessions = 0
 		for item_num in self.listWidget_2.selectedIndexes():
@@ -227,12 +258,12 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			ItemQWidget.setPl_sr(f"  {file_sr['platform']}  ")
 			ItemQWidget.setUrl_sr(f"  {file_sr['url']}  ")
 			ItemQWidget.setPl_icon_sr(f"plugins/{file_sr['platform']}/res/{file_sr['platform']}.png")
-			ItemQWidget.setPrev_text_sr(file_sr['name_test'])
-			ItemQWidget.setType_sr(file_sr['type_data'])
+			ItemQWidget.setPrev_text_sr(f" {file_sr['name_test']} ")
+			ItemQWidget.setType_sr(f" {file_sr['type_data']} ")
 			ItemQWidget.setScor_sr("none")
-			ItemQWidget.setQuest_sr(len(file_sr['answers']))
-			ItemQWidget.setLess_sr(file_sr['object'])
-			ItemQWidget.setClass_sr(file_sr['klass'])
+			ItemQWidget.setQuest_sr(f" {len(file_sr['answers'])} ")
+			ItemQWidget.setLess_sr(f" {file_sr['object']} ")
+			ItemQWidget.setClass_sr(f" {file_sr['klass']} ")
 			item = QtWidgets.QListWidgetItem(self.listWidget_3)
 			item.setSizeHint(QtCore.QSize(245, 178))
 			self.listWidget_3.addItem(item)
@@ -312,7 +343,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		with open(f"logs/{time.strftime('%Y-%m-%d')}.log", "a", encoding="utf-8") as log_wr:
 			log_wr.write(f'{data_log}\n')
 
-		print(data_log)
+		print(f"[{time_}] <{type_log}> [{theme_log}]{text_log}")
 		
 		if type_log == "ERROR":
 			data_log = f'<span style="color:#F23F43;">[{time_}] &lt;ERROR&gt; <{type_log}> [{theme_log}]{text_log}</span>'

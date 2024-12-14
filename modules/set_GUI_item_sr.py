@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, QProcess
 from modules import GUI_sr_item
+from modules import GUI_quiz
+from modules import GUI_answer
 
 
 class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
@@ -44,3 +46,78 @@ class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
 	def setClass_sr(self, sr_text=None):
 		if sr_text: self.label_3.setText(f"[class]: [{sr_text}]")
 		else: self.label_3.hide()
+
+class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
+	def __init__(self, parent=None):
+		super(Item_quiz, self).__init__(parent)
+		self.setupUi(self)
+
+	def setNum_quiz(self, qz_num=None):
+		if qz_num:
+			self.label.setText(qz_num)
+		else: self.label.hide()
+
+	def setImg_quiz(self, qz_ico=None):
+		if qz_ico:
+			icon = QtGui.QIcon()
+			icon.addPixmap(QtGui.QPixmap(qz_ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
+			self.pushButton.setIcon(icon)
+		else: self.pushButton.hide()
+
+	def setText_quiz(self, qz_text=None):
+		if qz_text: self.textBrowser.setText(qz_text)
+		else: self.textBrowser.hide()
+
+	def setList_answer(self, qz_item=None, type=None, index_hd=False):
+		if type == "matching":
+			for item_qz in qz_item['value']:
+				self.listWidget.addItem(item_qz[0]['text'])
+				self.listWidget_2.addItem(item_qz[0]['text'])
+
+		elif type == "sorting":
+			for item_qz in qz_item['value']:
+				for item_2 in item_qz['value']:
+					self.listWidget.addItem(item_qz['text'])
+					self.label_2.hide()
+
+		else:
+			if qz_item: 
+				for index, item_qz in enumerate(qz_item):
+					ItemQWidget = Item_answer()
+					ItemQWidget.setImg_answer(item_qz['img'])
+					ItemQWidget.setText_answer(item_qz['text'])
+					item = QtWidgets.QListWidgetItem(self.listWidget)
+
+					if index_hd: ItemQWidget.setNum_answer(f" {index} ")
+					else: ItemQWidget.setNum_answer()
+					if item_qz['img']: item.setSizeHint(QtCore.QSize(245, 76))
+					else: item.setSizeHint(QtCore.QSize(245, 32))
+					
+					self.listWidget.addItem(item)
+					self.listWidget.setItemWidget(item, ItemQWidget)
+
+			else: self.listWidget.hide()
+			self.listWidget_2.hide()
+			self.label_2.hide()
+
+
+class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
+	def __init__(self, parent=None):
+		super(Item_answer, self).__init__(parent)
+		self.setupUi(self)
+
+	def setNum_answer(self, qz_num=None, correctness=None):
+		if qz_num: self.pushButton_2.setText(f" {qz_num} ")
+		else: 
+			self.pushButton_2.hide()
+
+	def setImg_answer(self, qz_ico=None, correctness=None):
+		if qz_ico:
+			icon = QtGui.QIcon()
+			icon.addPixmap(QtGui.QPixmap(qz_ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
+			self.pushButton.setIcon(icon)
+		else: self.pushButton.hide()
+
+	def setText_answer(self, qz_text=None, correctness=None):
+		if qz_text: self.textBrowser.setText(qz_text)
+		else: self.textBrowser.hide()

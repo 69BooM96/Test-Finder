@@ -13,7 +13,7 @@ def load(url_list: list, proxy=None):
             async with aiofiles.open(file=f"temp_data/imgs/{image_name}.png", mode="wb") as file:
                 async for chunk in req.content.iter_chunked(65536):
                     await file.write(chunk)
-
+    
     async def run():
         task = [dowload(url, index) for index, url in enumerate(url_list)]
         return await asyncio.gather(*task)
