@@ -16,7 +16,7 @@ class Load_data:
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list:
-        @async_session(self.cookies)
+        @async_session(None)
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -29,10 +29,10 @@ class Load_data:
             task = [async_search(storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
         
-        return set(item2 for item in asyncio.run(run()) for item2 in item)
+        return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
-        @async_session(self.cookies)
+        @async_session(None)
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")

@@ -19,7 +19,7 @@ class Load_data:
 			task = [async_search(storinka=item) for item in range(*storinka)]
 			return await asyncio.gather(*task)
 		
-		return set(item2 for item in asyncio.run(run()) for item2 in item)
+		return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 	
 	def processing_data(self, url: list, proxy=None, qt_logs=None):
 		@async_session(None)
