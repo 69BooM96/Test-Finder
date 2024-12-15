@@ -17,6 +17,7 @@ from modules import sr_data
 from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
+from modules import ld_image
 
 from modules.decorate import try_except
 from colorama import *
@@ -41,11 +42,54 @@ class Search_parser(QThread):
 		self.platforms_num = 0
 		self.wiki_text_data = ""
 		self.wiki_title_data = ""
-		multiprocessing.Process(target=sr_data.plugin_data(self, subject="/geografiya", q=self.mainwindows.text_search)).start()
-		multiprocessing.Process(target=sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)).start()
+		self.progress_signal.emit(1)
+		self.progress_index = 2
+
+		sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
+		sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)
+
 		# sr_data.wiki_data(self)
-		
+		self.progress_signal.emit(100)		
 		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data}, self.urls_data_list)
+		self.progress_signal.emit(0)
+
+class Img_load(QThread):
+	log_signal = QtCore.pyqtSignal(str, str, str)
+	progress_signal = QtCore.pyqtSignal(int)
+
+	def __init__(self, mainwindows):
+		QThread.__init__(self)
+		self.mainwindows = mainwindows
+
+	def run(self):
+		start_time = time.perf_counter()
+		l_img = self.mainwindows.list_imgs
+
+		if len(l_img) != 0:
+			l_img_progress=0
+			l_img_num = 100//len(l_img)
+
+			self.log_signal.emit("INFO", f"Start_load_img", f" [img][{len(l_img)}]")
+
+			queue = multiprocessing.Queue()
+			load_pr = multiprocessing.Process(target=ld_image.load_img, args=(l_img, queue))
+			load_pr.start()
+
+			while load_pr.is_alive() or not queue.empty():
+				if not queue.empty():
+					msg = queue.get()
+					l_img_progress+=l_img_num
+					self.log_signal.emit(msg["level"], msg["source"], msg["data"])
+					self.progress_signal.emit(l_img_progress)
+
+			load_pr.join()
+
+			self.progress_signal.emit(100)
+			self.log_signal.emit("INFO", f"Stop_load_img", f" [img][{len(l_img)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
+			self.progress_signal.emit(0)
+		else:
+			self.log_signal.emit("INFO", f"None_img", f" [img][{len(l_img)}] [endTime][0]s")
+			self.progress_signal.emit(0)
 
 class Core_load_flow(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -140,12 +184,17 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.parser_search.progress_signal.connect(self.progress_search)
 		self.parser_search.update_data_signal.connect(self.set_session_data)
 
+		self.parser_img = Img_load(mainwindows=self)
+		self.parser_img.log_signal.connect(self.logs)
+		self.parser_img.progress_signal.connect(self.progress_img)
+
 	#Button
 		self.pushButton_10.clicked.connect(self.close_)
 		self.pushButton_18.clicked.connect(self.show_)
 		self.pushButton_19.clicked.connect(self.show_winow_)
 		self.pushButton_11.clicked.connect(self.start_search_0)
 		self.pushButton_22.clicked.connect(self.start_search_1)
+		self.pushButton.clicked.connect(self.open_list_url)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
@@ -177,10 +226,17 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_43.clicked.connect(self.open_settings_logs)
 
 	#list Widget
-		self.listWidget_3.clicked.connect(self.set_quiz_data_GUI)
+		self.listWidget_3.clicked.connect(self.set_quiz_data)
 
 #Core
-	#Search|============================================|
+#GUI|===================================================|
+	def back_page(self):
+		self.stackedWidget.setCurrentIndex(1)
+
+	def next_page(self):
+		self.stackedWidget.setCurrentIndex(2)
+
+#Search|================================================|
 	def start_search_1(self):
 		self.text_search = self.plainTextEdit_2.toPlainText()
 		self.parser_search.start()
@@ -209,34 +265,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
 
-	def set_quiz_data_GUI(self):
-		self.stackedWidget.setCurrentIndex(2)
-		index_sessions = 0
-		for item_num in self.listWidget_2.selectedIndexes():
-			index_sessions = item_num.row()
-
-		for item_num in self.listWidget_3.selectedIndexes():
-			index_json = item_num.row()
-
-		with open(f"temp_data/json/index_{index_sessions}_{index_json}.json", "r", encoding="utf-8") as file_r:
-			data = json.load(file_r)
-			self.lineEdit.setText(data['url'])
-
-			if data['type_data'] == "test":
-				self.stackedWidget_7.setCurrentIndex(0)
-				for index, data_item in enumerate(data['answers']):
-					ItemQWidget = set_GUI_item_sr.Item_quiz()
-					ItemQWidget.setNum_quiz(f"   {index}   ")
-					ItemQWidget.setImg_quiz(data_item['img'])
-					ItemQWidget.setText_quiz(data_item['text'])
-					ItemQWidget.setList_answer(data_item['value'], data_item['type'], True) #
-					
-					item = QtWidgets.QListWidgetItem(self.listWidget_8)
-					item.setSizeHint(QtCore.QSize(245, 254))
-					self.listWidget_8.addItem(item)
-					self.listWidget_8.setItemWidget(item, ItemQWidget)
-
-
 	def set_sr_data_GUI(self):
 		index_sessions = 0
 		for item_num in self.listWidget_2.selectedIndexes():
@@ -250,6 +278,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.label_5.setText(f"[time]: [{session_sr['times']}]")
 		# self.label_2.setText(session_sr['wiki_text']['title'])
 		# self.textBrowser.setText(session_sr['wiki_text']['text'])
+
+		self.listWidget_3.clear()
 		for index_files in session_sr['lists_data'][(session_sr['page']*10):(session_sr['page']*10+10)]:
 			with open(f"temp_data/json/index_{index_sessions}_{index_files}.json", "r", encoding="utf-8") as file_r:
 				file_sr = json.load(file_r)
@@ -269,6 +299,47 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
 
+#Load_data|=============================================|
+	def set_quiz_data(self):
+		self.set_quiz_data_GUI()
+		self.parser_img.start()
+
+	def progress_img(self, value_pr):
+		self.progressBar_2.setValue(value_pr)
+		if value_pr == 0:
+			self.set_quiz_data_GUI()
+
+	def set_quiz_data_GUI(self):
+		self.stackedWidget.setCurrentIndex(2)
+		self.list_imgs = []
+		index_sessions = 0
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
+
+		for item_num in self.listWidget_3.selectedIndexes():
+			index_json = item_num.row()
+
+		with open(f"temp_data/json/index_{index_sessions}_{index_json}.json", "r", encoding="utf-8") as file_r:
+			data = json.load(file_r)
+			self.lineEdit.setText(data['url'])
+
+			if data['type_data'] == "test":
+				self.listWidget_8.clear()
+				self.stackedWidget_7.setCurrentIndex(0)
+				for index, data_item in enumerate(data['answers'], 1):
+					ItemQWidget = set_GUI_item_sr.Item_quiz()
+					ItemQWidget.setNum_quiz(f"   {index}   ")
+					if data_item['img']: 
+						ItemQWidget.setImg_quiz(f"temp_data/imgs/{data_item['img'].split('/')[-1]}")
+						self.list_imgs.append(data_item['img'])
+					else: ItemQWidget.setImg_quiz()
+					ItemQWidget.setText_quiz(data_item['text'])
+					ItemQWidget.setList_answer(data_item['value'], data_item['type'], img_l=self.list_imgs)
+					
+					item = QtWidgets.QListWidgetItem(self.listWidget_8)
+					item.setSizeHint(QtCore.QSize(245, 254))
+					self.listWidget_8.addItem(item)
+					self.listWidget_8.setItemWidget(item, ItemQWidget)
 
 #Settings|==============================================|
 	#History

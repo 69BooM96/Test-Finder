@@ -12,12 +12,16 @@ from bs4 import BeautifulSoup
 
 def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
 	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
+	self.progress_signal.emit(2)
 	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
 	# self.urls_data_list = []
+	progress_pl = (42//len(plugins_list))
 
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
+		self.progress_index += progress_pl
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
+		self.progress_signal.emit(self.progress_index)
 		start_time = time.perf_counter()
 		try:
 			urls_lists = []
@@ -66,12 +70,16 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 
 def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None, qtLogs=True):
 	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
+	self.progress_signal.emit(46)
 	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
 	dict_num = 0
 	self.urls_data_list = []
 
+	progress_pl = (42//len(plugins_list))
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
+		self.progress_index += progress_pl
+		self.progress_signal.emit(self.progress_index)
 		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
 		start_time = time.perf_counter()
 		try:

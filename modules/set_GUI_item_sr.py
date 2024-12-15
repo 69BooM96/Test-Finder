@@ -68,7 +68,7 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 		if qz_text: self.textBrowser.setText(qz_text)
 		else: self.textBrowser.hide()
 
-	def setList_answer(self, qz_item=None, type=None, index_hd=False):
+	def setList_answer(self, qz_item=None, type=None, index_hd=True, img_l=None):
 		if type == "matching":
 			for item_qz in qz_item['value']:
 				self.listWidget.addItem(item_qz[0]['text'])
@@ -82,7 +82,7 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 
 		else:
 			if qz_item: 
-				for index, item_qz in enumerate(qz_item):
+				for index, item_qz in enumerate(qz_item, 1):
 					ItemQWidget = Item_answer()
 					ItemQWidget.setImg_answer(item_qz['img'])
 					ItemQWidget.setText_answer(item_qz['text'])
@@ -90,7 +90,9 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 
 					if index_hd: ItemQWidget.setNum_answer(f" {index} ")
 					else: ItemQWidget.setNum_answer()
-					if item_qz['img']: item.setSizeHint(QtCore.QSize(245, 76))
+					if item_qz['img']: 
+						item.setSizeHint(QtCore.QSize(245, 76))
+						img_l.append(item_qz['img'])
 					else: item.setSizeHint(QtCore.QSize(245, 32))
 					
 					self.listWidget.addItem(item)
