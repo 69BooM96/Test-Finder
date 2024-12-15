@@ -12,6 +12,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, QProcess
+from PyQt5.QtCore import QTimer
 from modules import ld_plugins
 from modules import sr_data
 from modules import GUI
@@ -301,7 +302,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 #Load_data|=============================================|
 	def set_quiz_data(self):
-		self.set_quiz_data_GUI()
+		self.stackedWidget.setCurrentIndex(2)
+		QTimer.singleShot(20, self.set_quiz_data_GUI)
+		QTimer.singleShot(90, self.start_load_img)
+
+	def start_load_img(self):
 		self.parser_img.start()
 
 	def progress_img(self, value_pr):
@@ -310,7 +315,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			self.set_quiz_data_GUI()
 
 	def set_quiz_data_GUI(self):
-		self.stackedWidget.setCurrentIndex(2)
 		self.listWidget_8.clear()
 		self.stackedWidget_7.setCurrentIndex(0)
 		self.list_imgs = []
