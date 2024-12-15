@@ -194,7 +194,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_19.clicked.connect(self.show_winow_)
 		self.pushButton_11.clicked.connect(self.start_search_0)
 		self.pushButton_22.clicked.connect(self.start_search_1)
-		self.pushButton.clicked.connect(self.open_list_url)
+		self.pushButton.clicked.connect(self.back_page)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
@@ -311,6 +311,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	def set_quiz_data_GUI(self):
 		self.stackedWidget.setCurrentIndex(2)
+		self.listWidget_8.clear()
+		self.stackedWidget_7.setCurrentIndex(0)
 		self.list_imgs = []
 		index_sessions = 0
 		for item_num in self.listWidget_2.selectedIndexes():
@@ -324,8 +326,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			self.lineEdit.setText(data['url'])
 
 			if data['type_data'] == "test":
-				self.listWidget_8.clear()
-				self.stackedWidget_7.setCurrentIndex(0)
 				for index, data_item in enumerate(data['answers'], 1):
 					ItemQWidget = set_GUI_item_sr.Item_quiz()
 					ItemQWidget.setNum_quiz(f"   {index}   ")
