@@ -79,7 +79,7 @@ class Img_load(QThread):
 			while load_pr.is_alive() or not queue.empty():
 				if not queue.empty():
 					msg = queue.get()
-					l_img_progress+=l_img_num
+					l_img_progress += l_img_num
 					self.log_signal.emit(msg["level"], msg["source"], msg["data"])
 					self.progress_signal.emit(l_img_progress)
 
@@ -303,7 +303,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 #Load_data|=============================================|
 	def set_quiz_data(self):
 		self.stackedWidget.setCurrentIndex(2)
-		QTimer.singleShot(20, self.set_quiz_data_GUI)
+		QTimer.singleShot(5, self.set_quiz_data_GUI)
 		QTimer.singleShot(90, self.start_load_img)
 
 	def start_load_img(self):
