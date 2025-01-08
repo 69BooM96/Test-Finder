@@ -71,12 +71,12 @@ class Load_data:
                     answers_dict["value"] = {
                         "text": BeautifulSoup(item["data"]["description"], "lxml").text,
                         "correctness": {
-                            i["header"]["text"]: [i2["text"] for i2 in i["items"]]
-                            for i in item["groups"]
+                            BeautifulSoup(i["header"]["text"], "lxml").text: [BeautifulSoup(i2["text"], "lxml").text for i2 in i["items"]]
+                            for i in item["data"]["groups"]
                         }
                     }
-
-            pprint(answers_dict)
+            
+            answers.append(answers_dict)
                 
                 
 
@@ -95,4 +95,5 @@ class Load_data:
 if __name__ == "__main__":
     qwe = Load_data()
     a = qwe.get_json("https://app.wizer.me/preview-legacy/F5LX2P")
-    qwe.processing_data(a)
+    with open("temp_data/json/index_0_0.json", "w") as file:
+        json.dump(qwe.processing_data(a), file, indent=4, ensure_ascii=False)
