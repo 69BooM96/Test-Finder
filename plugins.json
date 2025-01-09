@@ -10,5 +10,11 @@
 		"version": "0.0.1",
 		"git": "url://",
 		"status": "work"
+	},
+	{
+		"name": "appwizer",
+		"version": "0.0.1",
+		"git": "url://",
+		"status": "not_work"
 	}
 ]
