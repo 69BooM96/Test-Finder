@@ -19,7 +19,9 @@ class Load_data:
         for item in data["worksheet"]["widgets"]:
             answers_dict = {}
             typy_q = item["name"]
-            if typy_q not in ["Reflection", "Discussion", "Link", "Video", "Text", "Draw", "Open Question", "Image"]:
+            answers_dict["type"] = typy_q
+
+            if typy_q not in ["Reflection", "Image"]:
                 if typy_q == "Multiple Choice":
                     if sum(bool(j.get("checked")) for j in item["data"]["options"]) > 1:
                         answers_dict["type"] = "multiquiz"
@@ -37,7 +39,6 @@ class Load_data:
                     ]
 
                 elif typy_q == "Blanks":
-                    answers_dict["type"] = "Blanks"
                     answers_dict["value"] = [
                         {
                             "text": item["data"]["blankText"],
@@ -47,7 +48,6 @@ class Load_data:
                     ]
                 
                 elif typy_q == "Matching":
-                    answers_dict["type"] = "Matching"
                     answers_dict["value"] = [
                         {
                             "text": BeautifulSoup(item["data"]["title"], "lxml").text,
@@ -68,15 +68,46 @@ class Load_data:
                     ]
                 
                 elif typy_q == "Sorting":
-                    answers_dict["type"] = "Sorting"
-                    
                     answers_dict["value"] = {
                         "text": BeautifulSoup(item["data"]["description"], "lxml").text,
+                        "img": None,
                         "correctness": {
                             BeautifulSoup(i["header"]["text"], "lxml").text: [BeautifulSoup(i2["text"], "lxml").text for i2 in i["items"]]
                             for i in item["data"]["groups"]
                         }
                     }
+
+                #хуйня не робочая баля курва япьярдоле
+                elif typy_q == "Open Question":
+                    answers_dict["value"] = {
+                        "text": BeautifulSoup(item["data"]["description"], "lxml").text,
+                        "img": None,
+                    }
+
+                elif typy_q == "Draw":
+                    answers_dict["value"] = {
+                        "text": BeautifulSoup(item["data"]["description"], "lxml").text,
+                        "img": "https://app.wizer.me/images/draw/bg-pttrn.jpg",
+                    }
+
+                elif typy_q == "Text":
+                    answers_dict["value"] = {
+                        "text": BeautifulSoup(item["data"]["title"], "lxml").text,
+                    }
+
+                elif typy_q == "Video":
+                    answers_dict["value"] = {
+                        "text": BeautifulSoup(item["data"]["description"], "lxml").text,
+                        "img": item["data"]["video"]["thumbnails"]["standard"],
+                        "url": item["data"]["video"]["url"]
+                    }
+
+                elif typy_q == "Link":
+                    answers_dict["value"] = {
+                        "text": BeautifulSoup(item["data"]["teacher_description"], "lxml").text,
+                        "url": item["data"]["url"]
+                    }
+
 
             answers.append(answers_dict)
                 

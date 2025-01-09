@@ -10,9 +10,6 @@ from fake_useragent import UserAgent
 
 from modules.decorate import async_session
 
-def pprint(a):
-    print(json.dumps(a, indent=4, ensure_ascii=False))
-
 
 class Load_data:
     def __init__(self, cookies=None):
@@ -86,7 +83,8 @@ class Load_data:
                     "type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
                     "text": obj.find(class_="question-view-item-content").text.strip().replace(" ", "") if obj.find(class_="question-view-item-content") else None,
                     "img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
-                    "value": [{
+                    "value": [
+                        {
                         "text": item.find("p").text.strip().replace(" ", "") if item.find("p") else None,
                         "img": item.find("img").get("src") if item.find("img") else None,
                         "correctness": None
@@ -295,7 +293,7 @@ def main():
     naurok = Load_data()
     
     a = naurok.search(storinka=(1,2))
-    pprint(naurok.search_by_url({"https://naurok.com.ua/test/testing/547bd540-2421-4c78-bb18-037e462c147d"}))
+
     print(a)
 
     print(perf_counter()-start)
