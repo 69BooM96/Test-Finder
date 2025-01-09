@@ -52,10 +52,12 @@ class Load_data:
                         {
                             "text": BeautifulSoup(item["data"]["title"], "lxml").text,
                             "img": None,
-                            "correctness": [{
+                            "correctness": [
+                                {
                                 "target": {
                                     "text": i["target"]["value"],
-                                    "img": None},
+                                    "img": None
+                                    },
                                 "match": {
                                     "text": i["match"]["value"],
                                     "img": None
@@ -75,7 +77,7 @@ class Load_data:
                             for i in item["data"]["groups"]
                         }
                     }
-            
+
             answers.append(answers_dict)
                 
                 
@@ -94,6 +96,7 @@ class Load_data:
 
 if __name__ == "__main__":
     qwe = Load_data()
-    a = qwe.get_json("https://app.wizer.me/preview-legacy/F5LX2P")
+    a = qwe.get_json("https://app.wizer.me/learn/FA4E49")
+    pprint(qwe.processing_data(a))
     with open("temp_data/json/index_0_0.json", "w") as file:
         json.dump(qwe.processing_data(a), file, indent=4, ensure_ascii=False)

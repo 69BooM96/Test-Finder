@@ -10,6 +10,9 @@ from fake_useragent import UserAgent
 
 from modules.decorate import async_session
 
+def pprint(a):
+    print(json.dumps(a, indent=4, ensure_ascii=False))
+
 
 class Load_data:
     def __init__(self, cookies=None):
@@ -31,6 +34,38 @@ class Load_data:
         
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
+    def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list:
+        @async_session(None)
+        async def async_search_by_url(session: aiohttp.ClientSession, url):
+            async with session.get(url, proxy=None) as req:
+                soup = BeautifulSoup(await req.text(), "lxml")
+            id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
+            
+            async with session.get(f"https://naurok.com.ua/api2/test/sessions/{id}", proxy=proxy) as res:
+                res = await res.json()
+                
+            return [
+                {
+                    "type": item.get("type"),
+                    "text": BeautifulSoup(item.get("content"), "lxml").text.strip(),
+                    "img": item.get("image"),
+                    "value": [
+                        {
+                            "text": BeautifulSoup(item2.get("value"), "lxml").text.strip(),
+                            "img": item2.get("image")
+                        }
+                    for item2 in item["options"]
+                    ]
+                }
+            for item in res["questions"]
+            ]
+        
+        async def run():
+            task = [async_search_by_url(url) for url in url]
+            return await asyncio.gather(*task)
+        
+        return asyncio.run(run())
+    
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(None)
         async def async_processing_data(session: aiohttp.ClientSession, url):
@@ -257,9 +292,10 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = Load_data(json.load(open("plugins/naurok/cookies.json")))
+    naurok = Load_data()
     
     a = naurok.search(storinka=(1,2))
+    pprint(naurok.search_by_url({"https://naurok.com.ua/test/testing/547bd540-2421-4c78-bb18-037e462c147d"}))
     print(a)
 
     print(perf_counter()-start)
