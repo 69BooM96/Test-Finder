@@ -48,7 +48,6 @@ class Load_data:
                 "q": f"{q} site: {site}",
                 "first": "21"
             }
-            print()
 
             async with session.get("https://www.bing.com/search", params=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")

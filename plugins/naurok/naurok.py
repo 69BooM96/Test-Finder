@@ -311,7 +311,7 @@ def main():
 
     naurok = Load_data()
 
-    a = naurok.sitemap([f"https://naurok.com.ua/sitemap-{i}.xml" for i in range(42, 72)])
+    a = naurok.processing_data(['https://naurok.com.ua/test/mistectvo'])
 
     print(a)
 

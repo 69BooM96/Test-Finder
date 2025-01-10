@@ -2,39 +2,85 @@ import asyncio
 import time
 import json
 import aiohttp
+
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
+
+from modules.decorate import async_session
 
 
-class Load_data():
-	def __init__(self):
-		super().__init__()
-	
-	def search_url(self, pages, text):
-		self.url_list = []
-		async def get_test(session, page, text):
-			async with session.get("https://www.google.com/search", params={"q": text, "start": page * 10}) as req:
+class Load_data:
+	def search_url(self, text, site="", end="", pages=(1,2)):
+		@async_session(None)
+		async def get_test(session: aiohttp.ClientSession, page, text):
+			p = {
+				"q": text + f"site: {site}" if site else "",
+				"start": page * 10
+			}
+			async with session.get("https://www.google.com/search", params=p) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 
-			for item in soup.find_all(attrs={"jsname": "UWckNb"}):
-				if item.get('href').startswith("https://naurok.com.ua/test/"):
-					self.url_list.append(item.get('href'))
-				print(item.get('href'))
+			print(soup)
+			return [item.get('href') for item in soup.find_all(attrs={"jsname": "UWckNb"})]
 
 		async def async_run():
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}) as session:
-				task = [get_test(session, page, text=text) for page in range(pages)]
-				await asyncio.gather(*task)
-			
-		
-		start = time.perf_counter()
-		asyncio.run(async_run())
-		print(time.perf_counter()-start)
-		return self.url_list
-		
+			task = [get_test(page, text=text) for page in range(*pages)]
+			return await asyncio.gather(*task)
 
-# a = Load_data().search_url(15, "на урок тест укр мова")
-# print(a)
+		return [item2 for item in asyncio.run(async_run()) for item2 in item if item2.endswith(end) or not end]
+
 
 def data_info():
 	return {"": ""}
+
+if __name__ == '__main__':
+	start = time.perf_counter()
+	google = Load_data()
+
+	print(google.search_url("на урок вулканізм"))
+
+
+
+	print(time.perf_counter()-start)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
