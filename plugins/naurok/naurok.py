@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 import json
 
-from time import perf_counter
+from time import perf_counter, strftime
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -15,7 +15,7 @@ class Load_data:
     def __init__(self, cookies=None):
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-    def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list:
+    def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list[str]:
         @async_session(None)
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
@@ -31,10 +31,10 @@ class Load_data:
         
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
-    def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list:
+    def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(None)
         async def async_search_by_url(session: aiohttp.ClientSession, url):
-            async with session.get(url, proxy=None) as req:
+            async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
             id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
             
@@ -98,7 +98,7 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def get_test(self, url: list, proxy=None, qt_logs=None) -> list:
+    def get_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         @async_session(self.cookies)
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -143,7 +143,7 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list:
+    def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list[str]:
         @async_session(self.cookies)
         async def async_test_pass(session: aiohttp.ClientSession, gamecode):
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
@@ -189,7 +189,7 @@ class Load_data:
 
         return asyncio.run(run())			
 
-    def get_answer(self, url: list, proxy=None, qt_logs=None) -> list:
+    def get_answer(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         @async_session(self.cookies)
         async def async_get_answer(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -213,6 +213,25 @@ class Load_data:
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
+
+    def sitemap(self, url: list, proxy=None, qt_logs=None) -> list[str]:
+        @async_session(None)
+        async def async_sitemap(session, url, proxy=proxy) -> list:
+            async with session.get(url) as req:
+                soup = BeautifulSoup(await req.text(), "lxml-xml")
+
+            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+
+            date = strftime("%Y-%m-%d")
+
+            return [url.find("loc").text for url in soup.find_all("url") if url.find("lastmod").text == date and url.find("loc").text[:27] == "https://naurok.com.ua/test/"]
+
+        async def run():
+            task = [async_sitemap(url) for url in url]
+            return await asyncio.gather(*task)
+
+        return list(set(item2 for item in asyncio.run(run()) for item2 in item))
+
 
 class Create_Test:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
@@ -291,8 +310,8 @@ def main():
     start = perf_counter()
 
     naurok = Load_data()
-    
-    a = naurok.search(storinka=(1,2))
+
+    a = naurok.sitemap([f"https://naurok.com.ua/sitemap-{i}.xml" for i in range(42, 72)])
 
     print(a)
 
