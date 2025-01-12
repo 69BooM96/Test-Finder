@@ -16,17 +16,17 @@ class Load_data:
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list[str]:
-        @async_session(None)
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
             if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-            
+
             return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
-        
-        async def run():
-            task = [async_search(storinka=item) for item in range(*storinka)]
+
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_search(session, storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
         
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
@@ -34,7 +34,7 @@ class Load_data:
     def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         """Получение вопросов по UUID типо
          https://naurok.com.ua/test/testing/0fad247b-cb1d-4355-b946-062bba08d6a6"""
-        @async_session(None)
+
         async def async_search_by_url(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -58,16 +58,16 @@ class Load_data:
                 }
             for item in res["questions"]
             ]
-        
-        async def run():
-            task = [async_search_by_url(url) for url in url]
+
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_search_by_url(session, url) for url in url]
             return await asyncio.gather(*task)
         
         return asyncio.run(run())
     
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         """Получение вопросов с не пройденного теста"""
-        @async_session(None)
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -94,16 +94,16 @@ class Load_data:
                     } for item in obj.select('.question-options > div')]
                 } for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
             }
-        
-        async def run():
-            task = [async_processing_data(url) for url in url if url if url[:27] == "https://naurok.com.ua/test/"]
+
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_processing_data(session, url) for url in url if url if url[:27] == "https://naurok.com.ua/test/"]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def get_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         """создание теста"""
-        @async_session(self.cookies)
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -113,7 +113,7 @@ class Load_data:
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
                 "Homework[name]": "Test-Finder",
-                "Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[3].get("value"),
+                "Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[2].get("value"),
                 "Homework[deadline_hour]": "18:00",
                 "Homework[shuffle_question]": 0,
                 "Homework[shuffle_options]": [
@@ -139,17 +139,20 @@ class Load_data:
             async with session.get(url, data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
+            async with session.get("https://naurok.com.ua"+soup.find("a", class_="homework-name").get("href")) as req:
+                soup = BeautifulSoup(await req.text(), "lxml")
+
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
-        async def run():
-            task = [async_get_test(f"{url[:-5]}/set") for url in url]
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_get_test(session, f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list[str]:
         """получение ответов с теста по геймкоду который возврощяет get_test"""
-        @async_session(self.cookies)
         async def async_test_pass(session: aiohttp.ClientSession, gamecode):
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -188,15 +191,15 @@ class Load_data:
                 uuid = await req.json()
                 return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
 
-        async def run():
-            task = [async_test_pass(gamecode) for gamecode in gamecode]
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_test_pass(session, gamecode) for gamecode in gamecode]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())			
 
     def get_answer(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         """получение полных ответов с конечной сылки которая возврощяется test_pass (Очень похожа на processing_data)"""
-        @async_session(self.cookies)
         async def async_get_answer(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -214,15 +217,15 @@ class Load_data:
                 } for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
             } for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
 
-        async def run():
-            task = [async_get_answer(url) for url in url]
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_get_answer(session, url) for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def sitemap(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         """Получение тестов с подсказки для сайтов site map"""
-        @async_session(None)
         async def async_sitemap(session, url, proxy=proxy) -> list:
             async with session.get(url) as req:
                 soup = BeautifulSoup(await req.text(), "lxml-xml")
@@ -233,8 +236,9 @@ class Load_data:
 
             return [url.find("loc").text for url in soup.find_all("url") if url.find("lastmod").text == date and url.find("loc").text[:27] == "https://naurok.com.ua/test/"]
 
-        async def run():
-            task = [async_sitemap(url) for url in url]
+        @async_session(self.cookies)
+        async def run(session):
+            task = [async_sitemap(session, url) for url in url]
             return await asyncio.gather(*task)
 
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
@@ -318,12 +322,13 @@ def main():
 
     naurok = Load_data(json.load(open("plugins/naurok/cookies.json", "r")))
 
-    a = naurok.search()[:5]
+    a1 = naurok.search()[:2]
+    a2 = naurok.get_test(a1)
+    a3 = naurok.test_pass(a2)
+    a4 = naurok.get_answer(a3)
 
-    qwe = naurok.get_test(a)
-    eqw = naurok.test_pass(qwe)
-
-    print(eqw)
+    with open("temp_data/json/index_0_0.json", "w", encoding="utf-8") as file:
+        json.dump(a4, file, indent=4, ensure_ascii=False)
 
 
 
