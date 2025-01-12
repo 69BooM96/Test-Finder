@@ -32,6 +32,8 @@ class Load_data:
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
     def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+        """Получение вопросов по UUID типо
+         https://naurok.com.ua/test/testing/0fad247b-cb1d-4355-b946-062bba08d6a6"""
         @async_session(None)
         async def async_search_by_url(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -64,6 +66,7 @@ class Load_data:
         return asyncio.run(run())
     
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+        """Получение вопросов с не пройденного теста"""
         @async_session(None)
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -99,11 +102,12 @@ class Load_data:
         return asyncio.run(run())
 
     def get_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
+        """создание теста"""
         @async_session(self.cookies)
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
-            
+
             if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
@@ -111,39 +115,40 @@ class Load_data:
                 "Homework[name]": "Test-Finder",
                 "Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[3].get("value"),
                 "Homework[deadline_hour]": "18:00",
-                "Homework[shuffle_question]": "0",
+                "Homework[shuffle_question]": 0,
                 "Homework[shuffle_options]": [
-                    "0",
-                    "1"
+                    0,
+                    1
                 ],
-                "Homework[show_answer]": "0",
+                "Homework[show_answer]": 0,
                 "Homework[show_review]": [
-                    "0",
-                    "1"
+                    0,
+                    1
                 ],
                 "Homework[show_leaderbord]": [
-                    "0",
-                    "1"
+                    0,
+                    1
                 ],
-                "Homework[available_attempts]": "0",
-                "Homework[duration]": "40",
-                "Homework[show_timer]": "0",
-                "Homework[show_flashcard]": "0",
-                "Homework[show_match]": "0"
+                "Homework[available_attempts]": 0,
+                "Homework[duration]": 40,
+                "Homework[show_timer]": 0,
+                "Homework[show_flashcard]": 0,
+                "Homework[show_match]": 0
             }
-            
+
             async with session.get(url, data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
-            
+
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
         async def run():
-            task = [async_get_test(f"{url[:-5]}/set") for url in url if url[:27] == "https://naurok.com.ua/test/"]
+            task = [async_get_test(f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list[str]:
+        """получение ответов с теста по геймкоду который возврощяет get_test"""
         @async_session(self.cookies)
         async def async_test_pass(session: aiohttp.ClientSession, gamecode):
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
@@ -159,7 +164,7 @@ class Load_data:
             
             async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req: 
                 soup = BeautifulSoup(await req.text(), "lxml")
-            
+
             session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
 
             async with session.get(f"https://naurok.com.ua/api2/test/sessions/{session_id}", proxy=proxy) as req:
@@ -177,12 +182,12 @@ class Load_data:
                 "show_answer": session_res["settings"]["show_answer"],
                 "type": session_res["questions"][0]["type"]
                 }
-            
+
             async with session.put("https://naurok.com.ua/api2/test/responses/answer", data=data) as req: await req.text()
             async with session.put(f"https://naurok.com.ua/api2/test/sessions/end/{session_id}") as req:
                 uuid = await req.json()
                 return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
-            
+
         async def run():
             task = [async_test_pass(gamecode) for gamecode in gamecode]
             return await asyncio.gather(*task)
@@ -190,6 +195,7 @@ class Load_data:
         return asyncio.run(run())			
 
     def get_answer(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+        """получение полных ответов с конечной сылки которая возврощяется test_pass (Очень похожа на processing_data)"""
         @async_session(self.cookies)
         async def async_get_answer(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -205,16 +211,17 @@ class Load_data:
                     "text": item.find("p").text.strip() if item.find("p") else None,
                     "img": item.find("img").get("src") if item.find("img") else None,
                     "correctness": True if item.find("span")['class'][0] == "correct" else False
-                }	for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
-            }	for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
+                } for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
+            } for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
 
         async def run():
-            task = [async_get_answer(url) for url in url if url[:36] == "https://naurok.com.ua/test/complete/"]
+            task = [async_get_answer(url) for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def sitemap(self, url: list, proxy=None, qt_logs=None) -> list[str]:
+        """Получение тестов с подсказки для сайтов site map"""
         @async_session(None)
         async def async_sitemap(session, url, proxy=proxy) -> list:
             async with session.get(url) as req:
@@ -309,11 +316,16 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = Load_data()
+    naurok = Load_data(json.load(open("plugins/naurok/cookies.json", "r")))
 
-    a = naurok.processing_data(['https://naurok.com.ua/test/mistectvo'])
+    a = naurok.search()[:5]
 
-    print(a)
+    qwe = naurok.get_test(a)
+    eqw = naurok.test_pass(qwe)
+
+    print(eqw)
+
+
 
     print(perf_counter()-start)
 

@@ -1,4 +1,4 @@
-import asyncio 
+import asyncio
 import time
 import json
 import aiohttp
@@ -19,7 +19,6 @@ class Load_data:
 			async with session.get("https://www.google.com/search", params=p) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
 
-			print(soup)
 			return [item.get('href') for item in soup.find_all(attrs={"jsname": "UWckNb"})]
 
 		async def async_run():
@@ -36,7 +35,7 @@ if __name__ == '__main__':
 	start = time.perf_counter()
 	google = Load_data()
 
-	print(google.search_url("на урок вулканізм"))
+	print(google.search_url("вулканізм", "https://naurok.com.ua/test"))
 
 
 

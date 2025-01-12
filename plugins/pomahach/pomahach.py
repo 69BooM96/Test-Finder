@@ -1,9 +1,11 @@
 import json
 import asyncio
 import aiohttp
+
 from bs4 import BeautifulSoup
 
 from modules.decorate import async_session
+
 
 class Load_data:
 	def search(self, subject, storinka=(1,2), proxy=None, qt_logs=None):
@@ -11,6 +13,7 @@ class Load_data:
 		async def async_search(session: aiohttp.ClientSession, storinka):
 			async with session.get(f"https://pomahach.com/cat{subject}/page/{storinka}/", proxy=proxy) as req:
 				soup = BeautifulSoup(await req.text(), "lxml")
+
 				if qt_logs: qt_logs.emit("info", f"Pomahach", f" [{req.status}] [https://pomahach.com/cat{subject}/page/{storinka}/]")
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
