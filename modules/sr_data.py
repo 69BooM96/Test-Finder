@@ -15,7 +15,7 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 	self.progress_signal.emit(2)
 	big_start_time = time.perf_counter()
 	plugins_list = [name for name in os.listdir("plugins")]
-	# self.urls_data_list = []
+
 	progress_pl = (42//len(plugins_list))
 
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
@@ -33,7 +33,6 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 					data_info_pl = plugin.data_info()
 
-					#funk_start
 					args_pl = {}
 
 					if data_info_pl['search']['subject'][0] and subject:   args_pl["subject"]= subject
@@ -52,6 +51,7 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 					else:
 						if data_info_pl['search']['cookie'][0]:
 							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
+							
 							urls_lists = session_pl.search(**args_pl)
 							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 						else:
@@ -75,6 +75,7 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 	plugins_list = [name for name in os.listdir("plugins")]
 	dict_num = 0
 	self.urls_data_list = []
+	temp_json = []
 
 	progress_pl = (42//len(plugins_list))
 	for pl_index, pl_name in enumerate(plugins_list, start=1):
@@ -105,18 +106,26 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 							dict_data = pl_load_data.processing_data(url=list_urls, **args_pl)
 
 					for index_item in range(len(dict_data)):
-						with open(f"temp_data/json/index_{index_session}_{index_item+dict_num}.json", "w", encoding="utf-8") as session_set_sr_data:
-							test_data = dict_data[index_item]
-							test_data["index_file"] = (index_item+dict_num)
-							test_data["index_session"] = index_session
-							json.dump(test_data, session_set_sr_data, ensure_ascii=False, indent=4)
-							self.urls_data_list.append(index_item+dict_num)
+						test_data = dict_data[index_item]
+						test_data["index_file"] = (index_item+dict_num)
+						test_data["index_session"] = index_session
+
+						temp_json.append(test_data)
+
+					with open(f"temp_data/json/index_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
+						json.dump(temp_json, session_set_sr_data, ensure_ascii=False, indent=4)
 					dict_num += len(dict_data)
 
 			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
 			
+def plugin_answers_data(salf):
+	...
+
+def plugin_create_data(self):
+	...
+
 
 def wiki_data():
 	try:
