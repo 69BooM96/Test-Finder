@@ -1,0 +1,40 @@
+[
+    {
+        "search": {
+            "results": 30,
+            "platforms": 5,
+            "times": "10.29",
+            "page": 0
+        },
+        "history_page": 1,
+        "history": [
+            {
+                "page": "menu",
+                "data": null
+            },
+            {
+                "page": "search",
+                "data": null
+            }
+        ]
+    },
+    {
+        "search": {
+            "results": 6,
+            "platforms": 5,
+            "times": "3.62",
+            "page": 0
+        },
+        "history_page": 1,
+        "history": [
+            {
+                "page": "menu",
+                "data": null
+            },
+            {
+                "page": "search",
+                "data": null
+            }
+        ]
+    }
+]
