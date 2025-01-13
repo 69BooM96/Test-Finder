@@ -7,28 +7,30 @@ import random
 import multiprocessing
 import asyncio
 import aiohttp
+import webbrowser
+
 from typing import Literal
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
 from PyQt5.QtCore import QThread, QProcess
 from PyQt5.QtCore import QTimer
+from colorama import *
+
 from modules import ld_plugins
 from modules import sr_data
 from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
 from modules import ld_image
-
 from modules.decorate import try_except
-from colorama import *
+
 
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
 	progress_signal = QtCore.pyqtSignal(int)
-	update_data_signal = QtCore.pyqtSignal(int, int, int, str, dict, list)
+	update_data_signal = QtCore.pyqtSignal(int, int, int, str, dict)
 
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
@@ -40,6 +42,7 @@ class Search_parser(QThread):
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 		self.urls_data_list = []
+		self.len_url_list = 0
 		self.platforms_num = 0
 		self.wiki_text_data = ""
 		self.wiki_title_data = ""
@@ -47,11 +50,12 @@ class Search_parser(QThread):
 		self.progress_index = 2
 
 		sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
+		self.len_url_list = len(self.urls_data_list)
 		sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)
 
 		# sr_data.wiki_data(self)
 		self.progress_signal.emit(100)		
-		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data}, self.urls_data_list)
+		self.update_data_signal.emit(index_sessions, self.len_url_list, self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data})
 		self.progress_signal.emit(0)
 
 class Img_load(QThread):
@@ -79,7 +83,7 @@ class Img_load(QThread):
 			while load_pr.is_alive() or not queue.empty():
 				if not queue.empty():
 					msg = queue.get()
-					l_img_progress += l_img_num
+					l_img_progress+=l_img_num
 					self.log_signal.emit(msg["level"], msg["source"], msg["data"])
 					self.progress_signal.emit(l_img_progress)
 
@@ -179,6 +183,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.win_resizing_bottom = False
 		self.win_resizing_px = 4
 
+	#Preload
+		self.start_session()
+
 	#Class
 		self.parser_search = Search_parser(mainwindows=self)
 		self.parser_search.log_signal.connect(self.logs)
@@ -196,6 +203,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_11.clicked.connect(self.start_search_0)
 		self.pushButton_22.clicked.connect(self.start_search_1)
 		self.pushButton.clicked.connect(self.back_page)
+		self.pushButton_2.clicked.connect(self.next_page)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
@@ -223,19 +231,150 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_41.clicked.connect(self.open_settings_addons_plugins)
 		self.pushButton_32.clicked.connect(self.open_settings_addons)
 		self.pushButton_37.clicked.connect(self.open_settings_manual)
-		self.pushButton_16.clicked.connect(self.open_settings_manual)
 		self.pushButton_43.clicked.connect(self.open_settings_logs)
+		self.pushButton_16.clicked.connect(self.open_git)
+		self.pushButton_49.clicked.connect(self.add_tab_session)
 
 	#list Widget
 		self.listWidget_3.clicked.connect(self.set_quiz_data)
+		self.listWidget_2.clicked.connect(self.open_session)
 
 #Core
 #GUI|===================================================|
-	def back_page(self):
-		self.stackedWidget.setCurrentIndex(1)
+	def open_git(self):
+		webbrowser.open_new_tab("https://github.com/69BooM96/Test-Finder/")
+
+#Session|===============================================|
+	def start_session(self):
+		with open("data/sessions.json", "w", encoding="utf-8") as file:
+			json.dump([], file, ensure_ascii=False, indent=4)
+
+		self.add_tab_session()
+		self.listWidget_2.setCurrentRow(0)
+
+	def add_tab_session(self):
+		item = QtWidgets.QListWidgetItem(self.listWidget_2)
+		item.setSizeHint(QtCore.QSize(160, 26))
+		ItemQWidget = set_GUI_item_sr.Item_tab(self.del_tab_session, item)
+		
+		self.listWidget_2.addItem(item)
+		self.listWidget_2.setItemWidget(item, ItemQWidget)
+
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			data_sessions = json.load(file)
+
+		data_sessions.append({"search": None, "history_page": 0, "history": [{"page": "menu", "data": None}]})
+
+		with open("data/sessions.json", "w", encoding="utf-8") as file:
+			json.dump(data_sessions, file, ensure_ascii=False, indent=4)
+
+	def del_tab_session(self, item):
+		if self.listWidget_2.count() != 1:
+			item_num = self.listWidget_2.row(item)
+			if item_num != -1:
+				with open("data/sessions.json", "r", encoding="utf-8") as file:
+					data_sessions = json.load(file)
+				del data_sessions[item_num]
+				with open("data/sessions.json", "w", encoding="utf-8") as file:
+					json.dump(data_sessions, file, ensure_ascii=False, indent=4)
+
+				item = self.listWidget_2.takeItem(item_num)
+				del item
+		else:
+			sys.exit(app.exec_())
+
+	def set_session_data(self, index_session, results, platforms, times, wiki_text):
+		data_write = {
+			"results": results,
+			"platforms": platforms,
+			"times": times,
+			"page": 0,}
+
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+
+		sessions_load[index_session]["search"] = data_write
+		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
+			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
+		self.set_sr_data_GUI()
 
 	def next_page(self):
-		self.stackedWidget.setCurrentIndex(2)
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_session = item_num.row()
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+
+		if (sessions_load[index_session]["history_page"] + 1) <= (len(sessions_load[index_session]["history"])-1):
+			sessions_load[index_session]["history_page"] = sessions_load[index_session]["history_page"] + 1
+
+			with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
+				json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
+
+			self.load_session(sessions_load[index_session]["history"][sessions_load[index_session]["history_page"]])
+
+	def back_page(self):
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_session = item_num.row()
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+
+		if (sessions_load[index_session]["history_page"] - 1) >= 0:
+			sessions_load[index_session]["history_page"] = sessions_load[index_session]["history_page"] - 1
+
+			with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
+				json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
+
+			self.load_session(sessions_load[index_session]["history"][sessions_load[index_session]["history_page"]])
+
+	def add_history_sessions(self, page, data=None):
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_session = item_num.row()
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+		sessions_load[index_session]["history"].append({"page": page, "data": data})
+		sessions_load[index_session]["history_page"] = sessions_load[index_session]["history_page"] + 1
+		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
+			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
+
+	def del_history_sessions(self, index_session):
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+		for item in range(index_session, len(sessions_load)):
+			del sessions_load[item]
+		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
+			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
+
+	def open_session(self):
+		for item_num in self.listWidget_2.selectedIndexes():
+			index_session = item_num.row()
+		with open("data/sessions.json", "r", encoding="utf-8") as file:
+			sessions_load = json.load(file)
+		self.load_session(sessions_load[index_session]["history"][sessions_load[index_session]["history_page"]])
+
+	def load_session(self, page_load):
+		if page_load["page"] == "menu":
+			self.stackedWidget.setCurrentIndex(0)
+			if page_load["data"]:
+				...
+
+		elif page_load["page"] == "settings":
+			self.stackedWidget.setCurrentIndex(3)
+			if page_load["data"]:
+				...
+
+		elif page_load["page"] == "search":
+			self.stackedWidget.setCurrentIndex(1)
+			self.set_sr_data_GUI()
+
+		elif page_load["page"] == "test_browser":
+			self.stackedWidget.setCurrentIndex(2)
+			if page_load["data"]:
+				...
+
+		elif page_load["page"] == "web_browser":
+			self.stackedWidget.setCurrentIndex(2)
+			if page_load["data"]:
+				...
 
 #Search|================================================|
 	def start_search_1(self):
@@ -247,21 +386,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.text_search = self.plainTextEdit.toPlainText()
 		self.plainTextEdit.setPlainText("")
 		self.stackedWidget.setCurrentIndex(1)
+		self.add_history_sessions("search")
+
 		self.parser_search.start()
-		
-	def set_session_data(self, index_session, results, platforms, times, wiki_text, lists_data):
-		data_write = {
-			"session_index": index_session,
-			"results": results,
-			"platforms": platforms,
-			"times": times,
-			"lists_data": lists_data,
-			"page": 0,}
-			# "wiki_text": wiki_text
-		
-		with open(f"temp_data/sessions/session_{index_session}.json", "w", encoding="utf-8") as file_w:
-			json.dump(data_write, file_w, ensure_ascii=False, indent=4)
-		self.set_sr_data_GUI()
 
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
@@ -271,20 +398,21 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		for item_num in self.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
-		with open(f"temp_data/sessions/session_{index_sessions}.json", "r", encoding="utf-8") as file_r:
+		with open(f"data/sessions.json", "r", encoding="utf-8") as file_r:
 			session_sr = json.load(file_r)
 
-		self.label_3.setText(f"[results]: [{session_sr['results']}]")
-		self.label_4.setText(f"[platforms]: [{session_sr['platforms']}]")
-		self.label_5.setText(f"[time]: [{session_sr['times']}]")
+		self.label_3.setText(f"[results]: [{session_sr[index_sessions]["search"]['results']}]")
+		self.label_4.setText(f"[platforms]: [{session_sr[index_sessions]["search"]['platforms']}]")
+		self.label_5.setText(f"[time]: [{session_sr[index_sessions]["search"]['times']}]")
 		# self.label_2.setText(session_sr['wiki_text']['title'])
 		# self.textBrowser.setText(session_sr['wiki_text']['text'])
 
 		self.listWidget_3.clear()
-		for index_files in session_sr['lists_data'][(session_sr['page']*10):(session_sr['page']*10+10)]:
-			with open(f"temp_data/json/index_{index_sessions}_{index_files}.json", "r", encoding="utf-8") as file_r:
-				file_sr = json.load(file_r)
-				
+
+		with open(f"temp_data/json/index_{index_sessions}.json", "r", encoding="utf-8") as file_r:
+			session_data = json.load(file_r)
+
+		for file_sr in session_data[(session_sr[index_sessions]["search"]['page']*10):(session_sr[index_sessions]["search"]['page']*10+10)]:
 			ItemQWidget = set_GUI_item_sr.Item_search()
 			ItemQWidget.setPl_sr(f"  {file_sr['platform']}  ")
 			ItemQWidget.setUrl_sr(f"  {file_sr['url']}  ")
@@ -297,13 +425,15 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			ItemQWidget.setClass_sr(f" {file_sr['klass']} ")
 			item = QtWidgets.QListWidgetItem(self.listWidget_3)
 			item.setSizeHint(QtCore.QSize(245, 178))
+
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
 
 #Load_data|=============================================|
 	def set_quiz_data(self):
 		self.stackedWidget.setCurrentIndex(2)
-		QTimer.singleShot(5, self.set_quiz_data_GUI)
+		self.add_history_sessions("test_browser")
+		QTimer.singleShot(20, self.set_quiz_data_GUI)
 		QTimer.singleShot(90, self.start_load_img)
 
 	def start_load_img(self):
@@ -319,31 +449,35 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget_7.setCurrentIndex(0)
 		self.list_imgs = []
 		index_sessions = 0
+		
 		for item_num in self.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
 		for item_num in self.listWidget_3.selectedIndexes():
 			index_json = item_num.row()
 
-		with open(f"temp_data/json/index_{index_sessions}_{index_json}.json", "r", encoding="utf-8") as file_r:
-			data = json.load(file_r)
-			self.lineEdit.setText(data['url'])
+		with open(f"temp_data/json/index_{index_sessions}.json", "r", encoding="utf-8") as file_r:
+			l_data = json.load(file_r)
 
-			if data['type_data'] == "test":
-				for index, data_item in enumerate(data['answers'], 1):
-					ItemQWidget = set_GUI_item_sr.Item_quiz()
-					ItemQWidget.setNum_quiz(f"   {index}   ")
-					if data_item['img']: 
-						ItemQWidget.setImg_quiz(f"temp_data/imgs/{data_item['img'].split('/')[-1]}")
-						self.list_imgs.append(data_item['img'])
-					else: ItemQWidget.setImg_quiz()
-					ItemQWidget.setText_quiz(data_item['text'])
-					ItemQWidget.setList_answer(data_item['value'], data_item['type'], img_l=self.list_imgs)
-					
-					item = QtWidgets.QListWidgetItem(self.listWidget_8)
-					item.setSizeHint(QtCore.QSize(245, 254))
-					self.listWidget_8.addItem(item)
-					self.listWidget_8.setItemWidget(item, ItemQWidget)
+		data = l_data[index_json]
+		self.lineEdit.setText(data['url'])
+
+		if data['type_data'] == "test":
+			for index, data_item in enumerate(data['answers'], 1):
+				ItemQWidget = set_GUI_item_sr.Item_quiz()
+				ItemQWidget.setNum_quiz(f"   {index}   ")
+				if data_item['img']: 
+					ItemQWidget.setImg_quiz(f"temp_data/imgs/{data_item['img'].split('/')[-1]}")
+					self.list_imgs.append(data_item['img'])
+				else: ItemQWidget.setImg_quiz()
+				ItemQWidget.setText_quiz(data_item['text'])
+				ItemQWidget.setList_answer(data_item['value'], data_item['type'], img_l=self.list_imgs)
+				
+				item = QtWidgets.QListWidgetItem(self.listWidget_8)
+				# item.setSizeHint(QtCore.QSize(245, 254))
+				item.setSizeHint(QtCore.QSize(600, 288))
+				self.listWidget_8.addItem(item)
+				self.listWidget_8.setItemWidget(item, ItemQWidget)
 
 #Settings|==============================================|
 	#History
@@ -400,7 +534,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget_5.setCurrentIndex(0)
 
 	def open_settings(self):
-		self.stackedWidget.setCurrentIndex(2)
+		self.stackedWidget.setCurrentIndex(3)
+		self.add_history_sessions("settings")
 
 	#Close
 	def close_settings_general(self):
@@ -408,9 +543,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	def close_settings(self):
 		self.stackedWidget.setCurrentIndex(0)
+		self.add_history_sessions("menu")
 
 #System|================================================|
-
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
 		data_log = [f"[{time_}]", f"<{type_log}>", f"[{theme_log}]", f"[{text_log}]"]
@@ -436,7 +571,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	@try_except(Exception, funk=(lambda ex: None))
 	def mousePressEvent(self, event):
-		if self.show_w == True:
+		if self.show_w:
 			if event.button() == QtCore.Qt.LeftButton:
 				self.old_pos = event.pos()
 				if self.win_resizing_px >= self.old_pos.x():
@@ -451,17 +586,15 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 				if (self.size().height() - self.win_resizing_px) <= self.old_pos.y():
 					self.win_resizing_bottom = True
 
-
 	@try_except(Exception, funk=(lambda ex: None))
 	def mouseReleaseEvent(self, event):
-		if self.show_w == True:
+		if self.show_w:
 			if event.button() == QtCore.Qt.LeftButton:
 				self.old_pos = None
 				self.win_resizing_left = False
 				self.win_resizing_right = False
 				self.win_resizing_top = False
 				self.win_resizing_bottom = False
-
 
 	@try_except(Exception, funk=(lambda ex: None))
 	def mouseMoveEvent(self, event):

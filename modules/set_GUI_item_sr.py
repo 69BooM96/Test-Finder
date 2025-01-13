@@ -5,6 +5,7 @@ from PyQt5.QtCore import QThread, QProcess
 from modules import GUI_sr_item
 from modules import GUI_quiz
 from modules import GUI_answer
+from modules import GUI_tab
 
 
 class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
@@ -102,7 +103,6 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 			self.listWidget_2.hide()
 			self.label_2.hide()
 
-
 class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
 	def __init__(self, parent=None):
 		super(Item_answer, self).__init__(parent)
@@ -123,3 +123,10 @@ class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
 	def setText_answer(self, qz_text=None, correctness=None):
 		if qz_text: self.textBrowser.setText(qz_text)
 		else: self.textBrowser.hide()
+
+class Item_tab(QtWidgets.QWidget, GUI_tab.Ui_Form):
+	def __init__(self, del_tab_session, item_tab, parent=None):
+		super(Item_tab, self).__init__(parent)
+		self.setupUi(self)
+
+		self.pushButton.clicked.connect(lambda: del_tab_session(item_tab))
