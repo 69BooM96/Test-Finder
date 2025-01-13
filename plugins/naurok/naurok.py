@@ -3,12 +3,16 @@ import asyncio
 import aiohttp
 import json
 
-from time import perf_counter, strftime
+from time import perf_counter, strftime, sleep
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from modules.decorate import async_session
+from modules.decorate import async_session, thread
+
+
+def pprint(x):
+    print(json.dumps(x, indent=4, ensure_ascii=False))
 
 
 class Load_data:
@@ -28,7 +32,7 @@ class Load_data:
         async def run(session):
             task = [async_search(session, storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
-        
+
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
     def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
@@ -39,10 +43,10 @@ class Load_data:
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
             id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
-            
+
             async with session.get(f"https://naurok.com.ua/api2/test/sessions/{id}", proxy=proxy) as res:
                 res = await res.json()
-                
+
             return [
                 {
                     "type": item.get("type"),
@@ -63,15 +67,15 @@ class Load_data:
         async def run(session):
             task = [async_search_by_url(session, url) for url in url]
             return await asyncio.gather(*task)
-        
+
         return asyncio.run(run())
-    
+
     def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         """Получение вопросов с не пройденного теста"""
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
-                
+
             if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             return {
@@ -113,7 +117,7 @@ class Load_data:
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
                 "Homework[name]": "Test-Finder",
-                "Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[2].get("value"),
+                "Homework[deadline_day]": soup.find(id="homework-deadline_day").find_all("option")[3].get("value"),
                 "Homework[deadline_hour]": "18:00",
                 "Homework[shuffle_question]": 0,
                 "Homework[shuffle_options]": [
@@ -139,9 +143,6 @@ class Load_data:
             async with session.get(url, data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            async with session.get("https://naurok.com.ua"+soup.find("a", class_="homework-name").get("href")) as req:
-                soup = BeautifulSoup(await req.text(), "lxml")
-
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
         @async_session(self.cookies)
@@ -164,8 +165,8 @@ class Load_data:
                 "JoinForm[gamecode]": gamecode,
                 "JoinForm[name]": "Test-Finder"
             }
-            
-            async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req: 
+
+            async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
             session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
@@ -196,7 +197,7 @@ class Load_data:
             task = [async_test_pass(session, gamecode) for gamecode in gamecode]
             return await asyncio.gather(*task)
 
-        return asyncio.run(run())			
+        return asyncio.run(run())
 
     def get_answer(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
         """получение полных ответов с конечной сылки которая возврощяется test_pass (Очень похожа на processing_data)"""
@@ -205,7 +206,7 @@ class Load_data:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
             if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-            
+
             return [{
                 "type": obj.find(class_="homework-stat-option-line").find("span")['class'][1] if obj.find(class_="homework-stat-option-line").find("span") else None,
                 "text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]).replace("﻿", ""),
@@ -244,6 +245,76 @@ class Load_data:
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
 
+class AutoComplite:
+    def __init__(self, gamecode: str, name: str):
+        self.session = requests.Session()
+        self.session.headers.update({"user-agent": UserAgent().random})
+
+        req = self.session.get("https://naurok.com.ua/test/join")
+        soup = BeautifulSoup(req.text, "lxml")
+
+        data = {
+            "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
+            "JoinForm[gamecode]": gamecode,
+            "JoinForm[name]": name
+        }
+
+        self.req = self.session.post("https://naurok.com.ua/test/join", data=data)
+        soup = BeautifulSoup(self.req.text, "lxml")
+
+        self.id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
+        self.questions = self.session.get("https://naurok.com.ua/api2/test/sessions/" + self.id).json()["questions"]
+        self.point = sum(int(item["point"]) for item in self.questions)
+
+    def var(self):
+        for item in self.questions:
+            yield {
+                "id": item["id"],
+                "type": item["type"],
+                "point": item["point"],
+                "text": BeautifulSoup(item["content"], "lxml").text.strip(),
+                "img": item["image"],
+                "answers": [
+                    {
+                    "id": i["id"],
+                    "text": BeautifulSoup(i["value"], "lxml").text.strip(),
+                    "img": i["image"]
+                    }
+                for i in item["options"]
+                ]
+            }
+
+    def answer(self, queshion, text: list=None, img: list=None):
+        q_id = []
+        for item in queshion["answers"]:
+            if text:
+                for t in text:
+                    if t == item["text"]:
+                        q_id.append(item["id"])
+
+            if img:
+                for i in img:
+                    if i == item["img"]:
+                        q_id.append(item["id"])
+
+        if q_id:
+            data = {
+                "answer": list(set(q_id)),
+                "homework": True,
+                "homeworkType": 1,
+                "point": queshion["point"],
+                "question_id": queshion["id"],
+                "session_id": self.id,
+                "show_answer": 0,
+                "type": queshion["type"]
+            }
+
+            self.session.put("https://naurok.com.ua/api2/test/responses/answer", json=data)
+
+    def end(self):
+        self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
+        return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
+
 class Create_Test:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.session = requests.Session()
@@ -277,14 +348,14 @@ class Create_Test:
             "id": False,
             "order": 1,
             "point": 1,
-            "type": "quiz" if sum(answers.values()) < 1 else 'multiquiz',
+            "type": "quiz" if sum(answers.values()) <= 1 else 'multiquiz',
             "options": [{
-                "value": key if key[:62] != "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/" else None, 
+                "value": key if key[:62] != "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/" else None,
                 "correct": 1 if answers[key] else 0,
                 "image": key if key[:62] == "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/" else None}
             for key in answers]
         }
-               
+
         req = self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
         if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
@@ -295,13 +366,14 @@ class Create_Test:
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
+
 def data_info():
     list_object = [
                 "/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
-                "/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika", 
-                "/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika", 
-                "/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo", 
-                "/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya", 
+                "/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika",
+                "/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika",
+                "/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo",
+                "/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya",
                 "/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
                 ]
     return {"search": {
@@ -320,19 +392,16 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = Load_data(json.load(open("plugins/naurok/cookies.json", "r")))
-
-    a1 = naurok.search()[:2]
-    a2 = naurok.get_test(a1)
-    a3 = naurok.test_pass(a2)
-    a4 = naurok.get_answer(a3)
-
-    with open("temp_data/json/index_0_0.json", "w", encoding="utf-8") as file:
-        json.dump(a4, file, indent=4, ensure_ascii=False)
+    naurok = AutoComplite("1989533", "Адольф Гитлер")
+    for item in naurok.var():
+        if item["text"] == "":
+            naurok.answer(item, text=["Петро"])
+    print(naurok.end())
 
 
 
-    print(perf_counter()-start)
+
+    print(perf_counter() - start)
 
 if __name__ == "__main__":
     main()

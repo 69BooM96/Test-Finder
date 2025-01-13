@@ -55,7 +55,8 @@ def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=N
 							urls_lists = session_pl.search(**args_pl)
 							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 						else:
-							urls_lists = plugin.Load_data.search(self, **args_pl)
+							session_pl = plugin.Load_data()
+							urls_lists = session_pl.search(**args_pl)
 							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
 
 				elif mt_data['type'] == "search_engine":

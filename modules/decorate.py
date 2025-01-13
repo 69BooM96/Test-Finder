@@ -1,6 +1,10 @@
-from typing import Type
 import aiohttp
+
+from typing import Type
+from threading import Thread
+
 from fake_useragent import UserAgent
+
 
 def async_session(cookies):
 	def wrappers(funk):
@@ -18,9 +22,13 @@ def try_except(exp: Type[BaseException], funk=(lambda ex: print(ex))):
 				return fun(*agrs, **kwagrs)
 			except exp as ex:
 				funk(ex)
-
 		return wrapper
 	return wrappers
 
+
+def thread(funk):
+	def wrapper(*args, **kwargs):
+		Thread(target=funk, args=args, kwargs=kwargs, daemon=True).start()
+	return wrapper
 
 
