@@ -616,12 +616,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 												  self.geometry().y(), 
 												  self.geometry().width() - delta.x(), 
 												  self.geometry().height()))
-				else:
-					if delta.x() < 0:
-						self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
-													  self.geometry().y(), 
-													  self.geometry().width() - delta.x(), 
-													  self.geometry().height()))
+				elif delta.x() < 0:
+					self.setGeometry(QtCore.QRect(self.geometry().x() + delta.x(), 
+												  self.geometry().y(), 
+												  self.geometry().width() - delta.x(), 
+												  self.geometry().height()))
 
 			elif self.win_resizing_right:
 				self.setGeometry(QtCore.QRect(self.geometry().x(), 
@@ -635,12 +634,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 												  self.geometry().y() + delta.y(), 
 												  self.geometry().width(), 
 												  self.geometry().height() - delta.y()))
-				else:
-					if delta.y() < 0:
-						self.setGeometry(QtCore.QRect(self.geometry().x(), 
-													  self.geometry().y() + delta.y(), 
-													  self.geometry().width(), 
-													  self.geometry().height() - delta.y()))
+				elif delta.y() < 0:
+					self.setGeometry(QtCore.QRect(self.geometry().x(), 
+												  self.geometry().y() + delta.y(), 
+												  self.geometry().width(), 
+												  self.geometry().height() - delta.y()))
 			
 			elif self.win_resizing_bottom:
 				self.setGeometry(QtCore.QRect(self.geometry().x(), 
