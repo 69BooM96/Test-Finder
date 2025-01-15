@@ -83,7 +83,7 @@ class Img_load(QThread):
 			while load_pr.is_alive() or not queue.empty():
 				if not queue.empty():
 					msg = queue.get()
-					l_img_progress+=l_img_num
+					l_img_progress += l_img_num
 					self.log_signal.emit(msg["level"], msg["source"], msg["data"])
 					self.progress_signal.emit(l_img_progress)
 
@@ -354,22 +354,25 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def load_session(self, page_load):
 		if page_load["page"] == "menu":
 			self.stackedWidget.setCurrentIndex(0)
+			self.lineEdit.setText("menu")
 			if page_load["data"]:
 				...
 
 		elif page_load["page"] == "settings":
 			self.stackedWidget.setCurrentIndex(3)
+			self.lineEdit.setText("settings")
 			if page_load["data"]:
 				...
 
 		elif page_load["page"] == "search":
 			self.stackedWidget.setCurrentIndex(1)
+			self.lineEdit.setText(f"search://{self.text_search.replace(" ", "+")}")
 			self.set_sr_data_GUI()
 
 		elif page_load["page"] == "test_browser":
 			self.stackedWidget.setCurrentIndex(2)
 			if page_load["data"]:
-				...
+				self.set_quiz_data_GUI(page_load["data"])
 
 		elif page_load["page"] == "web_browser":
 			self.stackedWidget.setCurrentIndex(2)
@@ -379,6 +382,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 #Search|================================================|
 	def start_search_1(self):
 		self.text_search = self.plainTextEdit_2.toPlainText()
+		self.lineEdit.setText(f"search://{self.text_search.replace(" ", "+")}")
 		self.parser_search.start()
 
 	def start_search_0(self):
@@ -387,7 +391,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.plainTextEdit.setPlainText("")
 		self.stackedWidget.setCurrentIndex(1)
 		self.add_history_sessions("search")
-
+		self.lineEdit.setText(f"search://{self.text_search.replace(" ", "+")}")
 		self.parser_search.start()
 
 	def progress_search(self, value_pr):
@@ -432,8 +436,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 #Load_data|=============================================|
 	def set_quiz_data(self):
 		self.stackedWidget.setCurrentIndex(2)
-		self.add_history_sessions("test_browser")
-		QTimer.singleShot(20, self.set_quiz_data_GUI)
+		QTimer.singleShot(20, lambda: self.set_quiz_data_GUI(h_set=True))
 		QTimer.singleShot(90, self.start_load_img)
 
 	def start_load_img(self):
@@ -444,7 +447,8 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		if value_pr == 0:
 			self.set_quiz_data_GUI()
 
-	def set_quiz_data_GUI(self):
+	@try_except(Exception, funk=(lambda ex: None))
+	def set_quiz_data_GUI(self, index_json=None, h_set=False):
 		self.listWidget_8.clear()
 		self.stackedWidget_7.setCurrentIndex(0)
 		self.list_imgs = []
@@ -453,14 +457,20 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		for item_num in self.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
-		for item_num in self.listWidget_3.selectedIndexes():
-			index_json = item_num.row()
+		if index_json == None:
+			for item_num in self.listWidget_3.selectedIndexes():
+				index_json = item_num.row()
 
+		if h_set: self.add_history_sessions("test_browser", index_json)
 		with open(f"temp_data/json/index_{index_sessions}.json", "r", encoding="utf-8") as file_r:
 			l_data = json.load(file_r)
 
 		data = l_data[index_json]
-		self.lineEdit.setText(data['url'])
+		self.lineEdit.setText(f"{  data['url']}  ")
+		self.label_48.setText(f"{  data['name_test']}  ")
+		self.label_50.setText(f"{  data['object']}  ")
+		self.label_51.setText(f"{  data['klass']}  ")
+		self.label_49.setText(f"{  len(data['answers'])}  ")
 
 		if data['type_data'] == "test":
 			for index, data_item in enumerate(data['answers'], 1):
