@@ -106,7 +106,7 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def get_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
+    def create_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         """создание теста"""
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
@@ -315,6 +315,7 @@ class AutoComplite:
         self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
         return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
 
+
 class Create_Test:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.session = requests.Session()
@@ -392,10 +393,9 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = AutoComplite("1989533", "Адольф Гитлер")
+    naurok = AutoComplite("9946043", "Адольф Гитлер")
     for item in naurok.var():
-        if item["text"] == "":
-            naurok.answer(item, text=["Петро"])
+        naurok.answer(item, text=[item["answers"][1]["text"]])
     print(naurok.end())
 
 
