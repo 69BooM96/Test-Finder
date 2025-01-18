@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 import json
 
-from time import perf_counter, strftime
+from time import perf_counter, strftime, sleep
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -18,6 +18,11 @@ def pprint(x):
 class Load_data:
     def __init__(self, cookies=None):
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
+
+    def answers(self, url: list, proxy=None, qt_logs=None):
+        create_data = self.create_test(url, proxy=proxy, qt_logs=qt_logs)
+        pass_data = self.test_pass(create_data, proxy=proxy, qt_logs=qt_logs)
+        return self.get_answer(pass_data, proxy=proxy, qt_logs=qt_logs)
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
@@ -88,11 +93,11 @@ class Load_data:
 
                 "answers": [{
                     "type": "quiz" if obj.find(class_="option-marker quiz") else "multiquiz",
-                    "text": obj.find(class_="question-view-item-content").text.strip().replace(" ", "") if obj.find(class_="question-view-item-content") else None,
+                    "text": obj.find(class_="question-view-item-content").text.strip().replace(" ", "").replace("﻿", "") if obj.find(class_="question-view-item-content") else None,
                     "img": obj.find(class_="question-view-item-image").get("src") if obj.find(class_="question-view-item-image") else None,
                     "value": [
                         {
-                        "text": item.find("p").text.strip().replace(" ", "") if item.find("p") else None,
+                        "text": item.find("p").text.strip().replace(" ", "").replace("﻿", "") if item.find("p") else None,
                         "img": item.find("img").get("src") if item.find("img") else None,
                         "correctness": None
                     } for item in obj.select('.question-options > div')]
@@ -108,7 +113,7 @@ class Load_data:
 
     def create_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         """создание теста"""
-        async def async_create_test(session: aiohttp.ClientSession, url):
+        async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
@@ -147,7 +152,7 @@ class Load_data:
 
         @async_session(self.cookies)
         async def run(session):
-            task = [async_create_test(session, f"{url[:-5]}/set") for url in url]
+            task = [async_get_test(session, f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
@@ -209,10 +214,10 @@ class Load_data:
 
             return [{
                 "type": obj.find(class_="homework-stat-option-line").find("span")['class'][1] if obj.find(class_="homework-stat-option-line").find("span") else None,
-                "text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]).replace("﻿", ""),
+                "text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]).replace(" ", "").replace("﻿", ""),
                 "img": obj.find("img").get("src") if obj.find(class_="col-md-6") else None,
-                "answer": [{
-                    "text": item.find("p").text.strip() if item.find("p") else None,
+                "value": [{
+                    "text": item.find("p").text.strip().replace(" ", "").replace("﻿", "") if item.find("p") else None,
                     "img": item.find("img").get("src") if item.find("img") else None,
                     "correctness": True if item.find("span")['class'][0] == "correct" else False
                 } for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
@@ -243,7 +248,6 @@ class Load_data:
             return await asyncio.gather(*task)
 
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
-
 
 class AutoComplite:
     def __init__(self, gamecode: str, name: str):
@@ -315,7 +319,6 @@ class AutoComplite:
         self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
         return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
 
-
 class Create_Test:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.session = requests.Session()
@@ -377,7 +380,8 @@ def data_info():
                 "/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya",
                 "/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
                 ]
-    return {"search": {
+    return {
+            "search": {
                 "subject": [list_object, False],
                 "klass": [True, False],
                 "q": [True, False],
@@ -385,21 +389,24 @@ def data_info():
                 "proxy": [True, False],
                 "cookie": [False, False]},
             "processing_data": {
-                "url": ["list", False],
+                "url": ["True", False],
                 "proxy": [True, False],
                 "cookie": [False, False]},
-            "qt_logs": [True, False]}
+            "answers": {
+                "url": ["True", False],
+                "proxy": [True, False],
+                "cookie": [True, True]},
+            "qt_logs": [True, False]
+            }
 
 def main():
     start = perf_counter()
 
-    naurok = AutoComplite("9946043", "Адольф Гитлер")
+    naurok = AutoComplite("9946043", "Квантовый суб световой четырехмерный супер резиновый ХУЙ")
     for item in naurok.var():
-        naurok.answer(item, text=[item["answers"][1]["text"]])
+        if item["text"] == "":
+            naurok.answer(item, text=["Петро"])
     print(naurok.end())
-
-
-
 
     print(perf_counter() - start)
 
