@@ -3,12 +3,12 @@ import asyncio
 import aiohttp
 import json
 
-from time import perf_counter, strftime, sleep
+from time import perf_counter, strftime
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-from modules.decorate import async_session, thread
+from modules.decorate import async_session
 
 
 def pprint(x):
@@ -108,7 +108,7 @@ class Load_data:
 
     def create_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
         """создание теста"""
-        async def async_get_test(session: aiohttp.ClientSession, url):
+        async def async_create_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
@@ -147,13 +147,13 @@ class Load_data:
 
         @async_session(self.cookies)
         async def run(session):
-            task = [async_get_test(session, f"{url[:-5]}/set") for url in url]
+            task = [async_create_test(session, f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
 
         return asyncio.run(run())
 
     def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list[str]:
-        """получение ответов с теста по геймкоду который возврощяет get_test"""
+        """получение ответов с теста по геймкоду который возврощяет create_test"""
         async def async_test_pass(session: aiohttp.ClientSession, gamecode):
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
