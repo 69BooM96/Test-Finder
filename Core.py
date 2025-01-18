@@ -22,10 +22,31 @@ from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
 from modules import ld_image
+from modules import visualizer
 from modules.decorate import try_except
 
 
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+class Core_answer(QThread):
+	log_signal = QtCore.pyqtSignal(str, str, str)
+	progress_signal = QtCore.pyqtSignal(int)
+	update_data_signal = QtCore.pyqtSignal()
+
+	def __init__(self, mainwindows):
+		QThread.__init__(self)
+		self.mainwindows = mainwindows
+	
+	def run(self):
+		index_sessions = 0
+		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
+		for item_num in self.mainwindows.listWidget_3.selectedIndexes():
+			index_json = item_num.row()
+
+		sr_data.plugin_answers_data(self, index_sessions, index_json, self.mainwindows.url_data_answers)
+		self.update_data_signal.emit()
+		
 
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -35,12 +56,6 @@ class Search_parser(QThread):
 	def __init__(self, mainwindows):
 		QThread.__init__(self)
 		self.mainwindows = mainwindows
-	
-	def run(self):
-		start_time = time.perf_counter()
-		index_sessions = 0
-		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
-			index_sessions = item_num.row()
 		self.urls_data_list = []
 		self.len_url_list = 0
 		self.platforms_num = 0
@@ -48,6 +63,12 @@ class Search_parser(QThread):
 		self.wiki_title_data = ""
 		self.progress_signal.emit(1)
 		self.progress_index = 2
+	
+	def run(self):
+		start_time = time.perf_counter()
+		index_sessions = 0
+		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
+			index_sessions = item_num.row()
 
 		sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
 		self.len_url_list = len(self.urls_data_list)
@@ -176,6 +197,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 	#Data
 		self.text_search = ""
+		self.url_data_answers = ""
 		self.show_w = True
 		self.win_resizing_left = False
 		self.win_resizing_right = False
@@ -195,6 +217,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.parser_img = Img_load(mainwindows=self)
 		self.parser_img.log_signal.connect(self.logs)
 		self.parser_img.progress_signal.connect(self.progress_img)
+
+		self.parser_answers = Core_answer(mainwindows=self)
+		self.parser_answers.log_signal.connect(self.logs)
+		self.parser_answers.progress_signal.connect(self.progress_img)
+		self.parser_answers.update_data_signal.connect(self.set_quiz_data_GUI)
 
 	#Button
 		self.pushButton_10.clicked.connect(self.close_)
@@ -234,6 +261,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_43.clicked.connect(self.open_settings_logs)
 		self.pushButton_16.clicked.connect(self.open_git)
 		self.pushButton_49.clicked.connect(self.add_tab_session)
+		self.pushButton_46.clicked.connect(self.load_answer)
 
 	#list Widget
 		self.listWidget_3.clicked.connect(self.set_quiz_data)
@@ -432,6 +460,14 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
+
+#Load_answer
+	def load_answer(self):
+		for item_num in self.listWidget_3.selectedIndexes():
+			index_json = item_num.row()
+
+		self.url_data_answers = self.lineEdit.text().strip()
+		self.parser_answers.start()
 
 #Load_data|=============================================|
 	def set_quiz_data(self):

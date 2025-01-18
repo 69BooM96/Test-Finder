@@ -26,6 +26,7 @@ QLabel {
 }
 QPushButton {
 	border-radius: 5px;
+	color: rgb(130, 131, 134);
 	background-color: rgb(56, 58, 64);
 	border: 2px solid rgb(56, 58, 64);
 }
@@ -36,7 +37,7 @@ QPushButton:hover {
 
 QPushButton:pressed {
 	background-color: rgb(66, 68, 74);
-	color: rgb(30, 31, 34);
+	color: rgb(255, 255, 255);
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
@@ -236,6 +237,9 @@ QTextBrowser {
       </item>
       <item row="0" column="0">
        <widget class="QPushButton" name="pushButton_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -261,8 +265,18 @@ QTextBrowser {
           <bold>true</bold>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton:checked {
+	background-color: rgb(62, 127, 66);
+	border: 2px solid rgb(40, 83, 42);
+	color: rgb(240, 240, 240);
+}</string>
+        </property>
         <property name="text">
          <string>0</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
