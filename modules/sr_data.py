@@ -121,8 +121,56 @@ def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None,
 		except Exception as e:
 			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
 			
-def plugin_answers_data(salf):
-	...
+def plugin_answers_data(self, index_session=None, index_json=None, list_urls=None, proxy=None, qtLogs=True):
+	self.log_signal.emit("INFO", f"Start_answers", f" [urls][{list_urls}]")
+	big_start_time = time.perf_counter()
+	plugins_list = [name for name in os.listdir("plugins")]
+	dict_num = 0
+	self.urls_data_list = []
+	temp_json = []
+
+	for pl_index, pl_name in enumerate(plugins_list, start=1):
+		# self.progress_signal.emit(self.progress_index)
+		
+		start_time = time.perf_counter()
+		try:
+			urls_lists = []
+			with open(f"plugins/{pl_name}/metadata.json") as metadata:
+				mt_data = json.load(metadata)
+
+			if mt_data['status'] == "works":
+				if mt_data['type'] == "search":
+					dict_data = []
+					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
+					data_info_pl = plugin.data_info()
+					args_pl = {}
+
+					if data_info_pl['answers']['url'][0] and list_urls: args_pl["url"] = [list_urls]
+					if data_info_pl['answers']['proxy'][0] and proxy:   args_pl["proxy"] = proxy
+					if data_info_pl['qt_logs'][0] and qtLogs:           args_pl["qt_logs"] = self.log_signal
+					if data_info_pl['qt_logs'][1] and qtLogs: pass
+
+					else:
+						self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
+						if data_info_pl['answers']['cookie'][0]:
+							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
+							dict_data = session_pl.answers(**args_pl)
+						else:
+							pl_load_data = plugin.Load_data()
+							dict_data = pl_load_data.answers(**args_pl)
+
+						if dict_data:
+							with open(f"temp_data/json/index_{index_session}.json", "r", encoding="utf-8") as file:
+								data_session_test = json.load(file)
+
+							data_session_test[index_json]["answers"] = dict_data[0]
+
+							with open(f"temp_data/json/index_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
+								json.dump(data_session_test, session_set_sr_data, ensure_ascii=False, indent=4)
+						self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
+		except Exception as e:
+			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
+			
 
 def plugin_create_data(self):
 	...
