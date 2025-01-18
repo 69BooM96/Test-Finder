@@ -27,6 +27,7 @@ class Ui_Form(object):
 "}\n"
 "QPushButton {\n"
 "    border-radius: 5px;\n"
+"    color: rgb(130, 131, 134);\n"
 "    background-color: rgb(56, 58, 64);\n"
 "    border: 2px solid rgb(56, 58, 64);\n"
 "}\n"
@@ -37,7 +38,7 @@ class Ui_Form(object):
 "\n"
 "QPushButton:pressed {\n"
 "    background-color: rgb(66, 68, 74);\n"
-"    color: rgb(30, 31, 34);\n"
+"    color: rgb(255, 255, 255);\n"
 "}")
         self.gridLayout_2 = QtWidgets.QGridLayout(Form)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -177,6 +178,7 @@ class Ui_Form(object):
         self.pushButton.setObjectName("pushButton")
         self.gridLayout.addWidget(self.pushButton, 0, 1, 1, 1)
         self.pushButton_2 = QtWidgets.QPushButton(self.frame)
+        self.pushButton_2.setEnabled(False)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -189,6 +191,12 @@ class Ui_Form(object):
         font.setBold(True)
         font.setWeight(75)
         self.pushButton_2.setFont(font)
+        self.pushButton_2.setStyleSheet("QPushButton:checked {\n"
+"    background-color: rgb(62, 127, 66);\n"
+"    border: 2px solid rgb(40, 83, 42);\n"
+"    color: rgb(240, 240, 240);\n"
+"}")
+        self.pushButton_2.setCheckable(True)
         self.pushButton_2.setObjectName("pushButton_2")
         self.gridLayout.addWidget(self.pushButton_2, 0, 0, 1, 1)
         self.gridLayout_2.addWidget(self.frame, 0, 0, 1, 1)

@@ -2735,7 +2735,7 @@ QProgressBar::chunk {
                      </font>
                     </property>
                     <property name="text">
-                     <string>  Географія  </string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -2749,7 +2749,7 @@ QProgressBar::chunk {
                      </font>
                     </property>
                     <property name="text">
-                     <string>  Вулканізм та вулкан  </string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -2763,7 +2763,7 @@ QProgressBar::chunk {
                      </font>
                     </property>
                     <property name="text">
-                     <string>  6 клас  </string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -2833,7 +2833,7 @@ QProgressBar::chunk {
                      </font>
                     </property>
                     <property name="text">
-                     <string>  12  </string>
+                     <string>0</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -3150,8 +3150,8 @@ QProgressBar::chunk {
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>134</width>
-                 <height>209</height>
+                 <width>624</width>
+                 <height>456</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_28">

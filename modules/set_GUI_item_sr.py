@@ -89,7 +89,7 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 					ItemQWidget.setText_answer(item_qz['text'])
 					item = QtWidgets.QListWidgetItem(self.listWidget)
 
-					if index_hd: ItemQWidget.setNum_answer(f" {index} ")
+					if index_hd: ItemQWidget.setNum_answer(f" {index} ", item_qz["correctness"])
 					else: ItemQWidget.setNum_answer()
 					if item_qz['img']: 
 						item.setSizeHint(QtCore.QSize(245, 76))
@@ -109,6 +109,7 @@ class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
 		self.setupUi(self)
 
 	def setNum_answer(self, qz_num=None, correctness=None):
+		if correctness: self.pushButton_2.setChecked(correctness)
 		if qz_num: self.pushButton_2.setText(f" {qz_num} ")
 		else: 
 			self.pushButton_2.hide()
