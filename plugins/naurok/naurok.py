@@ -371,11 +371,11 @@ def data_info():
                 "proxy": [True, False],
                 "cookie": [False, False]},
             "processing_data": {
-                "url": ["True", False],
+                "url": [True, False],
                 "proxy": [True, False],
                 "cookie": [False, False]},
             "answers": {
-                "url": ["True", False],
+                "url": [True, False],
                 "proxy": [True, False],
                 "cookie": [True, True]},
             "qt_logs": [True, False]
