@@ -1,18 +1,13 @@
 import requests
 import asyncio
 import aiohttp
-import json
 
-from time import perf_counter, strftime, sleep
+from time import perf_counter
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 from modules.decorate import async_session
-
-
-def pprint(x):
-    print(json.dumps(x, indent=4, ensure_ascii=False))
 
 
 class Load_data:
@@ -380,12 +375,3 @@ def data_info():
                 "cookie": [True, True]},
             "qt_logs": [True, False]
             }
-
-def main():
-    start = perf_counter()
-
-    naurok = Load_data()
-    print(perf_counter() - start)
-
-if __name__ == "__main__":
-    main()
