@@ -2,8 +2,6 @@ import requests
 import asyncio
 import aiohttp
 
-from time import perf_counter
-
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
