@@ -19,11 +19,6 @@ class Load_data:
     def __init__(self, cookies=None):
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-    def answers(self, url: list, proxy=None, qt_logs=None):
-        create_data = self.create_test(url, proxy=proxy, qt_logs=qt_logs)
-        pass_data = self.test_pass(create_data, proxy=proxy, qt_logs=qt_logs)
-        return self.get_answer(pass_data, proxy=proxy, qt_logs=qt_logs)
-
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
@@ -230,24 +225,11 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def sitemap(self, url: list, proxy=None, qt_logs=None) -> list[str]:
-        """Получение тестов с подсказки для сайтов site map"""
-        async def async_sitemap(session, url, proxy=proxy) -> list:
-            async with session.get(url) as req:
-                soup = BeautifulSoup(await req.text(), "lxml-xml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
-            date = strftime("%Y-%m-%d")
-
-            return [url.find("loc").text for url in soup.find_all("url") if url.find("lastmod").text == date and url.find("loc").text[:27] == "https://naurok.com.ua/test/"]
-
-        @async_session(self.cookies)
-        async def run(session):
-            task = [async_sitemap(session, url) for url in url]
-            return await asyncio.gather(*task)
-
-        return list(set(item2 for item in asyncio.run(run()) for item2 in item))
+    def answers(self, url: list, proxy=None, qt_logs=None):
+        create_data = self.create_test(url, proxy=proxy, qt_logs=qt_logs)
+        pass_data = self.test_pass(create_data, proxy=proxy, qt_logs=qt_logs)
+        return self.get_answer(pass_data, proxy=proxy, qt_logs=qt_logs)
 
 class AutoComplite:
     def __init__(self, gamecode: str, name: str):
@@ -402,12 +384,7 @@ def data_info():
 def main():
     start = perf_counter()
 
-    naurok = AutoComplite("9946043", "Квантовый суб световой четырехмерный супер резиновый ХУЙ")
-    for item in naurok.var():
-        if item["text"] == "":
-            naurok.answer(item, text=["Петро"])
-    print(naurok.end())
-
+    naurok = Load_data()
     print(perf_counter() - start)
 
 if __name__ == "__main__":
