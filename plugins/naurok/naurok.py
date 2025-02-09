@@ -1,3 +1,6 @@
+import json
+from typing import TypedDict
+
 import requests
 import asyncio
 import aiohttp
@@ -218,12 +221,6 @@ class Load_data:
 
         return asyncio.run(run())
 
-
-    def answers(self, url: list, proxy=None, qt_logs=None):
-        create_data = self.create_test(url, proxy=proxy, qt_logs=qt_logs)
-        pass_data = self.test_pass(create_data, proxy=proxy, qt_logs=qt_logs)
-        return self.get_answer(pass_data, proxy=proxy, qt_logs=qt_logs)
-
 class AutoComplite:
     def __init__(self, gamecode: str, name: str):
         self.session = requests.Session()
@@ -294,7 +291,7 @@ class AutoComplite:
         self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
         return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
 
-class Create_Test:
+class CreateTest:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.session = requests.Session()
         self.session.cookies.update({i["name"]: i["value"] for i in cookies})
@@ -346,30 +343,140 @@ class Create_Test:
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
 
-def data_info():
-    list_object = [
-                "/algebra", "/angliyska-mova", "/astronomiya", "/biologiya", "/vsesvitnya-istoriya", "/geografiya", "/geometriya",
-                "/gromadyanska-osvita", "/ekologiya", "/ekonomika", "/etika", "/zarubizhna-literatura", "/zahist-vitchizni", "/informatika",
-                "/inshi-inozemni-movi", "/ispanska-mova", "/istoriya-ukra-ni", "/kreslennya", "/literaturne-chitannya", "/lyudina-i-svit", "/matematika",
-                "/mistectvo", "/movi-nacionalnih-menshin", "/muzichne-mistectvo", "/navchannya-gramoti", "/nimecka-mova", "/obrazotvorche-mistectvo",
-                "/osnovi-zdorov-ya", "/polska-mova", "/pravoznavstvo", "/prirodnichi-nauki", "/prirodoznavstvo", "/tehnologi", "/trudove-navchannya",
-                "/ukrainska-literatura", "/ukrainska-mova", "/fizika", "/fizichna-kultura", "/francuzka-mova", "/himiya", "/hudozhnya-kultura", "/ya-doslidzhuyu-svit"
-                ]
-    return {
-            "search": {
-                "subject": [list_object, False],
-                "klass": [True, False],
-                "q": [True, False],
-                "storinka": [True, False],
-                "proxy": [True, False],
-                "cookie": [False, False]},
-            "processing_data": {
-                "url": ["True", False],
-                "proxy": [True, False],
-                "cookie": [False, False]},
-            "answers": {
-                "url": ["True", False],
-                "proxy": [True, False],
-                "cookie": [True, True]},
-            "qt_logs": [True, False]
-            }
+class Main:
+    subject = {
+        "algebra": "/algebra",
+        "angliyska-mova": "/angliyska-mova",
+        "astronomiya": "/astronomiya",
+        "biologiya": "/biologiya",
+        "vsesvitnya-istoriya": "/vsesvitnya-istoriya",
+        "geografiya": "/geografiya",
+        "geometriya": "/geometriya",
+        "gromadyanska-osvita": "/gromadyanska-osvita",
+        "ekologiya": "/ekologiya",
+        "ekonomika": "/ekonomika",
+        "etika": "/etika",
+        "zarubizhna-literatura": "/zarubizhna-literatura",
+        "zahist-vitchizni": "/zahist-vitchizni",
+        "informatika": "/informatika",
+        "inshi-inozemni-movi": "/inshi-inozemni-movi",
+        "ispanska-mova": "/ispanska-mova",
+        "istoriya-ukra-ni": "/istoriya-ukra-ni",
+        "kreslennya": "/kreslennya",
+        "literaturne-chitannya": "/literaturne-chitannya",
+        "lyudina-i-svit": "/lyudina-i-svit",
+        "matematika": "/matematika",
+        "mistectvo": "/mistectvo",
+        "movi-nacionalnih-menshin": "/movi-nacionalnih-menshin",
+        "muzichne-mistectvo": "/muzichne-mistectvo",
+        "navchannya-gramoti": "/navchannya-gramoti",
+        "nimecka-mova": "/nimecka-mova",
+        "obrazotvorche-mistectvo": "/obrazotvorche-mistectvo",
+        "osnovi-zdorov-ya": "/osnovi-zdorov-ya",
+        "polska-mova": "/polska-mova",
+        "pravoznavstvo": "/pravoznavstvo",
+        "prirodnichi-nauki": "/prirodnichi-nauki",
+        "prirodoznavstvo": "/prirodoznavstvo",
+        "tehnologi": "/tehnologi",
+        "trudove-navchannya": "/trudove-navchannya",
+        "ukrainska-literatura": "/ukrainska-literatura",
+        "ukrainska-mova": "/ukrainska-mova",
+        "fizika": "/fizika",
+        "fizichna-kultura": "/fizichna-kultura",
+        "francuzka-mova": "/francuzka-mova",
+        "himiya": "/himiya",
+        "hudozhnya-kultura": "/hudozhnya-kultura",
+        "ya-doslidzhuyu-svit": "/ya-doslidzhuyu-svit"
+    }
+    grade = {
+        "1 клас": 1,
+        "2 клас": 2,
+        "3 клас": 3,
+        "4 клас": 4,
+        "5 клас": 5,
+        "6 клас": 6,
+        "7 клас": 7,
+        "8 клас": 8,
+        "9 клас": 9,
+        "10 клас": 10,
+        "11 клас": 11,
+    }
+
+    class QuestionData(TypedDict):
+        question: str
+        answers: dict[str, bool]
+
+    def __init__(self, interface, cookies=None):
+        self.interface = interface
+        self.qt_logs = None
+
+        self.cookies = cookies
+        self.naurok = Load_data(cookies=self.cookies)
+
+    def search(self, search_query, subject, grade, paggination=(1,11), proxy=None):
+        return self.naurok.search(
+            q=search_query,
+            subject=subject,
+            klass=grade,
+            storinka=paggination,
+            proxy=proxy,
+            qt_logs=self.qt_logs
+        )
+
+    def search_by_url(self, urls, proxy=None):
+        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/testing/")]
+        return self.naurok.search_by_url(
+            url=url,
+            proxy=proxy,
+            qt_logs=self.qt_logs
+        )
+
+    def processing_data(self, urls, proxy=None):
+        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/")]
+        return self.naurok.processing_data(
+            url=url,
+            proxy=proxy
+        )
+
+    def get_answer(self, urls, proxy=None):
+        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/")]
+        gamecode = self.naurok.create_test(
+            url=url,
+            proxy=proxy,
+            qt_logs=self.qt_logs
+        )
+
+        answer_url = self.naurok.test_pass(
+            gamecode=gamecode,
+            proxy=proxy,
+            qt_logs=self.qt_logs
+        )
+
+        return self.naurok.get_answer(
+            url=answer_url,
+            proxy=proxy,
+            qt_logs=self.qt_logs
+        )
+
+    #create_test
+    def test_build(self, name, subject, grade, *questions: QuestionData):
+        test = CreateTest(
+            name_test=name,
+            klass=grade,
+            subject=subject,
+            qt_logs=self.qt_logs,
+            cookies=self.cookies
+        )
+        for item in questions:
+            test.create_question(
+                question=item["question"],
+                answers=item["answers"],
+                qt_logs=self.qt_logs
+            )
+        return test.end_create(qt_logs=self.qt_logs)
+
+    #auto
+    def auto_complite(self, user_name, code, point, time): ...
+
+a = Main(None, json.load(open("data/cookies/naurok")))
+print(a.get_answer(["https://naurok.com.ua/test/gipertoniya-2-3231541.html"]))
