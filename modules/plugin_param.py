@@ -1,4 +1,13 @@
 class MainPlugin:
+    subject = {}
+    grade = {}
+    def __init__(self, interface, cookies=None):
+        self.interface = interface
+        self.qt_logs = None
+        self.cookies = cookies
+        self.res_list = []
+
+
     def search(self, search_query, subject, grade, pagination=(1, 11), proxy=None):
         raise NotMetodError("Метод плагина не определен")
 
@@ -17,14 +26,24 @@ class MainPlugin:
     def auto_complite(self, user_name, code, point, time):
         raise NotMetodError("Метод плагина не определен")
 
+
 class NotCookiesError(AttributeError):
-    ...
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Cookies\"")
 
 class NotGradeError(AttributeError):
-    ...
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Grade\"")
 
 class NotSubjectError(AttributeError):
-    ...
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Subject\"")
+
+class NotUrlsError(AttributeError):
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Urls\"")
+
 
 class NotMetodError(NameError):
-    ...
+    def __init__(self, *args):
+        super().__init__("Метод плагина не определен")

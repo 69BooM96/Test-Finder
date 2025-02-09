@@ -4,7 +4,6 @@ import requests
 import asyncio
 import aiohttp
 
-from typing import TypedDict
 from time import sleep
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -398,7 +397,6 @@ class Main(MainPlugin):
         "hudozhnya-kultura": ("/hudozhnya-kultura", 39),
         "ya-doslidzhuyu-svit": ("/ya-doslidzhuyu-svit", 28)
     }
-
     grade = {
         "1 клас": 1,
         "2 клас": 2,
@@ -413,19 +411,12 @@ class Main(MainPlugin):
         "11 клас": 11,
     }
 
-    class QuestionData(TypedDict):
-        question: str
-        answers: dict[str, bool]
-
     def __init__(self, interface, cookies=None):
-        self.interface = interface
-        self.qt_logs = None
-
-        self.cookies = cookies
+        super().__init__(interface, cookies=cookies)
         self.naurok = Load_data(cookies=self.cookies, qt_logs=self.qt_logs)
-        self.res_list = []
 
-    def search(self, search_query, subject, grade, pagination=(1,11), proxy=None):
+
+    def search(self, search_query=None, subject=None, grade=None, pagination=(1,11), proxy=None):
         a = self.naurok.search(
             q=search_query,
             subject=subject,
@@ -437,6 +428,9 @@ class Main(MainPlugin):
         return a
 
     def search_by_url(self, urls, proxy=None):
+        if not urls:
+            raise NotUrlsError
+
         return self.naurok.search_by_url(
             url=urls,
             proxy=proxy,
@@ -450,7 +444,7 @@ class Main(MainPlugin):
 
     def get_answer(self, urls=None, proxy=None):
         if not self.cookies:
-            raise NotCookiesError("не указаны куки")
+            raise NotCookiesError
 
         gamecode = self.naurok.create_test(
             url=urls or self.res_list,
@@ -468,9 +462,9 @@ class Main(MainPlugin):
         )
 
     #create_test
-    def test_build(self, name, subject, grade, *questions: QuestionData):
+    def test_build(self, name, subject, grade, *questions):
         if not self.cookies:
-            raise NotCookiesError("не указаны куки")
+            raise NotCookiesError
 
         test = CreateTest(
             name_test=name,
