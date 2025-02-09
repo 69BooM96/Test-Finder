@@ -1,26 +1,29 @@
 import json
-from typing import TypedDict
 
 import requests
 import asyncio
 import aiohttp
 
+from typing import TypedDict
+from time import sleep
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
 from modules.decorate import async_session
+from modules.plugin_param import *
 
 
 class Load_data:
-    def __init__(self, cookies=None):
+    def __init__(self, cookies=None, qt_logs=None):
+        self.qt_logs = qt_logs
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
 
-    def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None, qt_logs=None) -> list[str]:
+    def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 
@@ -31,7 +34,7 @@ class Load_data:
 
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
-    def search_by_url(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+    def search_by_url(self, url: list, proxy=None) -> list[dict]:
         """Получение вопросов по UUID типо
          https://naurok.com.ua/test/testing/0fad247b-cb1d-4355-b946-062bba08d6a6"""
 
@@ -66,13 +69,13 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def processing_data(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+    def processing_data(self, url: list, proxy=None) -> list[dict]:
         """Получение вопросов с не пройденного теста"""
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             return {
                 "platform": "naurok",
@@ -102,13 +105,13 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def create_test(self, url: list, proxy=None, qt_logs=None) -> list[str]:
+    def create_test(self, url: list, proxy=None) -> list[str]:
         """создание теста"""
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
@@ -148,13 +151,13 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def test_pass(self, gamecode: list, proxy=None, qt_logs=None) -> list[str]:
+    def test_pass(self, gamecode: list, proxy=None) -> list[str]:
         """получение ответов с теста по геймкоду который возврощяет create_test"""
         async def async_test_pass(session: aiohttp.ClientSession, gamecode):
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
@@ -165,10 +168,14 @@ class Load_data:
             async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+
             session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
 
             async with session.get(f"https://naurok.com.ua/api2/test/sessions/{session_id}", proxy=proxy) as req:
                 session_res = await req.json()
+
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
                 "answer": [
@@ -181,7 +188,7 @@ class Load_data:
                 "session_id": session_res["session"]["id"],
                 "show_answer": session_res["settings"]["show_answer"],
                 "type": session_res["questions"][0]["type"]
-                }
+            }
 
             async with session.put("https://naurok.com.ua/api2/test/responses/answer", data=data) as req: await req.text()
             async with session.put(f"https://naurok.com.ua/api2/test/sessions/end/{session_id}") as req:
@@ -195,13 +202,13 @@ class Load_data:
 
         return asyncio.run(run())
 
-    def get_answer(self, url: list, proxy=None, qt_logs=None) -> list[dict]:
+    def get_answer(self, url: list, proxy=None) -> list[dict]:
         """получение полных ответов с конечной сылки которая возврощяется test_pass (Очень похожа на processing_data)"""
         async def async_get_answer(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             return [{
                 "type": obj.find(class_="homework-stat-option-line").find("span")['class'][1] if obj.find(class_="homework-stat-option-line").find("span") else None,
@@ -293,6 +300,8 @@ class AutoComplite:
 
 class CreateTest:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
+        self.qt_logs = qt_logs
+
         self.session = requests.Session()
         self.session.cookies.update({i["name"]: i["value"] for i in cookies})
         self.session.headers.update({"user-agent": UserAgent().random})
@@ -300,7 +309,7 @@ class CreateTest:
         req = self.session.get("https://naurok.com.ua/test/create")
         soup = BeautifulSoup(req.text, "lxml")
 
-        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         data = {
             '_csrf': soup.find('input', attrs={'name': '_csrf'})["value"],
@@ -313,7 +322,7 @@ class CreateTest:
         self.doc_id = req.url.split("/")[-1]
         self.csrf = soup.find('meta', {'name': 'csrf-token'})['content']
 
-    def create_question(self, question: str, answers: dict[str, bool], qt_logs=None):
+    def create_question(self, question: str, answers: dict[str, bool]):
         data = {
             "_csrf": self.csrf,
             "content": question,
@@ -333,61 +342,63 @@ class CreateTest:
         }
 
         req = self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
-        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
-    def end_create(self, qt_logs=None):
+        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+
+    def end_create(self):
         req = self.session.put(f"https://naurok.com.ua/api/test/documents/{self.doc_id}")
 
-        if qt_logs: qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
 
-class Main:
+class Main(MainPlugin):
     subject = {
-        "algebra": "/algebra",
-        "angliyska-mova": "/angliyska-mova",
-        "astronomiya": "/astronomiya",
-        "biologiya": "/biologiya",
-        "vsesvitnya-istoriya": "/vsesvitnya-istoriya",
-        "geografiya": "/geografiya",
-        "geometriya": "/geometriya",
-        "gromadyanska-osvita": "/gromadyanska-osvita",
-        "ekologiya": "/ekologiya",
-        "ekonomika": "/ekonomika",
-        "etika": "/etika",
-        "zarubizhna-literatura": "/zarubizhna-literatura",
-        "zahist-vitchizni": "/zahist-vitchizni",
-        "informatika": "/informatika",
-        "inshi-inozemni-movi": "/inshi-inozemni-movi",
-        "ispanska-mova": "/ispanska-mova",
-        "istoriya-ukra-ni": "/istoriya-ukra-ni",
-        "kreslennya": "/kreslennya",
-        "literaturne-chitannya": "/literaturne-chitannya",
-        "lyudina-i-svit": "/lyudina-i-svit",
-        "matematika": "/matematika",
-        "mistectvo": "/mistectvo",
-        "movi-nacionalnih-menshin": "/movi-nacionalnih-menshin",
-        "muzichne-mistectvo": "/muzichne-mistectvo",
-        "navchannya-gramoti": "/navchannya-gramoti",
-        "nimecka-mova": "/nimecka-mova",
-        "obrazotvorche-mistectvo": "/obrazotvorche-mistectvo",
-        "osnovi-zdorov-ya": "/osnovi-zdorov-ya",
-        "polska-mova": "/polska-mova",
-        "pravoznavstvo": "/pravoznavstvo",
-        "prirodnichi-nauki": "/prirodnichi-nauki",
-        "prirodoznavstvo": "/prirodoznavstvo",
-        "tehnologi": "/tehnologi",
-        "trudove-navchannya": "/trudove-navchannya",
-        "ukrainska-literatura": "/ukrainska-literatura",
-        "ukrainska-mova": "/ukrainska-mova",
-        "fizika": "/fizika",
-        "fizichna-kultura": "/fizichna-kultura",
-        "francuzka-mova": "/francuzka-mova",
-        "himiya": "/himiya",
-        "hudozhnya-kultura": "/hudozhnya-kultura",
-        "ya-doslidzhuyu-svit": "/ya-doslidzhuyu-svit"
+        "algebra": ("/algebra", 1),
+        "angliyska-mova": ("/angliyska-mova", 34),
+        "astronomiya": ("/astronomiya", 40),
+        "biologiya": ("/biologiya", 3),
+        "vsesvitnya-istoriya": ("/vsesvitnya-istoriya", 9),
+        "geografiya": ("/geografiya", 4),
+        "geometriya": ("/geometriya", 5),
+        "gromadyanska-osvita": ("/gromadyanska-osvita", 50),
+        "ekologiya": ("/ekologiya", 41),
+        "ekonomika": ("/ekonomika", 37),
+        "etika": ("/etika", 45),
+        "zarubizhna-literatura": ("/zarubizhna-literatura", 6),
+        "zahist-vitchizni": ("/zahist-vitchizni", 43),
+        "informatika": ("/informatika", 7),
+        "inshi-inozemni-movi": ("/inshi-inozemni-movi", 53),
+        "ispanska-mova": ("/ispanska-mova", 44),
+        "istoriya-ukraini": ("/istoriya-ukraini", 8),
+        "kreslennya": ("/kreslennya", 52),
+        "literaturne-chitannya": ("/literaturne-chitannya", 26),
+        "lyudina-i-svit": ("/lyudina-i-svit", 38),
+        "matematika": ("/matematika", 10),
+        "mistectvo": ("/mistectvo", 30),
+        "movi-nacionalnih-menshin": ("/movi-nacionalnih-menshin", 29),
+        "muzichne-mistectvo": ("/muzichne-mistectvo", 11),
+        "navchannya-gramoti": ("/navchannya-gramoti", 12),
+        "nimecka-mova": ("/nimecka-mova", 35),
+        "obrazotvorche-mistectvo": ("/obrazotvorche-mistectvo", 31),
+        "osnovi-zdorovya": ("/osnovi-zdorovya", 13),
+        "polska-mova": ("/polska-mova", 48),
+        "pravoznavstvo": ("/pravoznavstvo", 33),
+        "prirodnichi-nauki": ("/prirodnichi-nauki", 49),
+        "prirodoznavstvo": ("/prirodoznavstvo", 27),
+        "tehnologi": ("/tehnologi", 42),
+        "trudove-navchannya": ("/trudove-navchannya", 32),
+        "ukrainska-literatura": ("/ukrainska-literatura", 15),
+        "ukrainska-mova": ("/ukrainska-mova", 14),
+        "fizika": ("/fizika", 2),
+        "fizichna-kultura": ("/fizichna-kultura", 17),
+        "francuzka-mova": ("/francuzka-mova", 36),
+        "himiya": ("/himiya", 16),
+        "hudozhnya-kultura": ("/hudozhnya-kultura", 39),
+        "ya-doslidzhuyu-svit": ("/ya-doslidzhuyu-svit", 28)
     }
+
     grade = {
         "1 клас": 1,
         "2 клас": 2,
@@ -411,55 +422,56 @@ class Main:
         self.qt_logs = None
 
         self.cookies = cookies
-        self.naurok = Load_data(cookies=self.cookies)
+        self.naurok = Load_data(cookies=self.cookies, qt_logs=self.qt_logs)
+        self.res_list = []
 
-    def search(self, search_query, subject, grade, paggination=(1,11), proxy=None):
-        return self.naurok.search(
+    def search(self, search_query, subject, grade, pagination=(1,11), proxy=None):
+        a = self.naurok.search(
             q=search_query,
             subject=subject,
             klass=grade,
-            storinka=paggination,
+            storinka=pagination,
             proxy=proxy,
-            qt_logs=self.qt_logs
         )
+        self.res_list += a
+        return a
 
     def search_by_url(self, urls, proxy=None):
-        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/testing/")]
         return self.naurok.search_by_url(
-            url=url,
+            url=urls,
             proxy=proxy,
-            qt_logs=self.qt_logs
         )
 
-    def processing_data(self, urls, proxy=None):
-        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/")]
+    def processing_data(self, urls=None, proxy=None):
         return self.naurok.processing_data(
-            url=url,
+            url=urls or self.res_list,
             proxy=proxy
         )
 
-    def get_answer(self, urls, proxy=None):
-        url = [url for url in urls if url.startswith("https://naurok.com.ua/test/")]
+    def get_answer(self, urls=None, proxy=None):
+        if not self.cookies:
+            raise NotCookiesError("не указаны куки")
+
         gamecode = self.naurok.create_test(
-            url=url,
+            url=urls or self.res_list,
             proxy=proxy,
-            qt_logs=self.qt_logs
         )
 
         answer_url = self.naurok.test_pass(
             gamecode=gamecode,
             proxy=proxy,
-            qt_logs=self.qt_logs
         )
 
         return self.naurok.get_answer(
             url=answer_url,
             proxy=proxy,
-            qt_logs=self.qt_logs
         )
 
     #create_test
     def test_build(self, name, subject, grade, *questions: QuestionData):
+        if not self.cookies:
+            raise NotCookiesError("не указаны куки")
+
         test = CreateTest(
             name_test=name,
             klass=grade,
@@ -470,13 +482,10 @@ class Main:
         for item in questions:
             test.create_question(
                 question=item["question"],
-                answers=item["answers"],
-                qt_logs=self.qt_logs
+                answers=item["answers"]
             )
-        return test.end_create(qt_logs=self.qt_logs)
+        return test.end_create()
 
-    #auto
-    def auto_complite(self, user_name, code, point, time): ...
 
 a = Main(None, json.load(open("data/cookies/naurok")))
-print(a.get_answer(["https://naurok.com.ua/test/gipertoniya-2-3231541.html"]))
+a.auto_complite(user_name=123, code=123, time=123, point=123)
