@@ -22,7 +22,7 @@ from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
 from modules import ld_image
-from modules import visualizer
+# from modules import visualizer
 from modules.decorate import try_except
 
 
@@ -70,9 +70,9 @@ class Search_parser(QThread):
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
-		sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
+		sr_data.PluginStart.search_data(self, search_query=self.mainwindows.text_search, subject=None, grade=None, pagination=(1,4), proxy=None)
 		self.len_url_list = len(self.urls_data_list)
-		sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)
+		sr_data.PluginStart.processing_data(self, index_sessions, self.urls_data_list)
 
 		# sr_data.wiki_data(self)
 		self.progress_signal.emit(100)		

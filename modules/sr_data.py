@@ -4,191 +4,163 @@ import os
 import time
 import json
 import importlib
-import threading
-import Core
+import traceback
 
 from bs4 import BeautifulSoup
+from .plugin_param import *
 
 
-def plugin_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None, qtLogs=True):
-	self.log_signal.emit("INFO", f"Start_search", f" [Text][{self.mainwindows.text_search}]")
-	self.progress_signal.emit(2)
-	big_start_time = time.perf_counter()
-	plugins_list = [name for name in os.listdir("plugins")]
+class PluginStart:
+    def __init__(self, plName=None, qtLogs=None, qtProgress=None):
+        self.plName = plName
+        self.qtLogs = qtLogs
+        self.qtProgress = qtProgress
+        self.big_start_time = time.perf_counter()
+        self.progress_pl = 0
+        self.progress_index = 0
+        self.info_pl = []
 
-	progress_pl = (42//len(plugins_list))
+    def load_info(self, type_pl=None, **kwargs):
+        if self.plName:
+            self.plugins_list = [self.plName]
+        else:
+            self.plugins_list = [name for name in os.listdir("plugins")]
 
-	for pl_index, pl_name in enumerate(plugins_list, start=1):
-		self.progress_index += progress_pl
-		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
-		self.progress_signal.emit(self.progress_index)
-		start_time = time.perf_counter()
-		try:
-			urls_lists = []
-			with open(f"plugins/{pl_name}/metadata.json") as metadata:
-				mt_data = json.load(metadata)
+        self.progress_pl = 42 // len(self.plugins_list)
+        self.progress_index = 0
+        self.info_pl = []
 
-			if mt_data['status'] == "works":
-				if mt_data['type'] == "search":
-					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
-					data_info_pl = plugin.data_info()
+        for pl_index, pl_name in enumerate(self.plugins_list):
+            self.info_pl.append({"name": pl_name})
+            self.progress_index += self.progress_pl
+            if self.qtLogs: self.qtLogs.emit("INFO", f"Plugin", f" [{pl_index + 1}]/[{len(self.plugins_list)}] [{pl_name}] [start]")
+            if self.qtProgress: self.qtProgress.emit(self.progress_index)
 
-					args_pl = {}
+            try:
+                with open(f"plugins/{pl_name}/metadata.json", "r", encoding="utf-8") as metadata:
+                    mt_data = json.load(metadata)
 
-					if data_info_pl['search']['subject'][0] and subject:   args_pl["subject"]= subject
-					if data_info_pl['search']['klass'][0] and klass:       args_pl["klass"]= klass
-					if data_info_pl['search']['q'][0] and q:               args_pl["q"]= q
-					if data_info_pl['search']['storinka'][0] and storinka: args_pl["storinka"]= storinka
-					if data_info_pl['search']['proxy'][0] and proxy:       args_pl["proxy"]= proxy
-					if data_info_pl['qt_logs'][0] and qtLogs:			   args_pl["qt_logs"]= self.log_signal
+                if mt_data['status'] != "works":
+                    continue
+                plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
 
-					if data_info_pl['search']['subject'][1] and not subject: pass
-					elif data_info_pl['search']['klass'][1] and not klass: pass
-					elif data_info_pl['search']['q'][1] and not q: pass
-					elif data_info_pl['search']['storinka'][1] and not storinka: pass
-					elif data_info_pl['search']['proxy'][1] and not proxy: pass
-					elif data_info_pl['qt_logs'][1] and qtLogs: pass
-					else:
-						if data_info_pl['search']['cookie'][0]:
-							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
-							
-							urls_lists = session_pl.search(**args_pl)
-							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
-						else:
-							session_pl = plugin.Load_data()
-							urls_lists = session_pl.search(**args_pl)
-							self.urls_data_list = list(dict.fromkeys(self.urls_data_list + urls_lists))
+                if mt_data['type'] == "search":
+                    if type_pl == "search":
+                        try:
+                            data_info = plugin.Main.subject
+                            kwagrs_pl = {}
 
-				elif mt_data['type'] == "search_engine":
-					...
+                            if data_info.get("subject") and data_info["subject"].get("opportunity") and kwargs.get("subject"):
+                                kwagrs_pl["subject"] = kwargs["subject"]
 
-			self.platforms_num += 1
-			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [results][{len(urls_lists)}] [endTime][{time.perf_counter() - start_time:.02f}]s")
-		except Exception as e:
-			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [{e}]")
-	self.log_signal.emit("INFO", f"Stop_search", f" [results][{len(self.urls_data_list)}] [endTime][{time.perf_counter() - big_start_time:.02f}]s")
-	self.urls_data_list = self.urls_data_list
+                            if data_info.get("klass") and data_info["klass"].get("opportunity") and kwargs.get("klass"):
+                                kwagrs_pl["klass"] = kwargs["klass"]
 
-def plugin_processing_data(self, index_session=None, list_urls=None, proxy=None, qtLogs=True):
-	self.log_signal.emit("INFO", f"Start_load", f" [urls][{len(list_urls)}]")
-	self.progress_signal.emit(46)
-	big_start_time = time.perf_counter()
-	plugins_list = [name for name in os.listdir("plugins")]
-	dict_num = 0
-	self.urls_data_list = []
-	temp_json = []
+                            if data_info.get("q") and data_info["q"].get("opportunity") and kwargs.get("q"):
+                                kwagrs_pl["q"] = kwargs["q"]
 
-	progress_pl = (42//len(plugins_list))
-	for pl_index, pl_name in enumerate(plugins_list, start=1):
-		self.progress_index += progress_pl
-		self.progress_signal.emit(self.progress_index)
-		self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
-		start_time = time.perf_counter()
-		try:
-			urls_lists = []
-			with open(f"plugins/{pl_name}/metadata.json") as metadata:
-				mt_data = json.load(metadata)
+                            if data_info.get("storinka") and data_info["storinka"].get("opportunity") and kwargs.get("storinka"):
+                                kwagrs_pl["storinka"] = kwargs["storinka"]
 
-			if mt_data['status'] == "works":
-				if mt_data['type'] == "search":
-					dict_data = []
-					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
-					data_info_pl = plugin.data_info()
-					args_pl = {}
+                            if data_info.get("proxy") and data_info["proxy"].get("opportunity") and kwargs.get("proxy"):
+                                kwagrs_pl["proxy"] = kwargs["proxy"]
 
-					if data_info_pl['qt_logs'][0] and qtLogs: args_pl["qt_logs"]= self.log_signal
-					if data_info_pl['qt_logs'][1] and qtLogs: pass
-					else:
-						if data_info_pl['processing_data']['cookie'][0]:
-							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
-							dict_data = session_pl.processing_data(url=list_urls, **args_pl)
-						else:
-							pl_load_data = plugin.Load_data()
-							dict_data = pl_load_data.processing_data(url=list_urls, **args_pl)
+                            if data_info.get("cookie") and data_info["cookie"].get("opportunity") and kwargs.get("cookie"):
+                                kwagrs_pl["cookie"] = kwargs["cookie"]
 
-					for index_item in range(len(dict_data)):
-						test_data = dict_data[index_item]
-						test_data["index_file"] = (index_item+dict_num)
-						test_data["index_session"] = index_session
+                            if (data_info.get("subject") and not data_info["subject"].get("required") and not kwargs["subject"] or
+                                    data_info.get("klass") and not data_info["klass"].get("required") and not kwargs["klass"] or
+                                    data_info.get("q") and not data_info["q"].get("required") and not kwargs["q"] or
+                                    data_info.get("storinka") and not data_info["storinka"].get("required") and not kwargs["storinka"] or
+                                    data_info.get("proxy") and not data_info["proxy"].get("required") and not kwargs["proxy"]):
+                                self.info_pl[pl_index]["search"] = {"work": False, "cookie": False}
+                            else:
+                                self.info_pl[pl_index]["search"] = {"work": True, "cookie": (data_info.get("cookie") and data_info["cookie"].get("required"))}
+                        except:
+                            self.info_pl[pl_index]["search"] = {"work": False, "cookie": False}
+                            traceback.print_exc()
 
-						temp_json.append(test_data)
+                    if type_pl == "processing":
+                        try:
+                            data_info = plugin.Load_data.PROCESSING_DATA
 
-					with open(f"temp_data/json/index_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
-						json.dump(temp_json, session_set_sr_data, ensure_ascii=False, indent=4)
-					dict_num += len(dict_data)
+                            kwagrs_pl = {}
 
-			self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
-		except Exception as e:
-			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
-			
-def plugin_answers_data(self, index_session=None, index_json=None, list_urls=None, proxy=None, qtLogs=True):
-	self.log_signal.emit("INFO", f"Start_answers", f" [urls][{list_urls}]")
-	big_start_time = time.perf_counter()
-	plugins_list = [name for name in os.listdir("plugins")]
-	dict_num = 0
-	self.urls_data_list = []
-	temp_json = []
+                            if data_info.get("url") and data_info["url"].get("opportunity") and kwargs.get("url"):       kwagrs_pl["url"] = kwargs["url"]
+                            if data_info.get("proxy") and data_info["proxy"].get("opportunity") and kwargs.get("proxy"):   kwagrs_pl["proxy"] = kwargs["proxy"]
+                            if data_info.get("cookie") and data_info["cookie"].get("opportunity") and kwargs.get("cookie"): kwagrs_pl["cookie"] = kwargs["cookie"]
 
-	for pl_index, pl_name in enumerate(plugins_list, start=1):
-		# self.progress_signal.emit(self.progress_index)
-		
-		start_time = time.perf_counter()
-		try:
-			urls_lists = []
-			with open(f"plugins/{pl_name}/metadata.json") as metadata:
-				mt_data = json.load(metadata)
+                            if (data_info.get("subject") and not data_info["url"].get("required") and not kwargs["url"] or
+                                    data_info.get("proxy") and not data_info["proxy"].get("required") and not kwargs["proxy"]):
+                                self.info_pl[pl_index]["processing"] = {"work": False, "cookie": False}
+                            else:
+                                self.info_pl[pl_index]["processing"] = {"work": True, "cookie": (data_info.get("cookie") and data_info["cookie"].get("required"))}
+                        except:
+                            self.info_pl[pl_index]["processing"] = {"work": False, "cookie": False}
+                            traceback.print_exc()
 
-			if mt_data['status'] == "works":
-				if mt_data['type'] == "search":
-					dict_data = []
-					plugin = importlib.import_module(f"plugins.{pl_name}.{mt_data['file']}")
-					data_info_pl = plugin.data_info()
-					args_pl = {}
+                    if type_pl == "answers":
+                        try:
+                            data_info = plugin.Load_data.ANSWERS
 
-					if data_info_pl['answers']['url'][0] and list_urls: args_pl["url"] = [list_urls]
-					if data_info_pl['answers']['proxy'][0] and proxy:   args_pl["proxy"] = proxy
-					if data_info_pl['qt_logs'][0] and qtLogs:           args_pl["qt_logs"] = self.log_signal
-					if data_info_pl['qt_logs'][1] and qtLogs: pass
+                            kwagrs_pl = {}
 
-					else:
-						self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [start]")
-						if data_info_pl['answers']['cookie'][0]:
-							session_pl = plugin.Load_data(json.load(open(f"data/cookies/{pl_name}", "r")))
-							dict_data = session_pl.answers(**args_pl)
-						else:
-							pl_load_data = plugin.Load_data()
-							dict_data = pl_load_data.answers(**args_pl)
+                            if data_info.get("url") and data_info["url"].get("opportunity") and kwargs.get("url"):       kwagrs_pl["url"] = kwargs["url"]
+                            if data_info.get("proxy") and data_info["proxy"].get("opportunity") and kwargs.get("proxy"):   kwagrs_pl["proxy"] = kwargs["proxy"]
+                            if data_info.get("cookie") and data_info["cookie"].get("opportunity") and kwargs.get("cookie"): kwagrs_pl["cookie"] = kwargs["cookie"]
 
-						if dict_data:
-							with open(f"temp_data/json/index_{index_session}.json", "r", encoding="utf-8") as file:
-								data_session_test = json.load(file)
+                            if (data_info.get("url") and data_info["url"].get("required") and not kwargs["url"] or
+                                    data_info.get("cookie") and data_info["cookie"].get("required") and not kwargs["cookie"]):
+                                self.info_pl[pl_index]["answers"] = {"work": False, "cookie": False}
+                            else:
+                                self.info_pl[pl_index]["answers"] = {"work": True, "cookie": (data_info.get("cookie") and data_info["cookie"].get("required"))}
+                        except:
+                            self.info_pl[pl_index]["answers"] = {"work": False, "cookie": False}
+                            traceback.print_exc()
 
-							data_session_test[index_json]["answers"] = dict_data[0]
+                    if type_pl == "qtLogs":
+                        try:
+                            data_info = plugin.Load_data.QT_LOGS
 
-							with open(f"temp_data/json/index_{index_session}.json", "w", encoding="utf-8") as session_set_sr_data:
-								json.dump(data_session_test, session_set_sr_data, ensure_ascii=False, indent=4)
-						self.log_signal.emit("INFO", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [end][{time.perf_counter()-start_time:.02f}]s")
-		except Exception as e:
-			self.log_signal.emit("ERROR", f"Plugin", f" [{pl_index}]/[{len(plugins_list)}] [{pl_name}] [error][{time.perf_counter()-start_time:.02f}]s [{e}]")
-			
+                            kwagrs_pl = {}
 
-def plugin_create_data(self):
-	...
+                            if data_info.get("opportunity") and kwargs.get("qtLogs"): kwagrs_pl["qtLogs"] = kwargs["qtLogs"]
 
+                            if data_info.get("required") and kwargs["qtLogs"]:
+                                self.info_pl[pl_index]["qtLogs"] = {"work": True, "cookie": (data_info.get("cookie") and data_info["cookie"].get("required"))}
+                        except:
+                            self.info_pl[pl_index]["qtLogs"] = {"work": False, "cookie": False}
+                            traceback.print_exc()
+            except:
+                traceback.print_exc()
 
-def wiki_data():
-	try:
-		req = requests.get("https://ru.wikipedia.org/wiki/Python")		
-		soup = BeautifulSoup(req.text, "lxml")
-		b = [
-			soup.find(class_="mw-page-title-main").text,
-			soup.find(class_="mw-content-ltr mw-parser-output").find("p").text.strip().replace("\xa0", ""),
-			"https:"+str(soup.find("img", class_="mw-file-element").get("src") if soup.find("img", class_="mw-file-element") else None)
-			]
+    def search_data(self, search_query, subject, grade, pagination=(1,11), proxy=None):
+        qwer = self.load_info()
 
-		print(b)
-	except BaseException as e:
-		print(e)
+    def processing_data(self, index_session=None, list_urls=None, proxy=None):
+        ...
+
+    def answers_data(self, index_session=None, index_json=None, list_urls=None, proxy=None):
+        ...
+
+    def create_data(self):
+        ...
+
+    def wiki_data(self):
+        try:
+            req = requests.get("https://ru.wikipedia.org/wiki/Python")
+            soup = BeautifulSoup(req.text, "lxml")
+            b = [
+                soup.find(class_="mw-page-title-main").text,
+                soup.find(class_="mw-content-ltr mw-parser-output").find("p").text.strip().replace("\xa0", ""),
+                "https:" + str(soup.find("img", class_="mw-file-element").get("src") if soup.find("img", class_="mw-file-element") else None)
+            ]
+
+            print(b)
+        except BaseException as e:
+            print(e)
+
 
 if __name__ == "__main__":
-	wiki_data()
+     plugin = PluginStart().load_info(subject="/algebra", klass=8)
+     plugin.search_data()

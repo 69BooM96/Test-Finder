@@ -1,19 +1,16 @@
-import json
-
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import CommandStart, Command
 
-from Core import *
-
+import keyboards as kb
 
 router = Router()
 a = {}
 
 @router.message(CommandStart())
 async def start(message: Message):
-    send = await message.answer("start")
-    await send.edit_text("fgkjdhgnjmdhf")
+    send = await message.answer("start", reply_markup=await kb.start())
+
 
 @router.message(Command("help"))
 async def help(message: Message): 

@@ -266,32 +266,19 @@ class AutoComplite:
                 ]
             }
 
-    def answer(self, queshion, text: list=None, img: list=None):
-        q_id = []
-        for item in queshion["answers"]:
-            if text:
-                for t in text:
-                    if t == item["text"]:
-                        q_id.append(item["id"])
+    def answer(self, queshion, index_answer: list):
+        data = {
+            "answer": [queshion["answers"][index]["id"] for index in index_answer],
+            "homework": True,
+            "homeworkType": 1,
+            "point": queshion["point"],
+            "question_id": queshion["id"],
+            "session_id": self.id,
+            "show_answer": 0,
+            "type": queshion["type"]
+        }
 
-            if img:
-                for i in img:
-                    if i == item["img"]:
-                        q_id.append(item["id"])
-
-        if q_id:
-            data = {
-                "answer": list(set(q_id)),
-                "homework": True,
-                "homeworkType": 1,
-                "point": queshion["point"],
-                "question_id": queshion["id"],
-                "session_id": self.id,
-                "show_answer": 0,
-                "type": queshion["type"]
-            }
-
-            self.session.put("https://naurok.com.ua/api2/test/responses/answer", json=data)
+        self.session.put("https://naurok.com.ua/api2/test/responses/answer", json=data)
 
     def end(self):
         self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
@@ -415,7 +402,6 @@ class Main(MainPlugin):
         super().__init__(interface, cookies=cookies)
         self.naurok = Load_data(cookies=self.cookies, qt_logs=self.qt_logs)
 
-
     def search(self, search_query=None, subject=None, grade=None, pagination=(1,11), proxy=None):
         a = self.naurok.search(
             q=search_query,
@@ -481,5 +467,21 @@ class Main(MainPlugin):
         return test.end_create()
 
 
-a = Main(None, json.load(open("data/cookies/naurok")))
-a.auto_complite(user_name=123, code=123, time=123, point=123)
+if __name__ == '__main__':
+    naurok = AutoComplite("5489476", "какойто даун чмо не делает плагины")
+
+    for item in naurok.var():
+        print(item.get("text"))
+        print(item.get("img"))
+        print("\n")
+        for qwe in item.get("answers"):
+            print("text:", qwe["text"])
+            print("img:", qwe["img"], '\n')
+
+
+        a = int(input("ответ: "))
+        print("\n\n\n")
+        naurok.answer(item, [a])
+
+    print(naurok.end())
+
