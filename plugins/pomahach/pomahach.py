@@ -244,9 +244,9 @@ class Main(MainPlugin):
 		"upovnovazhena-osoba-z-publichnih-zakupivel": ("/cat/upovnovazhena-osoba-z-publichnih-zakupivel/", 0)
 	}
 
-	def __init__(self, interface, cookies=None):
-		super().__init__(interface, cookies=cookies)
-		self.pomohach = Load_data(self.qt_logs)
+	def __init__(self, interface=None, logs=None, cookies=None):
+		super().__init__(interface=interface, logs=logs, cookies=cookies)
+		self.pomohach = Load_data(self.logs)
 
 	def search(self, search_query=None, subject=None, grade=None, pagination=(1, 11), proxy=None):
 		if not subject:

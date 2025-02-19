@@ -135,9 +135,9 @@ class Load_data:
 
 
 class Main(MainPlugin):
-    def __init__(self, interface, cookies=None):
-        super().__init__(interface, cookies=cookies)
-        self.appwizer = Load_data(qt_logs=self.qt_logs)
+    def __init__(self, interface=None, logs=None, cookies=None):
+        super().__init__(interface=interface, logs=logs, cookies=cookies)
+        self.appwizer = Load_data(qt_logs=self.logs)
 
     def get_answer(self, urls=None, proxy=None):
         if not urls:

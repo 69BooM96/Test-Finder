@@ -1,9 +1,9 @@
 class MainPlugin:
     subject = {}
     grade = {}
-    def __init__(self, interface, cookies=None):
+    def __init__(self, interface, logs=None, cookies=None):
         self.interface = interface
-        self.qt_logs = None
+        self.logs = logs
         self.cookies = cookies
         self.res_list = []
 
@@ -47,3 +47,15 @@ class NotUrlsError(AttributeError):
 class NotMetodError(NameError):
     def __init__(self, *args):
         super().__init__("Метод плагина не определен")
+
+
+
+#################
+class TypeQuestion:
+    class Quiz:
+        ...
+
+    class MultiQuiz:
+        ...
+
+

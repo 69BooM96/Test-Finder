@@ -6,10 +6,13 @@ from threading import Thread
 from fake_useragent import UserAgent
 
 
-def async_session(cookies):
+def async_session(cookies=None, headers=None):
 	def wrappers(funk):
 		async def wrapper(*agrs, **kwagrs):
-			async with aiohttp.ClientSession(headers={"user-agent": UserAgent().random}, timeout=aiohttp.ClientTimeout(15), cookies=cookies) as session:
+			async with aiohttp.ClientSession(
+					headers=headers or {"user-agent": UserAgent().random},
+					timeout=aiohttp.ClientTimeout(15),
+					cookies=cookies) as session:
 				return await funk(session, *agrs, **kwagrs)
 		return wrapper
 	return wrappers

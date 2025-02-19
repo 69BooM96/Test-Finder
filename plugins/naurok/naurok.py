@@ -398,15 +398,15 @@ class Main(MainPlugin):
         "11 клас": 11,
     }
 
-    def __init__(self, interface, cookies=None):
-        super().__init__(interface, cookies=cookies)
-        self.naurok = Load_data(cookies=self.cookies, qt_logs=self.qt_logs)
+    def __init__(self, interface=None, logs=None, cookies=None):
+        super().__init__(interface=interface, logs=logs, cookies=cookies)
+        self.naurok = Load_data(cookies=self.cookies, qt_logs=self.logs)
 
     def search(self, search_query=None, subject=None, grade=None, pagination=(1,11), proxy=None):
         a = self.naurok.search(
-            q=search_query,
-            subject=subject,
-            klass=grade,
+            q=search_query if search_query else "",
+            subject=subject if subject else "",
+            klass=grade if grade else "",
             storinka=pagination,
             proxy=proxy,
         )
@@ -468,7 +468,7 @@ class Main(MainPlugin):
 
 
 if __name__ == '__main__':
-    naurok = AutoComplite("5489476", "какойто даун чмо не делает плагины")
+    naurok = AutoComplite("4257641", "какойто даун чмо не делает плагины")
 
     for item in naurok.var():
         print(item.get("text"))
