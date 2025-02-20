@@ -22,11 +22,12 @@ from modules import GUI
 from modules import GUI_update
 from modules import set_GUI_item_sr
 from modules import ld_image
-# from modules import visualizer
+from modules import visualizer
 from modules.decorate import try_except
 
 
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 
 class Core_answer(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -44,9 +45,9 @@ class Core_answer(QThread):
 		for item_num in self.mainwindows.listWidget_3.selectedIndexes():
 			index_json = item_num.row()
 
-		sr_data.plugin_answers_data(self, index_sessions, index_json, self.mainwindows.url_data_answers)
+		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
+		Main.answers_data(index_session=index_sessions, index_json=index_json, list_urls=self.mainwindows.url_data_answers)
 		self.update_data_signal.emit()
-		
 
 class Search_parser(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -70,13 +71,17 @@ class Search_parser(QThread):
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
-		sr_data.PluginStart.search_data(self, search_query=self.mainwindows.text_search, subject=None, grade=None, pagination=(1,4), proxy=None)
-		self.len_url_list = len(self.urls_data_list)
-		sr_data.PluginStart.processing_data(self, index_sessions, self.urls_data_list)
+		# sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
+		# self.len_url_list = len(self.urls_data_list)
+		# sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)
+
+		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
+		self.urls_data_list = Main.search_data(q=self.mainwindows.text_search)
+		Main.processing_data(index_session=index_sessions, list_urls=self.urls_data_list)
 
 		# sr_data.wiki_data(self)
-		self.progress_signal.emit(100)		
-		self.update_data_signal.emit(index_sessions, self.len_url_list, self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data})
+		self.progress_signal.emit(100)
+		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data})
 		self.progress_signal.emit(0)
 
 class Img_load(QThread):
@@ -461,7 +466,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
 
-#Load_answer
+#Load_answer|===========================================|
 	def load_answer(self):
 		for item_num in self.listWidget_3.selectedIndexes():
 			index_json = item_num.row()
