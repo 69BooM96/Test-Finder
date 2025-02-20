@@ -6,9 +6,6 @@ from bs4 import BeautifulSoup
 from modules.plugin_param import *
 
 
-def pprint(a):
-    print(json.dumps(a, indent=4, ensure_ascii=False))
-
 class Load_data:
     def __init__(self, qt_logs, cookies=None):
         self.qt_logs = qt_logs
@@ -130,7 +127,6 @@ class Load_data:
                 "klass": None,
                 "answers": answers
             }
-        
 
 
 class Main(MainPlugin):

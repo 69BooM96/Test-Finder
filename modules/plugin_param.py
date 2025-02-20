@@ -44,7 +44,6 @@ class MainAutoComplite:
     def __init__(self, code: str=None, name: str=None, cookies=None):
         if not code:    raise NotCodeError
         if not name:    raise NotUserNameError
-        if not cookies: raise NotCookiesError
 
     def var(self):
         raise NotMetodError
@@ -52,8 +51,8 @@ class MainAutoComplite:
     def answer(self, queshion, index_answer: list):
         raise NotMetodError
 
-    def __del__(self):
-        ...
+    def end(self):
+        raise NotMetodError
 
 
 class NotUserNameError(AttributeError):

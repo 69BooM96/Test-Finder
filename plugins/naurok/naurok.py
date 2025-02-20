@@ -4,7 +4,6 @@ import requests
 import asyncio
 import aiohttp
 
-from time import sleep
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -282,10 +281,12 @@ class CreateTest:
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
 class AutoComplite(MainAutoComplite):
-    def __init__(self, gamecode: str, name: str, cookies):
-        super().__init__()
+    def __init__(self, code: str, name: str, cookies=None):
+        super().__init__(code, name, cookies)
+
         self.session = requests.Session()
         cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
+
         self.session.cookies.update(cookies)
         self.session.headers.update({"user-agent": UserAgent().random})
 
@@ -294,7 +295,7 @@ class AutoComplite(MainAutoComplite):
 
         data = {
             "_csrf": soup.find(attrs={"name": "_csrf"}).get("value"),
-            "JoinForm[gamecode]": gamecode,
+            "JoinForm[gamecode]": code,
             "JoinForm[name]": name
         }
 
@@ -467,8 +468,3 @@ class Main(MainPlugin):
                 answers=item["answers"]
             )
         return test.end_create()
-
-if __name__ == '__main__':
-    naurok = Main(cookies=json.load(open("data/cookies/naurok")))
-    print(naurok.auto_complite("адольф хэмингуэй", 2624500))
-
