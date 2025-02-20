@@ -19,7 +19,7 @@ class Load_data:
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
-            async with session.get(f"https://naurok.com.ua/test{subject}/klas-{klass}?q={q}&storinka={storinka}", proxy=proxy) as req:
+            async with session.get(f"https://naurok.com.ua/test{subject}/?klas-{klass}&q={q}&storinka={storinka}", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
             if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
@@ -227,63 +227,6 @@ class Load_data:
 
         return asyncio.run(run())
 
-class AutoComplite:
-    def __init__(self, gamecode: str, name: str):
-        self.session = requests.Session()
-        self.session.headers.update({"user-agent": UserAgent().random})
-
-        req = self.session.get("https://naurok.com.ua/test/join")
-        soup = BeautifulSoup(req.text, "lxml")
-
-        data = {
-            "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
-            "JoinForm[gamecode]": gamecode,
-            "JoinForm[name]": name
-        }
-
-        self.req = self.session.post("https://naurok.com.ua/test/join", data=data)
-        soup = BeautifulSoup(self.req.text, "lxml")
-
-        self.id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
-        self.questions = self.session.get("https://naurok.com.ua/api2/test/sessions/" + self.id).json()["questions"]
-        self.point = sum(int(item["point"]) for item in self.questions)
-
-    def var(self):
-        for item in self.questions:
-            yield {
-                "id": item["id"],
-                "type": item["type"],
-                "point": item["point"],
-                "text": BeautifulSoup(item["content"], "lxml").text.strip(),
-                "img": item["image"],
-                "answers": [
-                    {
-                    "id": i["id"],
-                    "text": BeautifulSoup(i["value"], "lxml").text.strip(),
-                    "img": i["image"]
-                    }
-                for i in item["options"]
-                ]
-            }
-
-    def answer(self, queshion, index_answer: list):
-        data = {
-            "answer": [queshion["answers"][index]["id"] for index in index_answer],
-            "homework": True,
-            "homeworkType": 1,
-            "point": queshion["point"],
-            "question_id": queshion["id"],
-            "session_id": self.id,
-            "show_answer": 0,
-            "type": queshion["type"]
-        }
-
-        self.session.put("https://naurok.com.ua/api2/test/responses/answer", json=data)
-
-    def end(self):
-        self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
-        return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
-
 class CreateTest:
     def __init__(self, name_test: str, subject: int, klass: int, cookies: list[dict], qt_logs=None):
         self.qt_logs = qt_logs
@@ -338,6 +281,65 @@ class CreateTest:
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
+class AutoComplite(MainAutoComplite):
+    def __init__(self, gamecode: str, name: str, cookies):
+        super().__init__()
+        self.session = requests.Session()
+        cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
+        self.session.cookies.update(cookies)
+        self.session.headers.update({"user-agent": UserAgent().random})
+
+        req = self.session.get("https://naurok.com.ua/test/join")
+        soup = BeautifulSoup(req.text, "lxml")
+
+        data = {
+            "_csrf": soup.find(attrs={"name": "_csrf"}).get("value"),
+            "JoinForm[gamecode]": gamecode,
+            "JoinForm[name]": name
+        }
+
+        self.req = self.session.post("https://naurok.com.ua/test/join", data=data)
+        soup = BeautifulSoup(self.req.text, "lxml")
+
+        self.id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
+        self.questions = self.session.get("https://naurok.com.ua/api2/test/sessions/" + self.id).json()["questions"]
+        self.point = sum(int(item["point"]) for item in self.questions)
+
+    def var(self):
+        for item in self.questions:
+            yield {
+                "id": item["id"],
+                "type": item["type"],
+                "point": item["point"],
+                "text": BeautifulSoup(item["content"], "lxml").text.strip(),
+                "img": item["image"],
+                "answers": [
+                    {
+                    "id": i["id"],
+                    "text": BeautifulSoup(i["value"], "lxml").text.strip(),
+                    "img": i["image"]
+                    }
+                for i in item["options"]
+                ]
+            }
+
+    def answer(self, queshion, index_answer: list):
+        data = {
+            "answer": [queshion["answers"][index]["id"] for index in index_answer],
+            "homework": True,
+            "homeworkType": 1,
+            "point": queshion["point"],
+            "question_id": queshion["id"],
+            "session_id": self.id,
+            "show_answer": 0,
+            "type": queshion["type"]
+        }
+
+        self.session.put("https://naurok.com.ua/api2/test/responses/answer", json=data)
+
+    def end(self):
+        self.session.put("https://naurok.com.ua/api2/test/sessions/end/" + self.id)
+        return "https://naurok.com.ua/test/complete/" + self.req.url.split("/")[-1]
 
 class Main(MainPlugin):
     subject = {
@@ -406,7 +408,7 @@ class Main(MainPlugin):
         a = self.naurok.search(
             q=search_query if search_query else "",
             subject=subject if subject else "",
-            klass=grade if grade else "",
+            klass=grade if grade else "0",
             storinka=pagination,
             proxy=proxy,
         )
@@ -456,7 +458,7 @@ class Main(MainPlugin):
             name_test=name,
             klass=grade,
             subject=subject,
-            qt_logs=self.qt_logs,
+            qt_logs=self.logs,
             cookies=self.cookies
         )
         for item in questions:
@@ -466,22 +468,7 @@ class Main(MainPlugin):
             )
         return test.end_create()
 
-
 if __name__ == '__main__':
-    naurok = AutoComplite("4257641", "какойто даун чмо не делает плагины")
-
-    for item in naurok.var():
-        print(item.get("text"))
-        print(item.get("img"))
-        print("\n")
-        for qwe in item.get("answers"):
-            print("text:", qwe["text"])
-            print("img:", qwe["img"], '\n')
-
-
-        a = int(input("ответ: "))
-        print("\n\n\n")
-        naurok.answer(item, [a])
-
-    print(naurok.end())
+    naurok = Main(cookies=json.load(open("data/cookies/naurok")))
+    print(naurok.auto_complite("адольф хэмингуэй", 2624500))
 

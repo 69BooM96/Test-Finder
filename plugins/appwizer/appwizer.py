@@ -2,7 +2,6 @@ import requests
 import json
 
 from bs4 import BeautifulSoup
-from django.db.backends.postgresql.operations import get_json_dumps
 
 from modules.plugin_param import *
 
@@ -143,9 +142,13 @@ class Main(MainPlugin):
         if not urls:
             raise NotUrlsError
 
-        a = self.appwizer.get_json(["https://app.wizer.me/learn/FA4E49"])
+        a = self.appwizer.get_json(urls)
 
-        b = self.appwizer.processing_data(a)
+        b = list(self.appwizer.processing_data(a))
         self.res_list += b
 
         return b
+
+if __name__ == '__main__':
+    a = Main()
+    print(a.get_answer(["https://app.wizer.me/learn/FA4E49"]))

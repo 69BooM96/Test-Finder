@@ -27,10 +27,6 @@ class MainPlugin:
         raise NotMetodError("Метод плагина не определен")
 
 
-class NotCookiesError(AttributeError):
-    def __init__(self, *args):
-        super().__init__("Не указан атрибут метода \"Cookies\"")
-
 class NotGradeError(AttributeError):
     def __init__(self, *args):
         super().__init__("Не указан атрибут метода \"Grade\"")
@@ -44,18 +40,40 @@ class NotUrlsError(AttributeError):
         super().__init__("Не указан атрибут метода \"Urls\"")
 
 
+class MainAutoComplite:
+    def __init__(self, code: str=None, name: str=None, cookies=None):
+        if not code:    raise NotCodeError
+        if not name:    raise NotUserNameError
+        if not cookies: raise NotCookiesError
+
+    def var(self):
+        raise NotMetodError
+
+    def answer(self, queshion, index_answer: list):
+        raise NotMetodError
+
+    def __del__(self):
+        ...
+
+
+class NotUserNameError(AttributeError):
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"UserName\"")
+
+class NotCodeError(AttributeError):
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Code\"")
+
+
+
+
+
+
+
+class NotCookiesError(AttributeError):
+    def __init__(self, *args):
+        super().__init__("Не указан атрибут метода \"Cookies\"")
+
 class NotMetodError(NameError):
     def __init__(self, *args):
         super().__init__("Метод плагина не определен")
-
-
-
-#################
-class TypeQuestion:
-    class Quiz:
-        ...
-
-    class MultiQuiz:
-        ...
-
-
