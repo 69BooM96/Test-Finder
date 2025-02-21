@@ -48,18 +48,20 @@ class PluginStart:
 						yield [pl_name, PL_DATA]
 
 			except:
-				traceback.print_exc()
+				pass
 
 	def search_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None):
 		list_urls = {}
-		for Main in self.load_info():
-			try:
-				if Main[1]:
-					data = Main[1].search(search_query=q, subject=subject, grade=klass, pagination=storinka, proxy=proxy)
-					list_urls[Main[0]] = data
-			except Exception as e:
-				pass
-
+		try:
+			for Main in self.load_info():
+				try:
+					if Main[1]:
+						data = Main[1].search(search_query=q, subject=subject, grade=klass, pagination=storinka, proxy=proxy)
+						list_urls[Main[0]] = data
+				except Exception as e:
+					pass
+		except:
+			pass
 		return list_urls
 
 	def processing_data(self, q=None, index_session=0, list_urls=None, proxy=None):
