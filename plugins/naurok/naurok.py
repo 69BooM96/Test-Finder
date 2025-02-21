@@ -250,7 +250,7 @@ class CreateTest:
         self.doc_id = req.url.split("/")[-1]
         self.csrf = soup.find('meta', {'name': 'csrf-token'})['content']
 
-    def create_question(self, question: str, answers: dict[str, bool]):
+    def create_question(self, question: str, answers, img: str = None, typeq: str = None):
         data = {
             "_csrf": self.csrf,
             "content": question,
@@ -261,12 +261,16 @@ class CreateTest:
             "id": False,
             "order": 1,
             "point": 1,
-            "type": "quiz" if sum(answers.values()) <= 1 else 'multiquiz',
-            "options": [{
-                "value": key if key[:62] != "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/" else None,
-                "correct": 1 if answers[key] else 0,
-                "image": key if key[:62] == "https://naurok-test2.nyc3.digitaloceanspaces.com/uploads/test/" else None}
-            for key in answers]
+            "image": img,
+            "type": ("quiz" if sum(answers.get("type")) <= 1 else 'multiquiz') if not typeq else typeq,
+            "options": [
+                {
+                    "value": item.get("text"),
+                    "correct": int(not not item.get("correct")),
+                    "image": item.get("img")
+                }
+            for item in answers
+            ]
         }
 
         req = self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
@@ -451,7 +455,7 @@ class Main(MainPlugin):
         )
 
     #create_test
-    def test_build(self, name, subject, grade, *questions):
+    def test_build(self, name, subject, grade, questions: list[dict], proxy=None):
         if not self.cookies:
             raise NotCookiesError
 
@@ -464,7 +468,75 @@ class Main(MainPlugin):
         )
         for item in questions:
             test.create_question(
-                question=item["question"],
-                answers=item["answers"]
+                typeq=item.get("type"),
+                question=item.get("question_text"),
+                img=item.get("img"),
+                answers=item.get("answers")
             )
         return test.end_create()
+
+if __name__ == '__main__':
+    a = Main(cookies=json.load(open("data/cookies/naurok")))
+    q = a.test_build(
+        name="<script>alert(12344)</script>",
+        subject=Main.subject["ukrainska-literatura"][1],
+        grade=5,
+        questions=[
+            {
+                "type": "multiquiz",
+                "question_text": "Адольф Гитлер",
+                "answers": [
+                    {
+                        "text": "адольф гитлер прав полностью аправдан",
+                        "correct": True,
+                    },
+                    {
+                        "text": "i LOve HiTleR",
+                        "correct": True,
+                    },
+                    {
+                        "text": "нет иди нахуй",
+                        "correct": False,
+                    },
+                ]
+            },
+            {
+                "type": "multiquiz",
+                "question_text": "Адольф Гитлер",
+                "answers": [
+                    {
+                        "text": "адольф гитлер прав полностью аправдан",
+                        "correct": True,
+                    },
+                    {
+                        "text": "i LOve HiTleR",
+                        "correct": True,
+                    },
+                    {
+                        "text": "нет иди нахуй",
+                        "correct": False,
+                    },
+                ]
+            },
+            {
+                "type": "multiquiz",
+                "question_text": "dfgdfsgdsfgfgdfg",
+                "answers": [
+                    {
+                        "text": "%3Cscript%3Ealert(123)%3C/script%3E",
+                        "correct": True,
+                    },
+                    {
+                        "text": "fghjkhgffbb",
+                        "correct": True,
+                    },
+                    {
+                        "text": "fghjhgj",
+                        "correct": False,
+                    },
+                ]
+            },
+
+        ]
+    )
+    print(q)

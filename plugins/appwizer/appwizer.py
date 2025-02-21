@@ -10,10 +10,10 @@ class Load_data:
     def __init__(self, qt_logs, cookies=None):
         self.qt_logs = qt_logs
 
-    def get_json(self, url):
+    def get_json(self, url, proxy=None):
         a = []
         for url in url:
-            req = requests.get(f"https://app.wizer.me/learn/worksheet/{url.split("/")[-1]}")
+            req = requests.get(f"https://app.wizer.me/learn/worksheet/{url.split("/")[-1]}", proxy=proxy)
 
             if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
@@ -138,7 +138,7 @@ class Main(MainPlugin):
         if not urls:
             raise NotUrlsError
 
-        a = self.appwizer.get_json(urls)
+        a = self.appwizer.get_json(urls, proxy=proxy)
 
         b = list(self.appwizer.processing_data(a))
         self.res_list += b

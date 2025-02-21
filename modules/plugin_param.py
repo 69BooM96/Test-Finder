@@ -20,10 +20,7 @@ class MainPlugin:
     def get_answer(self, urls=None, proxy=None):
         raise NotMetodError("Метод плагина не определен")
 
-    def test_build(self, name, subject, grade, *questions):
-        raise NotMetodError("Метод плагина не определен")
-
-    def auto_complite(self, user_name, code, point, time):
+    def test_build(self, name, subject, grade, questions, proxy=None):
         raise NotMetodError("Метод плагина не определен")
 
 
@@ -63,6 +60,16 @@ class NotCodeError(AttributeError):
     def __init__(self, *args):
         super().__init__("Не указан атрибут метода \"Code\"")
 
+
+class Searcher:
+    def __init__(self, interface, logs=None, cookies=None):
+        self.interface = interface
+        self.logs = logs
+        self.cookies = cookies
+        self.res_list = []
+
+    def search(self, search_query, site, pagination=(1,11), proxy=None):
+        raise NotMetodError
 
 
 
