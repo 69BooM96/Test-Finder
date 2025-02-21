@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWid
 from PyQt5.QtCore import QThread, QProcess
 from PyQt5.QtCore import QTimer
 from colorama import *
+from fuzzywuzzy import fuzz
 
 from modules import ld_plugins
 from modules import sr_data
@@ -71,17 +72,14 @@ class Search_parser(QThread):
 		for item_num in self.mainwindows.listWidget_2.selectedIndexes():
 			index_sessions = item_num.row()
 
-		# sr_data.plugin_data(self, subject=None, q=self.mainwindows.text_search)
-		# self.len_url_list = len(self.urls_data_list)
-		# sr_data.plugin_processing_data(self, index_sessions, self.urls_data_list)
-
 		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
 		self.urls_data_list = Main.search_data(q=self.mainwindows.text_search)
 		Main.processing_data(index_session=index_sessions, list_urls=self.urls_data_list)
+		self.wiki_title_data, self.wiki_text_data, self.wiki_img_data = Main.wiki_data(q=self.mainwindows.text_search)
 
 		# sr_data.wiki_data(self)
 		self.progress_signal.emit(100)
-		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data})
+		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data, "img": self.wiki_img_data})
 		self.progress_signal.emit(0)
 
 class Img_load(QThread):
@@ -236,12 +234,14 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_22.clicked.connect(self.start_search_1)
 		self.pushButton.clicked.connect(self.back_page)
 		self.pushButton_2.clicked.connect(self.next_page)
+		self.pushButton_52.clicked.connect(self.zoom_in_img)
 
 	#Close Button
 		self.pushButton_36.clicked.connect(self.close_settings)
 		self.pushButton_25.clicked.connect(self.close_settings_general)
 		self.pushButton_45.clicked.connect(self.close_settings_general)
 		self.pushButton_48.clicked.connect(self.close_settings_general)
+		self.pushButton_51.clicked.connect(self.zoom_img_exit)
 
 	#Open Button
 		self.pushButton_17.clicked.connect(self.open_settings)
@@ -296,7 +296,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		with open("data/sessions.json", "r", encoding="utf-8") as file:
 			data_sessions = json.load(file)
 
-		data_sessions.append({"search": None, "history_page": 0, "history": [{"page": "menu", "data": None}]})
+		data_sessions.append({"search": None, "wiki": {"title": None, "text": None, "img": None}, "history_page": 0, "history": [{"page": "menu", "data": None}]})
 
 		with open("data/sessions.json", "w", encoding="utf-8") as file:
 			json.dump(data_sessions, file, ensure_ascii=False, indent=4)
@@ -316,17 +316,23 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		else:
 			sys.exit(app.exec_())
 
-	def set_session_data(self, index_session, results, platforms, times, wiki_text):
+	def set_session_data(self, index_session, results, platforms, times, wiki_d):
 		data_write = {
 			"results": results,
 			"platforms": platforms,
 			"times": times,
 			"page": 0,}
+		data_wiki = {
+			"title": wiki_d["title"],
+			"text": wiki_d["text"],
+			"img": wiki_d["img"]
+		}
 
 		with open("data/sessions.json", "r", encoding="utf-8") as file:
 			sessions_load = json.load(file)
 
 		sessions_load[index_session]["search"] = data_write
+		sessions_load[index_session]["wiki"] = data_wiki
 		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
 			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
 		self.set_sr_data_GUI()
@@ -441,8 +447,24 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.label_3.setText(f"[results]: [{session_sr[index_sessions]["search"]['results']}]")
 		self.label_4.setText(f"[platforms]: [{session_sr[index_sessions]["search"]['platforms']}]")
 		self.label_5.setText(f"[time]: [{session_sr[index_sessions]["search"]['times']}]")
-		# self.label_2.setText(session_sr['wiki_text']['title'])
-		# self.textBrowser.setText(session_sr['wiki_text']['text'])
+
+		if session_sr[index_sessions]['wiki']['title']: 
+			self.textBrowser_7.show()
+			self.textBrowser_7.setText(session_sr[index_sessions]['wiki']['title'])
+		else: self.textBrowser_7.hide()
+
+		if session_sr[index_sessions]['wiki']['text']: 
+			self.textBrowser.show()
+			self.textBrowser.setText(session_sr[index_sessions]['wiki']['text'])
+		else: self.textBrowser.hide()
+
+		if session_sr[index_sessions]['wiki']['img']:
+			icon_n = session_sr[index_sessions]['wiki']['img'].split("/")[-1]
+			icon = QtGui.QIcon()
+			icon.addPixmap(QtGui.QPixmap(icon_n), QtGui.QIcon.Normal, QtGui.QIcon.On)
+			self.pushButton_12.setIcon(icon)
+			self.pushButton_12.show()
+		else: self.pushButton_12.hide()
 
 		self.listWidget_3.clear()
 
@@ -456,10 +478,10 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			ItemQWidget.setPl_icon_sr(f"plugins/{file_sr['platform']}/res/{file_sr['platform']}.png")
 			ItemQWidget.setPrev_text_sr(f" {file_sr['name_test']} ")
 			ItemQWidget.setType_sr(f" {file_sr['type_data']} ")
-			ItemQWidget.setScor_sr("none")
 			ItemQWidget.setQuest_sr(f" {len(file_sr['answers'])} ")
 			ItemQWidget.setLess_sr(f" {file_sr['object']} ")
 			ItemQWidget.setClass_sr(f" {file_sr['klass']} ")
+			ItemQWidget.setScor_sr("none")
 			item = QtWidgets.QListWidgetItem(self.listWidget_3)
 			item.setSizeHint(QtCore.QSize(245, 178))
 
@@ -475,6 +497,16 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.parser_answers.start()
 
 #Load_data|=============================================|
+	def zoom_img_exit(self):
+		self.stackedWidget_7.setCurrentIndex(0)
+
+	def zoom_in_img(self):
+		self.label_2.setScaledContents(self.pushButton_52.isChecked())
+
+	def zoom_img(self, img):
+		self.stackedWidget_7.setCurrentIndex(2)
+		self.label_2.setPixmap(QtGui.QPixmap(img))
+
 	def set_quiz_data(self):
 		self.stackedWidget.setCurrentIndex(2)
 		QTimer.singleShot(20, lambda: self.set_quiz_data_GUI(h_set=True))
@@ -507,15 +539,16 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			l_data = json.load(file_r)
 
 		data = l_data[index_json]
-		self.lineEdit.setText(f"{  data['url']}  ")
-		self.label_48.setText(f"{  data['name_test']}  ")
-		self.label_50.setText(f"{  data['object']}  ")
-		self.label_51.setText(f"{  data['klass']}  ")
-		self.label_49.setText(f"{  len(data['answers'])}  ")
+		self.lineEdit.setText(f"  {data['url']}  ")
+		self.lineEdit_2.setText(f"  {data['name_test']}  ")
+		self.label_50.setText(f"  {data['object']}  ")
+		self.label_51.setText(f"  {data['klass']}  ")
+		self.label_49.setText(f"  {len(data['answers'])}  ")
 
 		if data['type_data'] == "test":
 			for index, data_item in enumerate(data['answers'], 1):
-				ItemQWidget = set_GUI_item_sr.Item_quiz()
+				item = QtWidgets.QListWidgetItem(self.listWidget_8)
+				ItemQWidget = set_GUI_item_sr.Item_quiz(self.zoom_img, item)
 				ItemQWidget.setNum_quiz(f"   {index}   ")
 				if data_item['img']: 
 					ItemQWidget.setImg_quiz(f"temp_data/imgs/{data_item['img'].split('/')[-1]}")
@@ -523,8 +556,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 				else: ItemQWidget.setImg_quiz()
 				ItemQWidget.setText_quiz(data_item['text'])
 				ItemQWidget.setList_answer(data_item['value'], data_item['type'], img_l=self.list_imgs)
-				
-				item = QtWidgets.QListWidgetItem(self.listWidget_8)
+
 				# item.setSizeHint(QtCore.QSize(245, 254))
 				item.setSizeHint(QtCore.QSize(600, 288))
 				self.listWidget_8.addItem(item)
