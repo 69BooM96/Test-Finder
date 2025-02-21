@@ -6,7 +6,7 @@
   "author": "Test-Finder",
   "version": "0.0.1",
   "status": "not_working",
-  "git": "https://github.com/69BooM96/Test-Finder/plugin/pomahach",
+  "git": "https://github.com/69BooM96/Test-Finder/plugin/appwizer",
   "check": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/appwizer/metadata.json",
   "update": "update://"
 }
