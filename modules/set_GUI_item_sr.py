@@ -49,9 +49,14 @@ class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
 		else: self.label_3.hide()
 
 class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
-	def __init__(self, parent=None):
+	def __init__(self, zoom_img, item_w, parent=None):
 		super(Item_quiz, self).__init__(parent)
 		self.setupUi(self)
+
+		self.zoom_img = zoom_img
+		self.item_w = item_w
+
+		self.pushButton.clicked.connect(lambda: zoom_img(self.pushButton.property("icon_path")))
 
 	def setNum_quiz(self, qz_num=None):
 		if qz_num:
@@ -63,6 +68,7 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap(qz_ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
 			self.pushButton.setIcon(icon)
+			self.pushButton.setProperty("icon_path", qz_ico)
 		else: self.pushButton.hide()
 
 	def setText_quiz(self, qz_text=None):
@@ -84,7 +90,7 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 		else:
 			if qz_item: 
 				for index, item_qz in enumerate(qz_item, 1):
-					ItemQWidget = Item_answer()
+					ItemQWidget = Item_answer(self.zoom_img, self.item_w)
 					ItemQWidget.setImg_answer(item_qz['img'])
 					ItemQWidget.setText_answer(item_qz['text'])
 					item = QtWidgets.QListWidgetItem(self.listWidget)
@@ -104,9 +110,11 @@ class Item_quiz(QtWidgets.QWidget, GUI_quiz.Ui_Form):
 			self.label_2.hide()
 
 class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
-	def __init__(self, parent=None):
+	def __init__(self, zoom_img, item_w, parent=None):
 		super(Item_answer, self).__init__(parent)
 		self.setupUi(self)
+
+		self.pushButton.clicked.connect(lambda: zoom_img(self.pushButton.property("icon_path")))
 
 	def setNum_answer(self, qz_num=None, correctness=None):
 		if correctness: self.pushButton_2.setChecked(correctness)
@@ -119,6 +127,7 @@ class Item_answer(QtWidgets.QWidget, GUI_answer.Ui_Form):
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap(qz_ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
 			self.pushButton.setIcon(icon)
+			self.pushButton.setProperty("icon_path", qz_ico)
 		else: self.pushButton.hide()
 
 	def setText_answer(self, qz_text=None, correctness=None):

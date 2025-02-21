@@ -4,6 +4,7 @@ import time
 import json
 import importlib
 import traceback
+import wikipedia
 from bs4 import BeautifulSoup
 
 class PluginStart:
@@ -61,12 +62,43 @@ class PluginStart:
 
 		return list_urls
 
-	def processing_data(self, index_session=0, list_urls=None, proxy=None):
+	def processing_data(self, q=None, index_session=0, list_urls=None, proxy=None):
 		temp_json = []
 		for Main in self.load_info():
 			try:
 				if Main[1]:
-					temp_json += Main[1].processing_data(urls=list_urls[Main[0]], proxy=proxy)
+					data = Main[1].processing_data(urls=list_urls[Main[0]], proxy=proxy)
+
+					if q:
+						score = {
+							"index": None,
+							"text": None,
+							"score": None
+						}
+						for item in data:
+							fzz_0 = fuzz.WRatio(item["name_test"], text_1)
+							if fzz_0 > score["score"]:
+								score["index"] = [-1, -1]
+								score["text"] = item["name_test"]
+								score["score"] = fzz_0
+
+							for index_answers, item_answers in enumerate(item["answers"]):
+								fzz_1 = fuzz.WRatio(item_answers["text"], text_1)
+								if fzz_1 > score["score"]:
+									score["index"] = [index_answers, -1]
+									score["text"] = item_answers["text"]
+									score["score"] = fzz_1
+
+								for index_value, item_value in enumerate(item_answers["value"]):
+									fzz_2 = fuzz.WRatio(item_value["text"], text_1)
+									if fzz_2 > score["score"]:
+										score["index"] = [index_answers, index_value]
+										score["text"] = item_value["text"]
+										score["score"] = fzz_2
+
+						data["score"] = score
+					temp_json += data
+
 			except Exception as e:
 				pass
 
@@ -98,19 +130,25 @@ class PluginStart:
 	def create_data(self):
 		...
 
-	def wiki_data(self):
+	def wiki_data(self, q):
 		try:
-			req = requests.get("https://ru.wikipedia.org/wiki/Python")		
-			soup = BeautifulSoup(req.text, "lxml")
-			b = [
-				soup.find(class_="mw-page-title-main").text,
-				soup.find(class_="mw-content-ltr mw-parser-output").find("p").text.strip().replace("\xa0", ""),
-				"https:"+str(soup.find("img", class_="mw-file-element").get("src") if soup.find("img", class_="mw-file-element") else None)
-				]
+			img = None
+			text = None
+			title = None
 
-			print(b)
+			wikipedia.set_lang("ru")
+			# results = wikipedia.search(q)
+
+			text = wikipedia.summary(q, sentences=4)
+			page = wikipedia.page(q)
+			title = page.title
+
+			if page.images:
+			    img = page.images[-4]
+			
+			return title, text, img
 		except BaseException as e:
-			print(e)
+			return None, None, None
 
 if __name__ == "__main__":
-	PluginStart().load_info(subject=1234, klass=24)
+	PluginStart().wiki_data(q="вулкан")
