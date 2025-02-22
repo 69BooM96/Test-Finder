@@ -11,9 +11,9 @@ import webbrowser
 
 from typing import Literal
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
-from PyQt5.QtCore import QThread, QProcess
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QFileSystemModel, QListWidgetItem, QMessageBox, QWidget
+from PyQt5.QtCore import QThread, QProcess, QTimer, Qt
+from PyQt5.QtGui import QClipboard
 from colorama import *
 from fuzzywuzzy import fuzz
 
@@ -29,6 +29,23 @@ from modules.decorate import try_except
 
 # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+class Core_info_pl(QThread):
+	log_signal = QtCore.pyqtSignal(str, str, str)
+	# progress_signal = QtCore.pyqtSignal(int)
+	update_data_signal = QtCore.pyqtSignal(list)
+
+	def __init__(self, mainwindows):
+		QThread.__init__(self)
+		self.mainwindows = mainwindows
+	
+	def run(self):
+		data = ld_plugins.search_pl()
+		list_pl = []
+		if data:
+			for item in data:
+				list_pl.append(ld_plugins.search_info_pl(item["url"]))
+
+		self.update_data_signal.emit(list_pl)
 
 class Core_answer(QThread):
 	log_signal = QtCore.pyqtSignal(str, str, str)
@@ -74,7 +91,7 @@ class Search_parser(QThread):
 
 		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
 		self.urls_data_list = Main.search_data(q=self.mainwindows.text_search)
-		Main.processing_data(index_session=index_sessions, list_urls=self.urls_data_list)
+		Main.processing_data(q=self.mainwindows.text_search, index_session=index_sessions, list_urls=self.urls_data_list)
 		self.wiki_title_data, self.wiki_text_data, self.wiki_img_data = Main.wiki_data(q=self.mainwindows.text_search)
 
 		# sr_data.wiki_data(self)
@@ -155,7 +172,6 @@ class Core_load(QtWidgets.QMainWindow, GUI_update.Ui_MainWindow):
 		self.load_process.core_start_signal.connect(self.load_core_start)
 		self.load_process.start()
 
-
 	def load_core_start(self):
 		self.close()
 		self.app2 = ExampleApp()
@@ -208,9 +224,6 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.win_resizing_bottom = False
 		self.win_resizing_px = 4
 
-	#Preload
-		self.start_session()
-
 	#Class
 		self.parser_search = Search_parser(mainwindows=self)
 		self.parser_search.log_signal.connect(self.logs)
@@ -225,6 +238,10 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.parser_answers.log_signal.connect(self.logs)
 		self.parser_answers.progress_signal.connect(self.progress_img)
 		self.parser_answers.update_data_signal.connect(self.set_quiz_data_GUI)
+
+		self.parser_pl = Core_info_pl(mainwindows=self)
+		self.parser_pl.log_signal.connect(self.logs)
+		self.parser_pl.update_data_signal.connect(self.search_online_pl)
 
 	#Button
 		self.pushButton_10.clicked.connect(self.close_)
@@ -269,8 +286,12 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.pushButton_46.clicked.connect(self.load_answer)
 
 	#list Widget
-		self.listWidget_3.clicked.connect(self.set_quiz_data)
-		self.listWidget_2.clicked.connect(self.open_session)
+		self.listWidget_3.itemClicked.connect(self.set_quiz_data)
+		self.listWidget_2.itemClicked.connect(self.open_session)
+
+	#Preload
+		self.start_session()
+		self.parser_pl.start()
 
 #Core
 #GUI|===================================================|
@@ -288,8 +309,12 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def add_tab_session(self):
 		item = QtWidgets.QListWidgetItem(self.listWidget_2)
 		item.setSizeHint(QtCore.QSize(160, 26))
-		ItemQWidget = set_GUI_item_sr.Item_tab(self.del_tab_session, item)
+		item.setData(Qt.ItemDataRole.UserRole, self.listWidget_2.count()-1)
 		
+		ItemQWidget = set_GUI_item_sr.Item_tab(self.del_tab_session, item)
+		ItemQWidget.setTab_text("menu")
+		ItemQWidget.setTab_icon("res/search.png")
+
 		self.listWidget_2.addItem(item)
 		self.listWidget_2.setItemWidget(item, ItemQWidget)
 
@@ -335,7 +360,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		sessions_load[index_session]["wiki"] = data_wiki
 		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
 			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
-		self.set_sr_data_GUI()
+		self.set_sr_data_GUI(index_session)
 
 	def next_page(self):
 		for item_num in self.listWidget_2.selectedIndexes():
@@ -383,7 +408,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		with open(f"data/sessions.json", "w", encoding="utf-8") as file_w:
 			json.dump(sessions_load, file_w, ensure_ascii=False, indent=4)
 
-	def open_session(self):
+	def open_session(self, item):
 		for item_num in self.listWidget_2.selectedIndexes():
 			index_session = item_num.row()
 		with open("data/sessions.json", "r", encoding="utf-8") as file:
@@ -436,10 +461,12 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	def progress_search(self, value_pr):
 		self.progressBar.setValue(value_pr)
 
-	def set_sr_data_GUI(self):
-		index_sessions = 0
-		for item_num in self.listWidget_2.selectedIndexes():
-			index_sessions = item_num.row()
+	@try_except(Exception, funk=(lambda ex: None))
+	def set_sr_data_GUI(self, index_sessions=None):
+		if not index_sessions:
+			index_sessions = 0
+			for item_num in self.listWidget_2.selectedIndexes():
+				index_sessions = item_num.row()
 
 		with open(f"data/sessions.json", "r", encoding="utf-8") as file_r:
 			session_sr = json.load(file_r)
@@ -475,18 +502,49 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			ItemQWidget = set_GUI_item_sr.Item_search()
 			ItemQWidget.setPl_sr(f"  {file_sr['platform']}  ")
 			ItemQWidget.setUrl_sr(f"  {file_sr['url']}  ")
-			ItemQWidget.setPl_icon_sr(f"plugins/{file_sr['platform']}/res/{file_sr['platform']}.png")
+			ItemQWidget.setPl_icon_sr(f"plugins/{file_sr['platform']}/res/icon.png")
 			ItemQWidget.setPrev_text_sr(f" {file_sr['name_test']} ")
 			ItemQWidget.setType_sr(f" {file_sr['type_data']} ")
 			ItemQWidget.setQuest_sr(f" {len(file_sr['answers'])} ")
 			ItemQWidget.setLess_sr(f" {file_sr['object']} ")
 			ItemQWidget.setClass_sr(f" {file_sr['klass']} ")
-			ItemQWidget.setScor_sr("none")
+			ItemQWidget.setScor_sr(f" {file_sr['score']['score']}% ")
 			item = QtWidgets.QListWidgetItem(self.listWidget_3)
 			item.setSizeHint(QtCore.QSize(245, 178))
 
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
+
+
+#Pl_info|===============================================|
+	def search_local_pl(self):
+		...
+
+	@try_except(Exception, funk=(lambda ex: None))
+	def search_online_pl(self, pl_list):
+		for data in pl_list:
+			try:
+				if data != None:
+					item = QtWidgets.QListWidgetItem(self.listWidget_9)
+					item.setData(Qt.ItemDataRole.UserRole, data.get("git"))
+					ItemQWidget = set_GUI_item_sr.Item_sr_pl(self.pl_share, item)
+					if data.get("name"):    ItemQWidget.setName(f"   {data["name"]}   ")
+					if data.get("data"):    ItemQWidget.setUrl(f"   {data["data"][0].get("url")}   ")
+					if data.get("version"): ItemQWidget.setVersion(f"   {data["version"]}   ")
+					if data.get("author"):  ItemQWidget.setAuthor(f"   {data.get("author")}   ")
+					if data.get("type"):    ItemQWidget.setType(f"   {data.get("type")}   ")
+					if data.get("status"):  ItemQWidget.setStatus(f"   {data.get("status")}   ")
+
+					item.setSizeHint(QtCore.QSize(120, 80))
+					self.listWidget_9.addItem(item)
+					self.listWidget_9.setItemWidget(item, ItemQWidget)
+			except:
+				pass
+
+	def pl_share(self, url):
+		clipboard = QApplication.clipboard()
+		clipboard.setText(url.data(Qt.ItemDataRole.UserRole))
+
 
 #Load_answer|===========================================|
 	def load_answer(self):
@@ -544,6 +602,10 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.label_50.setText(f"  {data['object']}  ")
 		self.label_51.setText(f"  {data['klass']}  ")
 		self.label_49.setText(f"  {len(data['answers'])}  ")
+
+		icon = QtGui.QIcon()
+		icon.addPixmap(QtGui.QPixmap(f"plugins/{data['platform']}/res/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+		self.pushButton_50.setIcon(icon)
 
 		if data['type_data'] == "test":
 			for index, data_item in enumerate(data['answers'], 1):
