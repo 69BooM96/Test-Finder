@@ -1,0 +1,11 @@
+{
+  "name": "Duckduckgo",
+  "file": "duckduckgo",
+  "type": "search_engine",
+  "author": "Test-Finder",
+  "version": "0.0.1",
+  "status": "works",
+  "git": "https://github.com/69BooM96/Test-Finder/tree/main/plugins/duckduckgo",
+  "check": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/duckduckgo/metadata.json",
+  "update": "update://"
+}
