@@ -6,6 +6,8 @@ import importlib
 import traceback
 import wikipedia
 from bs4 import BeautifulSoup
+from fuzzywuzzy import fuzz
+
 
 class PluginStart:
 	def __init__(self, front=None, plName=None, qtLogs=None, qtProgress=None):
@@ -75,31 +77,34 @@ class PluginStart:
 						score = {
 							"index": None,
 							"text": None,
-							"score": None
+							"score": 0
 						}
 						for item in data:
-							fzz_0 = fuzz.WRatio(item["name_test"], text_1)
-							if fzz_0 > score["score"]:
-								score["index"] = [-1, -1]
-								score["text"] = item["name_test"]
-								score["score"] = fzz_0
+							if item["name_test"]:
+								fzz_0 = fuzz.WRatio(item["name_test"], q)
+								if fzz_0 > score["score"]:
+									score["index"] = [-1, -1]
+									score["text"] = item["name_test"]
+									score["score"] = fzz_0
 
-							for index_answers, item_answers in enumerate(item["answers"]):
-								fzz_1 = fuzz.WRatio(item_answers["text"], text_1)
-								if fzz_1 > score["score"]:
-									score["index"] = [index_answers, -1]
-									score["text"] = item_answers["text"]
-									score["score"] = fzz_1
+								for index_answers, item_answers in enumerate(item["answers"]):
+									if item_answers["text"]:
+										fzz_1 = fuzz.WRatio(item_answers["text"], q)
+										if fzz_1 > score["score"]:
+											score["index"] = [index_answers, -1]
+											score["text"] = item_answers["text"]
+											score["score"] = fzz_1
 
-								for index_value, item_value in enumerate(item_answers["value"]):
-									fzz_2 = fuzz.WRatio(item_value["text"], text_1)
-									if fzz_2 > score["score"]:
-										score["index"] = [index_answers, index_value]
-										score["text"] = item_value["text"]
-										score["score"] = fzz_2
+										for index_value, item_value in enumerate(item_answers["value"]):
+											if item_value["text"]:
+												fzz_2 = fuzz.WRatio(item_value["text"], q)
+												if fzz_2 > score["score"]:
+													score["index"] = [index_answers, index_value]
+													score["text"] = item_value["text"]
+													score["score"] = fzz_2
 
-						data["score"] = score
-					temp_json += data
+							item["score"] = score
+							temp_json.append(item)
 
 			except Exception as e:
 				pass

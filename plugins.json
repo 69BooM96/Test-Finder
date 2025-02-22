@@ -1,20 +1,26 @@
 [
 	{
+		"name": "duckduckgo",
+		"version": "0.0.1",
+		"url": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/duckduckgo/metadata.json",
+		"status": "work"
+	},
+	{
 		"name": "naurok",
 		"version": "0.0.1",
-		"git": "url://",
+		"url": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/naurok/metadata.json",
 		"status": "work"
 	},
 	{
 		"name": "pomahach",
 		"version": "0.0.1",
-		"git": "url://",
+		"url": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/pomahach/metadata.json",
 		"status": "work"
 	},
 	{
 		"name": "appwizer",
 		"version": "0.0.1",
-		"git": "url://",
+		"url": "https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins/appwizer/metadata.json",
 		"status": "not_work"
 	}
 ]

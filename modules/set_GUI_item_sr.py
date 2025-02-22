@@ -6,6 +6,7 @@ from modules import GUI_sr_item
 from modules import GUI_quiz
 from modules import GUI_answer
 from modules import GUI_tab
+from modules import GUI_sr_pl
 
 
 class Item_search(QtWidgets.QWidget, GUI_sr_item.Ui_Form):
@@ -140,3 +141,37 @@ class Item_tab(QtWidgets.QWidget, GUI_tab.Ui_Form):
 		self.setupUi(self)
 
 		self.pushButton.clicked.connect(lambda: del_tab_session(item_tab))
+
+	def setTab_text(self, text):
+		self.label.setText(text)
+
+	def setTab_icon(self, ico):
+		icon = QtGui.QIcon()
+		icon.addPixmap(QtGui.QPixmap(ico), QtGui.QIcon.Normal, QtGui.QIcon.On)
+		self.pushButton_2.setIcon(icon)
+
+class Item_sr_pl(QtWidgets.QWidget, GUI_sr_pl.Ui_Form):
+	def __init__(self, pl_share, item_w, parent=None):
+		super(Item_sr_pl, self).__init__(parent)
+		self.setupUi(self)
+
+		# self.pushButton_2.clicked.connect(lambda: pl_download(item_w))
+		self.pushButton_3.clicked.connect(lambda: pl_share(item_w))
+
+	def setName(self, name):
+		self.label_2.setText(name)
+
+	def setUrl(self, url):
+		self.label_3.setText(url)
+
+	def setVersion(self, ver):
+		self.label.setText(ver)
+
+	def setAuthor(self, name):
+		self.label_4.setText(name)
+
+	def setType(self, name):
+		self.label_5.setText(name)
+
+	def setStatus(self, status):
+		self.label_6.setText(status)
