@@ -48,7 +48,32 @@ def check_pl(log_signal, progress_signal, text_signal):
 	except Exception as e:
 		log_signal.emit("ERROR", "check plugins", f" [{e}]")
 
-def update_pl(self, list_update):
+def update_pl(list_update):
 	log_signal.emit("INFO", "update plugin", f" [{len(list_update)}]{list_update}")
 	for item_update in list_update:
 		pass
+
+def search_pl():
+	try:
+		return json.loads(requests.get("https://raw.githubusercontent.com/69BooM96/Test-Finder/refs/heads/main/plugins.json").text)
+	except:
+		return None
+
+def search_info_pl(url):
+	try:
+		return json.loads(requests.get(url).text)
+	except:
+		return None
+
+def local_pl():
+	try:
+		return [name for name in os.listdir("plugins")]
+	except:
+		return None
+
+def local_info_pl(name):
+	try:
+		with open(f"plugins/{name}/metadata.json", "r", encoding="utf-8") as metadata:
+			return json.load(metadata)
+	except:
+		return None
