@@ -12,9 +12,10 @@ from modules.plugin_param import *
 
 
 class Load_data:
-    def __init__(self, cookies=None, qt_logs=None):
+    def __init__(self, cookies=None, qt_logs=None, monitoring=print):
         self.qt_logs = qt_logs
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
+        self.monitoring = monitoring
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
@@ -25,7 +26,7 @@ class Load_data:
 
             return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_search(session, storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
@@ -60,7 +61,7 @@ class Load_data:
             for item in res["questions"]
             ]
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_search_by_url(session, url) for url in url]
             return await asyncio.gather(*task)
@@ -96,7 +97,7 @@ class Load_data:
                 } for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
             }
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_processing_data(session, url) for url in url if url if url[:27] == "https://naurok.com.ua/test/"]
             return await asyncio.gather(*task)
@@ -142,7 +143,7 @@ class Load_data:
 
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_get_test(session, f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
@@ -188,12 +189,12 @@ class Load_data:
                 "type": session_res["questions"][0]["type"]
             }
 
-            async with session.put("https://naurok.com.ua/api2/test/responses/answer", data=data) as req: await req.text()
-            async with session.put(f"https://naurok.com.ua/api2/test/sessions/end/{session_id}") as req:
+            async with session.put("https://naurok.com.ua/api2/test/responses/answer", data=data, proxy=proxy) as req: await req.text()
+            async with session.put(f"https://naurok.com.ua/api2/test/sessions/end/{session_id}", proxy=proxy) as req:
                 uuid = await req.json()
                 return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_test_pass(session, gamecode) for gamecode in gamecode]
             return await asyncio.gather(*task)
@@ -219,7 +220,7 @@ class Load_data:
                 } for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
             } for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
 
-        @async_session(self.cookies)
+        @async_session(self.cookies, log_func=self.monitoring)
         async def run(session):
             task = [async_get_answer(session, url) for url in url]
             return await asyncio.gather(*task)
@@ -405,9 +406,9 @@ class Main(MainPlugin):
         "11 клас": 11,
     }
 
-    def __init__(self, interface=None, logs=None, cookies=None):
-        super().__init__(interface=interface, logs=logs, cookies=cookies)
-        self.naurok = Load_data(cookies=self.cookies, qt_logs=self.logs)
+    def __init__(self, interface=None, logs=None, cookies=None, monitoring=print):
+        super().__init__(interface=interface, logs=logs, cookies=cookies, monitoring=monitoring)
+        self.naurok = Load_data(cookies=self.cookies, qt_logs=self.logs, monitoring=monitoring)
 
     def search(self, search_query=None, subject=None, grade=None, pagination=(1,11), proxy=None):
         a = self.naurok.search(
@@ -477,5 +478,5 @@ class Main(MainPlugin):
 
 if __name__ == '__main__':
     a = Main(cookies=json.load(open("data/cookies/naurok")))
-    q = a.search(pagination=(1,4), proxy="http://127.0.0.1:2876")
+    q = a.search(pagination=(1,3))
     print(q)

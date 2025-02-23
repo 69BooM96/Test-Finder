@@ -1,10 +1,11 @@
 class MainPlugin:
     subject = {}
     grade = {}
-    def __init__(self, interface, logs=None, cookies=None):
+    def __init__(self, interface, logs=None, cookies=None, monitoring=print):
         self.interface = interface
         self.logs = logs
         self.cookies = cookies
+        self.monitoring = monitoring
         self.res_list = []
 
 

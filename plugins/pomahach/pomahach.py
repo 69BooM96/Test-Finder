@@ -9,8 +9,9 @@ from modules.plugin_param import *
 
 
 class Load_data:
-	def __init__(self, qt_logs=None):
+	def __init__(self, qt_logs=None, monitoring=print):
 		self.qt_logs = qt_logs
+		self.monitoring = monitoring
 
 	def search(self, subject, storinka=(1,2), proxy=None):
 		async def async_search(session: aiohttp.ClientSession, storinka):
@@ -21,7 +22,7 @@ class Load_data:
 
 			return [obj.get("href") for obj in soup.find_all(class_="list-group-item")]
 
-		@async_session(None)
+		@async_session(None, log_func=self.monitoring)
 		async def run(session):
 			task = [async_search(session, storinka=item) for item in range(*storinka)]
 			return await asyncio.gather(*task)
@@ -53,7 +54,7 @@ class Load_data:
 					} for obj in soup.find_all(class_="list-group")[1].find_all("li")]
 				}]}
 
-		@async_session(None)
+		@async_session(None, log_func=self.monitoring)
 		async def run(session):
 			task = [async_processing_data(session, url) for url in url if url[:30] == "https://pomahach.com/question/"]
 			return await asyncio.gather(*task)
@@ -244,9 +245,9 @@ class Main(MainPlugin):
 		"upovnovazhena-osoba-z-publichnih-zakupivel": ("/cat/upovnovazhena-osoba-z-publichnih-zakupivel/", 0)
 	}
 
-	def __init__(self, interface=None, logs=None, cookies=None):
-		super().__init__(interface=interface, logs=logs, cookies=cookies)
-		self.pomohach = Load_data(self.logs)
+	def __init__(self, interface=None, logs=None, cookies=None, monitoring=print):
+		super().__init__(interface=interface, logs=logs, cookies=cookies, monitoring=monitoring)
+		self.pomohach = Load_data(self.logs, monitoring=self.monitoring)
 
 	def search(self, search_query=None, subject=None, grade=None, pagination=(1, 11), proxy=None):
 		if not subject:
