@@ -76,6 +76,7 @@ class Search_parser(QThread):
 		QThread.__init__(self)
 		self.mainwindows = mainwindows
 		self.urls_data_list = []
+		self.results = 0
 		self.len_url_list = 0
 		self.platforms_num = 0
 		self.wiki_text_data = ""
@@ -90,13 +91,13 @@ class Search_parser(QThread):
 			index_sessions = item_num.row()
 
 		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
-		self.urls_data_list = Main.search_data(q=self.mainwindows.text_search)
+		self.urls_data_list, self.platforms_num, self.results = Main.search_data(q=self.mainwindows.text_search)
 		Main.processing_data(q=self.mainwindows.text_search, index_session=index_sessions, list_urls=self.urls_data_list)
 		self.wiki_title_data, self.wiki_text_data, self.wiki_img_data = Main.wiki_data(q=self.mainwindows.text_search)
 
 		# sr_data.wiki_data(self)
 		self.progress_signal.emit(100)
-		self.update_data_signal.emit(index_sessions, len(self.urls_data_list), self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data, "img": self.wiki_img_data})
+		self.update_data_signal.emit(index_sessions, self.results, self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data, "img": self.wiki_img_data})
 		self.progress_signal.emit(0)
 
 class Img_load(QThread):
