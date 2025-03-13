@@ -46,7 +46,7 @@ class Ui_Form(object):
         self.pushButton.setMinimumSize(QtCore.QSize(50, 50))
         self.pushButton.setMaximumSize(QtCore.QSize(50, 50))
         self.pushButton.setStyleSheet("QPushButton {\n"
-"    border-radius: 5px;\n"
+"    border-radius: 4px;\n"
 "    background-color: rgb(56, 58, 64);\n"
 "    border: 2px solid rgb(56, 58, 64);\n"
 "}\n"
@@ -140,7 +140,7 @@ class Ui_Form(object):
         self.frame_4.setStyleSheet("QLabel {\n"
 "    color: rgb(255, 255, 255);\n"
 "    background-color: rgb(23, 24, 26);\n"
-"    border-radius: 5px;\n"
+"    border-radius: 3px;\n"
 "}")
         self.frame_4.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame_4.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -247,7 +247,7 @@ class Ui_Form(object):
         self.frame_3.setStyleSheet("QLabel {\n"
 "    color: rgb(255, 255, 255);\n"
 "    background-color: rgb(23, 24, 26);\n"
-"    border-radius: 5px;\n"
+"    border-radius: 3px;\n"
 "}")
         self.frame_3.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)

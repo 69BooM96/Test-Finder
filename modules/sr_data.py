@@ -54,17 +54,21 @@ class PluginStart:
 
 	def search_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None):
 		list_urls = {}
+		pl_num = 4
+		results = 0
 		try:
 			for Main in self.load_info():
 				try:
 					if Main[1]:
 						data = Main[1].search(search_query=q, subject=subject, grade=klass, pagination=storinka, proxy=proxy)
 						list_urls[Main[0]] = data
+						pl_num += 1
+						results += len(data)
 				except Exception as e:
 					pass
 		except:
 			pass
-		return list_urls
+		return list_urls, pl_num, results
 
 	def processing_data(self, q=None, index_session=0, list_urls=None, proxy=None):
 		temp_json = []
