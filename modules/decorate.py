@@ -1,44 +1,81 @@
-import aiohttp
-import json
+from http.cookies import SimpleCookie
 
-from typing import Type, Callable, Optional, Dict, Any
+import aiohttp
+
+from typing import Type, Callable
 from threading import Thread
 
+from aiohttp import ClientRequest, ClientResponse
 from fake_useragent import UserAgent
 
+class _LoggingRequest(ClientRequest):
+    def __init__(self, *args, log_funk=print, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log_funk = log_funk
 
-def async_session(cookies: Optional[Dict[str, str]] = None, headers: Optional[Dict[str, str]] = None, log_func=print):
-    async def _on_request_start(session, trace_config_ctx, params, log_func):
-        request_data = {
-            "event": "request_started",
-            "method": params.method,
-            "url": str(params.url),
-            "headers": dict(params.headers),
-            "cookies": {key: value.value for key, value in session.cookie_jar.filter_cookies(params.url).items()}
-        }
-        if log_func: log_func(request_data)
+    async def send(self, conn):
+        cookies = {}
+        if self.headers.get("Cookie"):
+            cookie = SimpleCookie()
+            cookie.load(self.headers["Cookie"])
+            cookies = {k: v.value for k, v in cookie.items()}
+        if self.log_funk: self.log_funk(
+            {
+                "event": "request_started",
+                "method": self.method,
+                "url": str(self.url),
+                "headers": dict(self.headers),
+                "cookies": cookies
+            }
+        )
 
-    async def _on_request_end(session, trace_config_ctx, params, log_func):
-        response_data = {
+        return await super().send(conn)
+
+class _LoggingResponse(ClientResponse):
+    def __init__(self, *args, log_funk=print, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log_funk = log_funk
+
+    async def start(self, connection):
+        await super().start(connection)
+
+        body = None
+        res_type = self.headers.get("Content-Type", "").lower()
+
+        if "json" in res_type:
+            body = await self.json()
+        elif "text" in res_type:
+            body = await self.text()
+        elif "image" in res_type:
+            body = self.read()
+        else:
+            body = await self.text()
+
+        cookies = {}
+        if self.headers.get("Cookie"):
+            cookie = SimpleCookie()
+            cookie.load(self.headers["Cookie"])
+            cookies = {k: v.value for k, v in cookie.items()}
+
+        if self.log_funk: self.log_funk({
             "event": "request_ended",
-            "url": str(params.url),
-            "status": params.response.status,
-            "headers": dict(params.response.headers),
-            "cookies": {key: value.value for key, value in session.cookie_jar.filter_cookies(params.url).items()},
-        }
-        if log_func: log_func(response_data)
+            "url": str(self.url),
+            "status": self.status,
+            "headers": dict(self.headers),
+            "cookies": cookies,
+            "body": body
+        })
 
+
+def async_session(cookies=None, headers=None, log_func=print):
     def wrappers(funk: Callable):
         async def wrapper(*args, **kwargs):
-            trace_config = aiohttp.TraceConfig()
-            trace_config.on_request_start.append(lambda *args: _on_request_start(*args, log_func=log_func))
-            trace_config.on_request_end.append(lambda *args: _on_request_end(*args, log_func=log_func))
-
             async with aiohttp.ClientSession(
-                    headers=headers or {"user-agent": UserAgent().random},
-                    timeout=aiohttp.ClientTimeout(15),
-                    cookies=cookies,
-                    trace_configs=[trace_config]
+                headers=headers or {"user-agent": UserAgent().random},
+                timeout=aiohttp.ClientTimeout(15),
+                cookies=cookies,
+                request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=print, **kwargs),
+                response_class=lambda *args, **kwargs: _LoggingResponse(*args, log_funk=print, **kwargs),
             ) as session:
                 return await funk(session, *args, **kwargs)
 

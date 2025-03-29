@@ -141,6 +141,8 @@ class Load_data:
             async with session.get(url, data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
+            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
+
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
         @async_session(self.cookies, log_func=self.monitoring)
@@ -477,6 +479,7 @@ class Main(MainPlugin):
         return test.end_create()
 
 if __name__ == '__main__':
-    a = Main(cookies=json.load(open("data/cookies/naurok")))
-    q = a.search(pagination=(1,3))
+    a = Main()
+    q = a.search(pagination=(1,2))
+    print(a.processing_data(q))
     print(q)
