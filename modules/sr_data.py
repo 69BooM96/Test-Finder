@@ -5,6 +5,7 @@ import json
 import importlib
 import traceback
 import wikipedia
+import multiprocessing
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
 
@@ -14,6 +15,7 @@ class PluginStart:
 		self.front = front
 		self.plName = plName
 		self.qtLogs = qtLogs
+		self.multi_logs = multiprocessing.Queue()
 		self.qtProgress = qtProgress
 		self.progress_pl = 0
 		self.progress_index = 0
@@ -43,9 +45,9 @@ class PluginStart:
 						try:
 							with open(f"data/cookies/{pl_name}", "r", encoding="utf-8") as f:
 								cookies=json.load(f)
-							PL_DATA = plugin.Main(interface=self.front, cookies=cookies, logs=self.qtLogs)
+							PL_DATA = plugin.Main(interface=self.front, cookies=cookies, logs=self.multi_logs)
 						except:
-							PL_DATA = plugin.Main(interface=self.front, logs=self.qtLogs)
+							PL_DATA = plugin.Main(interface=self.front, logs=self.multi_logs)
 
 						yield [pl_name, PL_DATA]
 
@@ -60,7 +62,19 @@ class PluginStart:
 			for Main in self.load_info():
 				try:
 					if Main[1]:
-						data = Main[1].search(search_query=q, subject=subject, grade=klass, pagination=storinka, proxy=proxy)
+						# data = Main[1].search()
+						data = None
+						load_pr = multiprocessing.Process(target=Main[1].search, args=(q, subject, klass, storinka, proxy,))
+						load_pr.start()
+
+						while load_pr.is_alive() or not self.multi_logs.empty():
+							if not self.multi_logs.empty():
+								msg = self.multi_logs.get()
+								if msg["type"] == "logs":
+									self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
+								elif msg["type"] == "data": data = msg["data"]
+						load_pr.join()
+
 						list_urls[Main[0]] = data
 						pl_num += 1
 						results += len(data)
@@ -75,7 +89,19 @@ class PluginStart:
 		for Main in self.load_info():
 			try:
 				if Main[1]:
-					data = Main[1].processing_data(urls=list_urls[Main[0]], proxy=proxy)
+					data = None
+					load_pr = multiprocessing.Process(target=Main[1].processing_data, args=(list_urls[Main[0]], proxy,))
+					load_pr.start()
+
+					while load_pr.is_alive() or not self.multi_logs.empty():
+						if not self.multi_logs.empty():
+							msg = self.multi_logs.get()
+							if msg["type"] == "logs": self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
+							elif msg["type"] == "data": data = msg["data"]
+
+					load_pr.join()
+
+					# data = Main[1].processing_data(urls=list_urls[Main[0]], proxy=proxy)
 
 					if q:
 						score = {

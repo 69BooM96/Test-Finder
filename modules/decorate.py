@@ -1,15 +1,12 @@
-from http.cookies import SimpleCookie
-
 import aiohttp
-
+from http.cookies import SimpleCookie
 from typing import Type, Callable
 from threading import Thread
-
 from aiohttp import ClientRequest, ClientResponse
 from fake_useragent import UserAgent
 
 class _LoggingRequest(ClientRequest):
-    def __init__(self, *args, log_funk=print, **kwargs):
+    def __init__(self, *args, log_funk=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_funk = log_funk
 
@@ -32,7 +29,7 @@ class _LoggingRequest(ClientRequest):
         return await super().send(conn)
 
 class _LoggingResponse(ClientResponse):
-    def __init__(self, *args, log_funk=print, **kwargs):
+    def __init__(self, *args, log_funk=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_funk = log_funk
 
@@ -74,15 +71,14 @@ def async_session(cookies=None, headers=None, log_func=print):
                 headers=headers or {"user-agent": UserAgent().random},
                 timeout=aiohttp.ClientTimeout(15),
                 cookies=cookies,
-                request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=print, **kwargs),
-                response_class=lambda *args, **kwargs: _LoggingResponse(*args, log_funk=print, **kwargs),
+                request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=None, **kwargs),
+                response_class=lambda *args, **kwargs: _LoggingResponse(*args, log_funk=None, **kwargs),
             ) as session:
                 return await funk(session, *args, **kwargs)
 
         return wrapper
 
     return wrappers
-
 
 def try_except(exp: Type[BaseException], funk=(lambda ex: print(ex))):
     def wrappers(fun):
@@ -94,10 +90,8 @@ def try_except(exp: Type[BaseException], funk=(lambda ex: print(ex))):
         return wrapper
     return wrappers
 
-
 def thread(funk):
     def wrapper(*args, **kwargs):
         Thread(target=funk, args=args, kwargs=kwargs).start()
     return wrapper
-
 

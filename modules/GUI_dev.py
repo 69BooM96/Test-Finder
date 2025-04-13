@@ -16,92 +16,76 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(848, 552)
         MainWindow.setStyleSheet("/* VERTICAL SCROLLBAR */\n"
-" QScrollBar:vertical {\n"
+"QScrollBar:vertical {\n"
 "    border: none;\n"
 "    background-color: rgb(30, 31, 34);\n"
 "    width: 7px;\n"
 "    border-radius: 0px;\n"
-" }\n"
+"}\n"
 "\n"
-"/*  HANDLE BAR VERTICAL */\n"
-"QScrollBar::handle:vertical {    \n"
+"QScrollBar::handle:vertical {\n"
 "    background-color: rgb(43, 45, 49);\n"
 "    min-height: 2px;\n"
 "    border-radius: 2px;\n"
 "    margin-right: 1px;\n"
 "    margin-left: 1px;\n"
 "}\n"
-"QScrollBar::handle:vertical:hover{    \n"
+"QScrollBar::handle:vertical:hover {\n"
 "    background-color: rgb(63, 65, 69);\n"
 "}\n"
-"QScrollBar::handle:vertical:pressed {    \n"
+"QScrollBar::handle:vertical:pressed {\n"
 "    background-color: rgb(53, 55, 59);\n"
 "}\n"
 "\n"
-"/* horizontal SCROLLBAR */\n"
-" QScrollBar:horizontal {\n"
+"/* HORIZONTAL SCROLLBAR */\n"
+"QScrollBar:horizontal {\n"
 "    border: none;\n"
 "    background-color: rgb(30, 31, 34);\n"
 "    height: 10px;\n"
 "    border-radius: 0px;\n"
-" }\n"
+"}\n"
 "\n"
-"/*  HANDLE BAR horizontal */\n"
-"QScrollBar::handle:horizontal {    \n"
+"QScrollBar::handle:horizontal {\n"
 "    background-color: rgb(43, 45, 49);\n"
 "    min-width: 7px;\n"
 "    border-radius: 2px;\n"
 "    margin-top: 1px;\n"
 "    margin-bottom: 4px;\n"
 "}\n"
-"QScrollBar::handle:horizontal:hover{    \n"
+"QScrollBar::handle:horizontal:hover {\n"
 "    background-color: rgb(63, 65, 69);\n"
 "}\n"
-"QScrollBar::handle:horizontal:pressed {    \n"
+"QScrollBar::handle:horizontal:pressed {\n"
 "    background-color: rgb(53, 55, 59);\n"
 "}\n"
 "\n"
-"/* BTN TOP - SCROLLBAR */\n"
-"QScrollBar::sub-line {\n"
-"    border: none;\n"
-"    background-color: none;\n"
-"    height: none;\n"
-"    border-top-left-radius: none;\n"
-"    border-top-right-radius: none;\n"
-"    subcontrol-position: none;\n"
-"    subcontrol-origin: none;\n"
-"}\n"
-"QScrollBar::sub-line:hover {    \n"
-"    background-color: none;\n"
-"}\n"
-"QScrollBar::sub-line:pressed {    \n"
-"    background-color: none;\n"
-"}\n"
-"\n"
-"/* BTN BOTTOM - SCROLLBAR */\n"
+"/* REMOVE BUTTONS */\n"
+"QScrollBar::sub-line,\n"
 "QScrollBar::add-line {\n"
 "    border: none;\n"
-"    background-color: none;\n"
-"    height: none;\n"
-"    border-bottom-left-radius: none;\n"
-"    border-bottom-right-radius: none;\n"
-"    subcontrol-position: none;\n"
-"    subcontrol-origin: none;\n"
-"}\n"
-"QScrollBar::add-line:hover {    \n"
-"    background-color: none;\n"
-"}\n"
-"QScrollBar::add-line:pressed {    \n"
-"    background-color: none;\n"
+"    background: transparent;\n"
+"    height: 0px;\n"
+"    width: 0px;\n"
 "}\n"
 "\n"
-"/* RESET ARROW */\n"
-"QScrollBar::up-arrow, QScrollBar::down-arrow {\n"
+"QScrollBar::sub-line:hover,\n"
+"QScrollBar::add-line:hover,\n"
+"QScrollBar::sub-line:pressed,\n"
+"QScrollBar::add-line:pressed {\n"
+"    background: transparent;\n"
+"}\n"
+"\n"
+"/* REMOVE ARROWS */\n"
+"QScrollBar::up-arrow,\n"
+"QScrollBar::down-arrow {\n"
+"    background: transparent;\n"
+"}\n"
+"\n"
+"QScrollBar::add-page,\n"
+"QScrollBar::sub-page {\n"
 "    background: none;\n"
 "}\n"
-"QScrollBar::add-page, QScrollBar::sub-page {\n"
-"    background: none;\n"
-"}\n"
+"\n"
 "\n"
 "QWidget {\n"
 "    background-color: rgb(15,16,17);\n"
@@ -196,7 +180,8 @@ class Ui_MainWindow(object):
 "QListWidget::item:hover {\n"
 "    background-color: rgb(66, 68, 74);\n"
 "    border-left: -2px solid rgb(0, 0, 0);\n"
-"}")
+"}\n"
+"")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
@@ -220,9 +205,32 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
         self.tableWidget.setSizePolicy(sizePolicy)
-        self.tableWidget.setStyleSheet("QTableView {\n"
-"    selection-background-color: rgb(56, 58, 64);\n"
-"}")
+        self.tableWidget.setStyleSheet("QHeaderView::section {\n"
+"\n"
+"    padding: 2px;\n"
+"    border-left: 1px solid rgb(45, 42, 42);\n"
+"    border-right: 1px solid rgb(45, 42, 42);\n"
+"    border-top: 2px solid rgb(23, 24, 26);\n"
+"    border-bottom: 2px solid rgb(56, 58, 64);\n"
+"    font-weight: bold;\n"
+"}\n"
+"\n"
+"QHeaderView::section:horizontal {\n"
+"    text-align: left;\n"
+"}\n"
+"\n"
+"QHeaderView::section:vertical {\n"
+"    text-align: center;\n"
+"}\n"
+"QTableView::item:focus {\n"
+"    outline: none; /* убрать рамку фокуса */\n"
+"}\n"
+"\n"
+"QTableView::item:selected:active {\n"
+"    background-color: rgb(56, 58, 64);\n"
+"}\n"
+"\n"
+"")
         self.tableWidget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.tableWidget.setShowGrid(False)
         self.tableWidget.setGridStyle(QtCore.Qt.NoPen)
@@ -230,7 +238,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setCornerButtonEnabled(False)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(8)
-        self.tableWidget.setRowCount(11)
+        self.tableWidget.setRowCount(21)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -253,6 +261,26 @@ class Ui_MainWindow(object):
         self.tableWidget.setVerticalHeaderItem(9, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setVerticalHeaderItem(10, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(11, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(12, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(13, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(14, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(15, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(16, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(17, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(18, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(19, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(20, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -302,17 +330,17 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setItem(7, 1, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(8, 0, item)
+        self.tableWidget.setItem(18, 0, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(8, 1, item)
+        self.tableWidget.setItem(18, 1, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(9, 0, item)
+        self.tableWidget.setItem(19, 0, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(9, 1, item)
+        self.tableWidget.setItem(19, 1, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(10, 0, item)
+        self.tableWidget.setItem(20, 0, item)
         item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setItem(10, 1, item)
+        self.tableWidget.setItem(20, 1, item)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setVisible(False)
@@ -460,7 +488,10 @@ class Ui_MainWindow(object):
         self.dockWidget_6.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         self.dockWidget_6.setObjectName("dockWidget_6")
         self.dockWidgetContents_6 = QtWidgets.QWidget()
-        self.dockWidgetContents_6.setStyleSheet("")
+        self.dockWidgetContents_6.setStyleSheet("Line {\n"
+"    background-color: rgb(15,16,17);\n"
+"}\n"
+"")
         self.dockWidgetContents_6.setObjectName("dockWidgetContents_6")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.dockWidgetContents_6)
         self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
@@ -484,6 +515,11 @@ class Ui_MainWindow(object):
         self.frame_5.setStyleSheet("QWidget {\n"
 "    background-color: rgb(23, 24, 26);\n"
 "}\n"
+"Line {\n"
+"    background-color: rgb(15,16,17);\n"
+"}\n"
+"\n"
+"\n"
 "QPushButton {\n"
 "    border-radius: 0.1px;\n"
 "}\n"
@@ -498,7 +534,8 @@ class Ui_MainWindow(object):
 "QPushButton:checked {\n"
 "    background-color: rgb(39, 41, 46);\n"
 "    border-top: 2px solid rgb(59, 61, 66);\n"
-"}")
+"}\n"
+"")
         self.frame_5.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.frame_5.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_5.setObjectName("frame_5")
@@ -513,6 +550,7 @@ class Ui_MainWindow(object):
         self.line_12.setObjectName("line_12")
         self.gridLayout_7.addWidget(self.line_12, 1, 0, 1, 1)
         self.line_15 = QtWidgets.QFrame(self.frame_5)
+        self.line_15.setStyleSheet("")
         self.line_15.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_15.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_15.setObjectName("line_15")
@@ -529,7 +567,7 @@ class Ui_MainWindow(object):
         self.pushButton_11.setObjectName("pushButton_11")
         self.gridLayout_7.addWidget(self.pushButton_11, 1, 7, 1, 1)
         self.line_11 = QtWidgets.QFrame(self.frame_5)
-        self.line_11.setStyleSheet("background-color: rgb(15,16,17);")
+        self.line_11.setStyleSheet("")
         self.line_11.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_11.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_11.setObjectName("line_11")
@@ -602,7 +640,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7.addItem(spacerItem, 1, 11, 1, 1)
         self.gridLayout_4.addWidget(self.frame_5, 0, 0, 1, 1)
         self.line = QtWidgets.QFrame(self.frame_2)
-        self.line.setStyleSheet("background-color: rgb(15,16,17);")
+        self.line.setStyleSheet("")
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
@@ -766,6 +804,26 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        item = self.tableWidget.verticalHeaderItem(8)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(9)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(10)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(11)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(12)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(13)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(14)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(15)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(16)
+        item.setText(_translate("MainWindow", "New Row"))
+        item = self.tableWidget.verticalHeaderItem(17)
+        item.setText(_translate("MainWindow", "New Row"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Status"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -816,17 +874,17 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "  200  "))
         item = self.tableWidget.item(7, 1)
         item.setText(_translate("MainWindow", "  POST"))
-        item = self.tableWidget.item(8, 0)
+        item = self.tableWidget.item(18, 0)
         item.setText(_translate("MainWindow", "  200  "))
-        item = self.tableWidget.item(8, 1)
+        item = self.tableWidget.item(18, 1)
         item.setText(_translate("MainWindow", "  GET"))
-        item = self.tableWidget.item(9, 0)
+        item = self.tableWidget.item(19, 0)
         item.setText(_translate("MainWindow", "  200  "))
-        item = self.tableWidget.item(9, 1)
+        item = self.tableWidget.item(19, 1)
         item.setText(_translate("MainWindow", "  POST"))
-        item = self.tableWidget.item(10, 0)
+        item = self.tableWidget.item(20, 0)
         item.setText(_translate("MainWindow", "  200  "))
-        item = self.tableWidget.item(10, 1)
+        item = self.tableWidget.item(20, 1)
         item.setText(_translate("MainWindow", "  POST"))
         self.tableWidget.setSortingEnabled(__sortingEnabled)
         self.dockWidget_6.setWindowTitle(_translate("MainWindow", "[===]"))
