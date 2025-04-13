@@ -91,11 +91,12 @@ class Search_parser(QThread):
 			index_sessions = item_num.row()
 
 		Main = sr_data.PluginStart(front=self.mainwindows, qtLogs=self.log_signal, qtProgress=self.progress_signal)
+
 		self.urls_data_list, self.platforms_num, self.results = Main.search_data(q=self.mainwindows.text_search)
 		Main.processing_data(q=self.mainwindows.text_search, index_session=index_sessions, list_urls=self.urls_data_list)
+
 		self.wiki_title_data, self.wiki_text_data, self.wiki_img_data = Main.wiki_data(q=self.mainwindows.text_search)
 
-		# sr_data.wiki_data(self)
 		self.progress_signal.emit(100)
 		self.update_data_signal.emit(index_sessions, self.results, self.platforms_num, f"{time.perf_counter()-start_time:.02f}", {"title": self.wiki_title_data, "text": self.wiki_text_data, "img": self.wiki_img_data})
 		self.progress_signal.emit(0)
@@ -224,6 +225,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.win_resizing_top = False
 		self.win_resizing_bottom = False
 		self.win_resizing_px = 4
+		self.pl_list = []
 
 	#Class
 		self.parser_search = Search_parser(mainwindows=self)
@@ -289,6 +291,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 	#list Widget
 		self.listWidget_3.itemClicked.connect(self.set_quiz_data)
 		self.listWidget_2.itemClicked.connect(self.open_session)
+		self.listWidget_10.itemClicked.connect(self.pl_info_auto)
 
 	#Preload
 		self.start_session()
@@ -424,7 +427,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 				...
 
 		elif page_load["page"] == "settings":
-			self.stackedWidget.setCurrentIndex(3)
+			self.stackedWidget.setCurrentIndex(4)
 			self.lineEdit.setText("settings")
 			if page_load["data"]:
 				...
@@ -472,9 +475,9 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		with open(f"data/sessions.json", "r", encoding="utf-8") as file_r:
 			session_sr = json.load(file_r)
 
-		self.label_3.setText(f"[results]: [{session_sr[index_sessions]["search"]['results']}]")
-		self.label_4.setText(f"[platforms]: [{session_sr[index_sessions]["search"]['platforms']}]")
-		self.label_5.setText(f"[time]: [{session_sr[index_sessions]["search"]['times']}]")
+		self.label_3.setText(f" [results]: [{session_sr[index_sessions]["search"]['results']}] ")
+		self.label_4.setText(f" [platforms]: [{session_sr[index_sessions]["search"]['platforms']}] ")
+		self.label_5.setText(f" [time]: [{session_sr[index_sessions]["search"]['times']}] ")
 
 		if session_sr[index_sessions]['wiki']['title']: 
 			self.textBrowser_7.show()
@@ -516,13 +519,13 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 			self.listWidget_3.addItem(item)
 			self.listWidget_3.setItemWidget(item, ItemQWidget)
 
-
 #Pl_info|===============================================|
 	def search_local_pl(self):
 		...
 
 	@try_except(Exception, funk=(lambda ex: None))
 	def search_online_pl(self, pl_list):
+		self.pl_list = pl_list
 		for data in pl_list:
 			try:
 				if data != None:
@@ -539,6 +542,11 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 					item.setSizeHint(QtCore.QSize(120, 80))
 					self.listWidget_9.addItem(item)
 					self.listWidget_9.setItemWidget(item, ItemQWidget)
+
+					item = QtWidgets.QListWidgetItem(self.listWidget_10)
+					item.setText(f"{data["name"]}")
+					item.setCheckState(QtCore.Qt.Unchecked)
+					self.listWidget_10.addItem(item)
 			except:
 				pass
 
@@ -546,6 +554,13 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		clipboard = QApplication.clipboard()
 		clipboard.setText(url.data(Qt.ItemDataRole.UserRole))
 
+	@try_except(Exception, funk=(lambda ex: None))
+	def pl_info_auto(self):
+		for item_num in self.listWidget_10.selectedIndexes():
+			index_pl = item_num.row()
+
+		meta_pl = ld_plugins.local_info_pl(self.pl_list[index_pl]["file"])
+		self.textBrowser_8.setText(f"{meta_pl["name"]}\n{meta_pl["type"]}\n{meta_pl["author"]}\n{meta_pl["version"]}\n{meta_pl["status"]}\n{meta_pl["git"]}")
 
 #Load_answer|===========================================|
 	def load_answer(self):
@@ -680,7 +695,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 		self.stackedWidget_5.setCurrentIndex(0)
 
 	def open_settings(self):
-		self.stackedWidget.setCurrentIndex(3)
+		self.stackedWidget.setCurrentIndex(4)
 		self.add_history_sessions("settings")
 
 	#Close
@@ -694,12 +709,12 @@ class ExampleApp(QtWidgets.QMainWindow, GUI.Ui_MainWindow):
 #System|================================================|
 	def logs(self, type_log: Literal["info", "INFO", "WARN", "ERROR"], theme_log="none", text_log=""):
 		time_ = time.strftime("%H:%M:%S")
-		data_log = [f"[{time_}]", f"<{type_log}>", f"[{theme_log}]", f"[{text_log}]"]
+		data_log = f"[{time_}] <{type_log}> [{theme_log}]{text_log}"
 		
 		with open(f"logs/{time.strftime('%Y-%m-%d')}.log", "a", encoding="utf-8") as log_wr:
 			log_wr.write(f'{data_log}\n')
 
-		print(f"[{time_}] <{type_log}> [{theme_log}]{text_log}")
+		print(data_log)
 		
 		if type_log == "ERROR":
 			data_log = f'<span style="color:#F23F43;">[{time_}] &lt;ERROR&gt; <{type_log}> [{theme_log}]{text_log}</span>'
