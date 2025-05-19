@@ -69,7 +69,7 @@ def async_session(cookies=None, headers=None, log_func=print):
         async def wrapper(*args, **kwargs):
             async with aiohttp.ClientSession(
                 headers=headers or {"user-agent": UserAgent().random},
-                timeout=aiohttp.ClientTimeout(15),
+                timeout=aiohttp.ClientTimeout(total=20),
                 cookies=cookies,
                 request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=None, **kwargs),
                 response_class=lambda *args, **kwargs: _LoggingResponse(*args, log_funk=None, **kwargs),
