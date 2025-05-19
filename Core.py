@@ -121,6 +121,7 @@ class Img_load(QThread):
 
 			queue = multiprocessing.Queue()
 			load_pr = multiprocessing.Process(target=ld_image.load_img, args=(l_img, queue))
+			load_pr.daemon = True
 			load_pr.start()
 
 			while load_pr.is_alive() or not queue.empty():
