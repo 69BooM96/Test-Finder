@@ -73,10 +73,6 @@ class Searcher:
         raise NotMetodError
 
 
-
-
-
-
 class NotCookiesError(AttributeError):
     def __init__(self, *args):
         super().__init__("Не указан атрибут метода \"Cookies\"")

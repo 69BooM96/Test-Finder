@@ -7,7 +7,8 @@ import traceback
 import wikipedia
 import multiprocessing
 from bs4 import BeautifulSoup
-from fuzzywuzzy import fuzz
+from modules import sr_scan
+from modules import toolset
 
 
 class PluginStart:
@@ -56,28 +57,33 @@ class PluginStart:
 
 	def search_data(self, subject=None, klass=None, q=None, storinka=(1, 2), proxy=None):
 		list_urls = {}
+		processes = []
 		pl_num = 4
 		results = 0
 		try:
 			for Main in self.load_info():
 				try:
 					if Main[1]:
-						# data = Main[1].search()
-						data = None
 						load_pr = multiprocessing.Process(target=Main[1].search, args=(q, subject, klass, storinka, proxy,))
+						load_pr.daemon = True
+						processes.append({"processes": load_pr, "name": Main[0]})
 						load_pr.start()
+				except Exception as e:
+					pass
 
-						while load_pr.is_alive() or not self.multi_logs.empty():
-							if not self.multi_logs.empty():
-								msg = self.multi_logs.get()
-								if msg["type"] == "logs":
-									self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
-								elif msg["type"] == "data": data = msg["data"]
-						load_pr.join()
-
-						list_urls[Main[0]] = data
-						pl_num += 1
-						results += len(data)
+			for p in processes:
+				try:
+					data = None
+					while p["processes"].is_alive() or not self.multi_logs.empty():
+						if not self.multi_logs.empty():
+							msg = self.multi_logs.get()
+							if msg["type"] == "logs": self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
+							elif msg["type"] == "data": 
+								data = msg["data"]
+								list_urls[p["name"]] = data
+								pl_num += 1
+								results += len(data)
+					p["processes"].join()
 				except Exception as e:
 					pass
 		except:
@@ -85,57 +91,50 @@ class PluginStart:
 		return list_urls, pl_num, results
 
 	def processing_data(self, q=None, index_session=0, list_urls=None, proxy=None):
+		processes = []
+		data = None
 		temp_json = []
 		for Main in self.load_info():
 			try:
 				if Main[1]:
-					data = None
 					load_pr = multiprocessing.Process(target=Main[1].processing_data, args=(list_urls[Main[0]], proxy,))
+					load_pr.daemon = True
+					processes.append({"processes": load_pr, "name": Main[0]})
 					load_pr.start()
+			except Exception as e:
+				pass
 
-					while load_pr.is_alive() or not self.multi_logs.empty():
-						if not self.multi_logs.empty():
-							msg = self.multi_logs.get()
-							if msg["type"] == "logs": self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
-							elif msg["type"] == "data": data = msg["data"]
+		for p in processes:
+			try:
+				while p["processes"].is_alive() or not self.multi_logs.empty():
+					if not self.multi_logs.empty():
+						msg = self.multi_logs.get()
+						if msg["type"] == "logs": self.qtLogs.emit(msg["level"], msg["source"], msg["data"])
+						elif msg["type"] == "data": data = msg["data"]
 
-					load_pr.join()
+				if q:
+					scan_processes = []
+					scan_pr_num = 2
+					if len(data) > scan_pr_num: urls_scan = toolset.chunk_list(data, 2)
+					else: urls_scan = [data]
 
-					# data = Main[1].processing_data(urls=list_urls[Main[0]], proxy=proxy)
+					for index, item in enumerate(urls_scan):
+						scan_session = sr_scan.Scan(multi=self.multi_logs, text=q, data=item)
+						scan_pr = multiprocessing.Process(target=scan_session.tests, args=(True, True, True,))
+						scan_pr.daemon = True
+						scan_processes.append({"processes": scan_pr, "name": index})
+						scan_pr.start()
 
-					if q:
-						score = {
-							"index": None,
-							"text": None,
-							"score": 0
-						}
-						for item in data:
-							if item["name_test"]:
-								fzz_0 = fuzz.WRatio(item["name_test"], q)
-								if fzz_0 > score["score"]:
-									score["index"] = [-1, -1]
-									score["text"] = item["name_test"]
-									score["score"] = fzz_0
+					for scan_p in scan_processes:
+						while scan_p["processes"].is_alive() or not self.multi_logs.empty():
+							if not self.multi_logs.empty():
+								msg = self.multi_logs.get()
+								if msg["type"] == "scan": temp_json = temp_json+msg["data"]
+								elif msg["type"] == "logs": self.qtLogs.emit(msg["level"], msg["source"], f"[{scan_p["name"]+1}]/[{len(scan_processes)}]{msg["data"]}")
 
-								for index_answers, item_answers in enumerate(item["answers"]):
-									if item_answers["text"]:
-										fzz_1 = fuzz.WRatio(item_answers["text"], q)
-										if fzz_1 > score["score"]:
-											score["index"] = [index_answers, -1]
-											score["text"] = item_answers["text"]
-											score["score"] = fzz_1
+						scan_p["processes"].join()
 
-										for index_value, item_value in enumerate(item_answers["value"]):
-											if item_value["text"]:
-												fzz_2 = fuzz.WRatio(item_value["text"], q)
-												if fzz_2 > score["score"]:
-													score["index"] = [index_answers, index_value]
-													score["text"] = item_value["text"]
-													score["score"] = fzz_2
-
-							item["score"] = score
-							temp_json.append(item)
-
+				p["processes"].join()
 			except Exception as e:
 				pass
 
@@ -182,10 +181,11 @@ class PluginStart:
 
 			if page.images:
 			    img = page.images[-4]
-			
+
 			return title, text, img
 		except BaseException as e:
 			return None, None, None
+		# return None, None, None
 
 if __name__ == "__main__":
 	PluginStart().wiki_data(q="вулкан")
