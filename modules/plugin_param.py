@@ -1,7 +1,7 @@
 class MainPlugin:
     subject = {}
     grade = {}
-    def __init__(self, interface, logs=None, cookies=None, monitoring=print):
+    def __init__(self, interface, logs=None, cookies=None, monitoring=None):
         self.interface = interface
         self.logs = logs
         self.cookies = cookies

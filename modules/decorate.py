@@ -1,4 +1,7 @@
 import aiohttp
+import inspect
+from pathlib import Path
+
 from http.cookies import SimpleCookie
 from typing import Type, Callable
 from threading import Thread
@@ -29,12 +32,16 @@ class _LoggingRequest(ClientRequest):
         return await super().send(conn)
 
 class _LoggingResponse(ClientResponse):
-    def __init__(self, *args, log_funk=None, **kwargs):
+    def __init__(self, *args, qt_logs=None, log_funk=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.log_funk = log_funk
+        self.qt_logs = qt_logs
 
     async def start(self, connection):
         await super().start(connection)
+
+        if self.qt_logs and not 300 < self.status < 320:
+            self.qt_logs("info", f"{inspect.stack()[3].filename.split("\\")[-1]}", f"[{self.status}] [{str(self.url)}]")
 
         body = None
         res_type = self.headers.get("Content-Type", "").lower()
@@ -64,15 +71,15 @@ class _LoggingResponse(ClientResponse):
         })
 
 
-def async_session(cookies=None, headers=None, log_func=print):
+def async_session(cookies=None, headers=None, log_func=None, qt_logs=None):
     def wrappers(funk: Callable):
         async def wrapper(*args, **kwargs):
             async with aiohttp.ClientSession(
                 headers=headers or {"user-agent": UserAgent().random},
                 timeout=aiohttp.ClientTimeout(total=20),
                 cookies=cookies,
-                request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=None, **kwargs),
-                response_class=lambda *args, **kwargs: _LoggingResponse(*args, log_funk=None, **kwargs),
+                request_class=lambda *args, **kwargs: _LoggingRequest(*args, log_funk=log_func, **kwargs),
+                response_class=lambda *args, **kwargs: _LoggingResponse(*args, qt_logs=qt_logs, log_funk=log_func, **kwargs),
             ) as session:
                 return await funk(session, *args, **kwargs)
 

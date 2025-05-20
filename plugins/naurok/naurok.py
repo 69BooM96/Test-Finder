@@ -4,6 +4,8 @@ import requests
 import asyncio
 import aiohttp
 
+from functools import partial
+
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -11,22 +13,27 @@ from modules.decorate import async_session
 from modules.plugin_param import *
 
 
+
 class Load_data:
     def __init__(self, cookies=None, qt_logs=None, monitoring=print):
         self.qt_logs = qt_logs
         self.cookies = {item["name"]: item["value"] for item in cookies} if cookies else None
         self.monitoring = monitoring
+        self.async_session = partial(
+            async_session,
+            cookies=self.cookies,
+            log_func=self.monitoring,
+            qt_logs=self.qt_logs
+        )
 
     def search(self, subject="", klass=0, q="", storinka=(1,2), proxy=None) -> list[str]:
         async def async_search(session: aiohttp.ClientSession, storinka=1):
             async with session.get(f"https://naurok.com.ua/test{subject}/?klas-{klass}&q={q}&storinka={storinka}", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
             return ["https://naurok.com.ua" + obj.find("a").get("href") for obj in soup.find_all(class_="headline")]
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_search(session, storinka=item) for item in range(*storinka)]
             return await asyncio.gather(*task)
@@ -34,9 +41,6 @@ class Load_data:
         return list(set(item2 for item in asyncio.run(run()) for item2 in item))
 
     def search_by_url(self, url: list, proxy=None) -> list[dict]:
-        """Получение вопросов по UUID типо
-         https://naurok.com.ua/test/testing/0fad247b-cb1d-4355-b946-062bba08d6a6"""
-
         async def async_search_by_url(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
@@ -61,7 +65,7 @@ class Load_data:
             for item in res["questions"]
             ]
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_search_by_url(session, url) for url in url]
             return await asyncio.gather(*task)
@@ -73,8 +77,6 @@ class Load_data:
         async def async_processing_data(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
-
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             return {
                 "platform": "naurok",
@@ -97,7 +99,7 @@ class Load_data:
                 } for obj in soup.find(class_="col-md-9 col-sm-8").find_all(class_="content-block entry-item question-view-item")]
             }
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_processing_data(session, url) for url in url if url if url[:27] == "https://naurok.com.ua/test/"]
             return await asyncio.gather(*task)
@@ -109,8 +111,6 @@ class Load_data:
         async def async_get_test(session: aiohttp.ClientSession, url):
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
-
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
@@ -141,11 +141,9 @@ class Load_data:
             async with session.get(url, data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
             return soup.find(class_="form-control input-xs").get("value").split("=")[-1]
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_get_test(session, f"{url[:-5]}/set") for url in url]
             return await asyncio.gather(*task)
@@ -158,8 +156,6 @@ class Load_data:
             async with session.get("https://naurok.com.ua/test/join", proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
             data = {
                 "_csrf": soup.find(attrs={"name": "csrf-token"}).get("content"),
                 "JoinForm[gamecode]": gamecode,
@@ -169,14 +165,10 @@ class Load_data:
             async with session.post("https://naurok.com.ua/test/join", data=data, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
             session_id = soup.find(class_="{{test.font}}").get("ng-init").split(",")[1]
 
             async with session.get(f"https://naurok.com.ua/api2/test/sessions/{session_id}", proxy=proxy) as req:
                 session_res = await req.json()
-
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
 
             data = {
                 "answer": [
@@ -196,7 +188,7 @@ class Load_data:
                 uuid = await req.json()
                 return "https://naurok.com.ua/test/complete/" + uuid["session"]["uuid"]
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_test_pass(session, gamecode) for gamecode in gamecode]
             return await asyncio.gather(*task)
@@ -209,8 +201,6 @@ class Load_data:
             async with session.get(url, proxy=proxy) as req:
                 soup = BeautifulSoup(await req.text(), "lxml")
 
-            if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status}] [{str(req.url)}]")
-
             return [{
                 "type": obj.find(class_="homework-stat-option-line").find("span")['class'][1] if obj.find(class_="homework-stat-option-line").find("span") else None,
                 "text": "".join([item.text.strip() for item in obj.find(class_='homework-stat-question-line').find_all('p', recursive=False)]).replace(" ", "").replace("﻿", ""),
@@ -222,7 +212,7 @@ class Load_data:
                 } for item in obj.find(class_="homework-stat-options").find_all(class_="row")]
             } for obj in soup.find(class_="homework-stats").find_all(class_="content-block")]
 
-        @async_session(self.cookies, log_func=self.monitoring)
+        @self.async_session()
         async def run(session):
             task = [async_get_answer(session, url) for url in url]
             return await asyncio.gather(*task)
@@ -240,7 +230,7 @@ class CreateTest:
         req = self.session.get("https://naurok.com.ua/test/create")
         soup = BeautifulSoup(req.text, "lxml")
 
-        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+        if self.qt_logs: self.qt_logs("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         data = {
             '_csrf': soup.find('input', attrs={'name': '_csrf'})["value"],
@@ -278,12 +268,12 @@ class CreateTest:
 
         req = self.session.post('https://naurok.com.ua/api/test/questions?expand=options', json=data)
 
-        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+        if self.qt_logs: self.qt_logs("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
     def end_create(self):
         req = self.session.put(f"https://naurok.com.ua/api/test/documents/{self.doc_id}")
 
-        if self.qt_logs: self.qt_logs.emit("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
+        if self.qt_logs: self.qt_logs("info", f"Naurok", f" [{req.status_code}] [{str(req.url)}]")
 
         return f"https://naurok.com.ua/test/{req.json()["slug"]}.html"
 
@@ -408,7 +398,7 @@ class Main(MainPlugin):
         "11 клас": 11,
     }
 
-    def __init__(self, interface=None, logs=None, cookies=None, monitoring=print):
+    def __init__(self, interface=None, logs=None, cookies=None, monitoring=None):
         super().__init__(interface=interface, logs=logs, cookies=cookies, monitoring=monitoring)
         self.naurok = Load_data(cookies=self.cookies, qt_logs=self.logs, monitoring=monitoring)
 
@@ -457,7 +447,6 @@ class Main(MainPlugin):
             proxy=proxy,
         )
 
-    #create_test
     def test_build(self, name, subject, grade, questions: list[dict], proxy=None):
         if not self.cookies:
             raise NotCookiesError
@@ -479,7 +468,6 @@ class Main(MainPlugin):
         return test.end_create()
 
 if __name__ == '__main__':
-    a = Main()
-    q = a.search(pagination=(1,2))
-    print(a.processing_data(q))
+    a = Main(logs=print)
+    q = a.search(pagination=(1,3))
     print(q)
